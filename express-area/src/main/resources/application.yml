@@ -1,0 +1,116 @@
+##########################################################
+##
+## 端口，app名字
+##
+##########################################################
+server:
+  port: ${PORT:40500}
+  servlet:
+    context-path: /area
+spring:
+  application:
+    name: express-area
+  ##########################################################
+  ##
+  ## mysql 数据源配置
+  ##
+  ##########################################################
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.129.133:3306/express_area?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-timeout: 30000
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 60000
+      pool-name: DatebookHikariCP
+      max-lifetime: 28740000
+      #连接在连接池的最小生存时间（毫秒）
+      connection-test-query: SELECT 1
+  ##########################################################
+  ##
+  ## redis 数据源配置
+  ##
+  ##########################################################
+  redis:
+    host: 192.168.129.133
+    database: 0
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1ms # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 8 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 3000ms # 连接超时时间（毫秒）
+  ##########################################################
+  ##
+  ## nacos，sentinel配置
+  ##
+  ##########################################################
+  cloud:
+    nacos:
+      discovery:
+        # 指定nacos server的地址
+        server-addr: localhost:8848
+        cluster-name: EXPRESS
+    # 配置sentinel
+    sentinel:
+      filter:
+        # 打开/关闭掉对Spring MVC端点的保护
+        enabled: true
+      transport:
+        # 指定sentinel 控制台的地址
+        dashboard: localhost:8080
+  main:
+    allow-bean-definition-overriding: true
+
+##########################################################
+##
+## actuate 配置
+##
+##########################################################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+##########################################################
+##
+## mybatis-plus 配置
+##
+##########################################################
+mybatis-plus:
+  mapper-locations: classpath*:mapping/*.xml
+  global-config:
+    # 是否显示mybatis-plus图标
+    banner: false
+  typeEnumsPackage: com.cwj.express.common.enums
+  # SQL 执行log，调试时可打开
+  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false
+
+##########################################################
+##
+## 日志 配置
+##
+##########################################################
+logging.file: logs/${spring.application.name}.log
+logging:
+  file:
+    max-size: 10MB
+    max-history: 20
+  level:
+    root: info
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%-40.40logger{39}) %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39}[lineno:%line]: %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"

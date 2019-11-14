@@ -1,0 +1,49 @@
+@Cacheable(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+public OrderDashboardVO getUserDashboardData(String userId)
+删除缓存：
+    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+    public ResponseResult createOrder(OrderInfoVO orderInfoVO, String userId)
+
+    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+    public void cancelOrder(String orderId, String userId, LocalDateTime timeVersion)
+
+    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+    public void updatePayment(UpdateOrderVo orderVo, String userId)
+
+
+
+
+com.cwj.express.order.service.impl.OrderInfoServiceImpl.createOrder
+com.cwj.express.order.service.impl.OrderInfoServiceImpl.getOrderByIdAndUserId
+删除缓存：
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void updateOrderInfoById(OrderInfo orderInfo){
+        //清除订单详情缓存
+        String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + orderInfo.getUserId();
+        redisService.remove(key);
+        orderInfo.setUserId(null);
+        orderInfoMapper.updateById(orderInfo);
+    }
+
+    public void cancelOrder(String orderId, String userId, LocalDateTime timeVersion) {
+        OrderInfo orderInfo = OrderInfo.builder().id(orderId).orderStatus(OrderStatusEnum.CANCEL).updateDate(timeVersion).build();
+        OrderPayment orderPayment = OrderPayment.builder().orderId(orderId).paymentStatus(PaymentStatusEnum.TRADE_CLOSED).updateDate(timeVersion).build();
+        // 这里使用乐观锁更新，支付成功则是强制更新
+        boolean success1 = SqlHelper.retBool(orderPaymentMapper.updateById(orderPayment));
+        if (success1){
+            boolean success2 = SqlHelper.retBool(orderInfoMapper.updateById(orderInfo));
+            if (success2){
+                // 清除redis缓存
+                String key = RedisConfig.ORDER_INFO_DATA + "::" + orderId + userId;
+                redisService.remove(key);
+            }
+        }
+    }
+
+    public void updateOrder(OrderInfo orderInfo) {
+        //清除订单详情缓存
+        String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + orderInfo.getUserId();
+        redisService.remove(key);
+        orderInfo.setUserId(null);
+        orderInfoMapper.updateById(orderInfo);
+    }

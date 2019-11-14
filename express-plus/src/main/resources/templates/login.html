@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - Express</title>
+    <link th:href="@{/assets/css/bootstrap.min.css}" href="../static/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/assets/css/login.css}" href="../static/assets/css/.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="row" style="z-index:1000">
+        <div class="col-md-4  col-lg-5" >
+        </div>
+        <div class="col-md-8 col-sm-12 col-lg-7 col-xs-12 left" >
+            <div class="main">
+                <div class="mt10 pull-right">
+                    <a href="/register"><i class="glyphicon glyphicon-forward"></i>立即注册</a>
+                </div>
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active"><a href="#namePW" data-toggle="tab">用户名登陆</a></li>
+                    <li><a href="#phone" data-toggle="tab">短信验证登录</a></li>
+                    <li class="dropdown"> <a href="#face" data-toggle="tab">人脸登录</a> </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="namePW">
+                        <form role="form" action="/auth/form-login" method="post">
+                            <div class="form-group">
+                                <label for="name">用户名</label>
+                                <input type="text" class="form-control" id="name" name="username" placeholder="请输入用户名">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwd">密码</label>
+                                <input type="password" class="form-control" id="passwd" name="password" placeholder="请输入密码">
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label for="verifyCode">验证码</label>
+                                </div>
+                                <div class="row" >
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12" >
+                                        <input type="text" class="form-control" name="verifyCode" id="verifyCode" placeholder="请输入验证码">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 ">
+                                        <img src="/auth/code/getVerifyCode" title="看不清，请点我" onclick="refresh(this)" onmouseover="mouseover(this)" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkboxd">
+                                    <input type="checkbox" name="remember-me"> 自动登录</div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg btn-block" id="submit1">登录</button>
+                        </form>
+                        <div class="separa">
+                            <div class="row">
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 line"></div>
+                                <div class="col-md-2 col-sm-2 col-lg-2 col-xs-2"><span>or</span></div>
+                                <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 line"></div>
+                            </div>
+                            <button class="btn btn-default btn-lg btn-qq" onclick="window.location.href='/auth/third-login/qq'">
+                                <img width="30" th:src="@{/assets/img/qq.png}" src="../static/assets/img/qq.png" alt="Sign in with QQ"> Sign in with QQ
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="phone">
+                        <form role="form" action="/auth/mobile-login" method="post">
+                            <div class="form-group">
+                                <label for="inputTel">手机号</label>
+                                <input type="text" class="form-control" id="inputTel" name="mobile" placeholder="请输入手机号">
+                            </div>
+                            <div class="form-group">
+                                <label for="telCode">验证码</label>
+                                <div class="row" >
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 " >
+                                        <input type="text" class="form-control" id="telCode" name="smsCode" placeholder="请输入验证码">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 telCode">
+                                        <button type="button" class="btn btn-info" id="getTelCode"  >获取验证码</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg btn-block" id="submit2">登录</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="face">
+                        <div class="capture">
+                            <video id="video" autoplay></video>
+                            <canvas id="canvas" width="480" height="320" style="display: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="messageInfo" th:value="${message}">
+
+<script th:src="@{/assets/js/http.js}" src="../static/assets/js/http.js"></script>
+<script th:src="@{/assets/js/express.js}" src="../static/assets/js/express.js"></script>
+<script th:src="@{/assets/js/jquery.min.js}" src="../static/assets/js/jquery.min.js"></script>
+<script th:src="@{/assets/layer/layer.js}" src="../static/assets/layer/layer.js"></script>
+<script th:src="@{/assets/js/bootstrap.min.js}" src="../static/assets/js/bootstrap.min.js"></script>
+<script>
+    let cookieName = 'loginCookie';
+
+    $(function () {
+        // 传递消息
+        let text = $("#messageInfo").val();
+        if (text != null && text !== '') {
+            layer.msg(text, {icon: 2});
+            $("#messageInfo").val('');
+        }
+
+        // 验证码
+        $("#getTelCode").click(function () {
+            sendCode($("#getTelCode"));
+        });
+        let v = getCookieValue(cookieName);//获取cookie值
+        if (v > 0) {
+            setTime($("#getTelCode"));//开始倒计时
+        }
+    });
+
+    function refresh(obj) { obj.src = "/auth/code/getVerifyCode?" + Math.random(); }
+
+    function mouseover(obj) { obj.style.cursor = "pointer"; }
+
+    // 发送验证码
+    function sendCode(obj) {
+        let phoneNum = $("#inputTel").val();
+        if (!isPoneAvailable(phoneNum)) {
+            layer.msg("手机号码不合法", {icon: 7});
+            return false;
+        }
+        sendJson(HTTP.GET, '/auth/code/sms?mobile=' + phoneNum, null, false, function (res) {
+                if (res.code === 0) {
+                    layer.msg("短信发送成功", {icon: 1});
+                    addCookie(cookieName, 60, 60);//添加cookie记录,有效时间60s
+                    setTime(obj);//开始倒计
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            },
+            function () {
+                layer.msg("未知错误", {icon: 2});
+            });
+    }
+
+    //开始倒计时
+    function setTime(obj) {
+        let countdown = getCookieValue(cookieName);
+        if (countdown == 0) {
+            obj.removeAttr("disabled");
+            document.getElementById("getTelCode").innerText = '重新获取验证码';
+            return;
+        } else {
+            obj.attr("disabled", true);
+            document.getElementById("getTelCode").innerText = countdown + 's之后重新发送';
+            countdown--;
+            editCookie(cookieName, countdown, countdown + 1);
+        }
+        setTimeout(function () {
+            setTime(obj)
+        }, 1000) //每1000毫秒执行一次
+    }
+
+    // 切换tab页
+    let videoTimer = null;
+    $(function(){
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            let activeTab = $(e.target).text();
+            // 获取前一个激活的标签页的名称
+            if (activeTab == "人脸登录") {
+                startCamera();
+            } else {
+                if(streams) {
+                    streams.stop();
+                    videoTimer = null;
+                }
+                clearInterval(timers)
+            }
+            let previousTab = $(e.relatedTarget).text();
+            $(".active-tab span").html(activeTab);
+            $(".previous-tab span").html(previousTab);
+        });
+    });
+    // 获取摄像头使用权限
+    let file ,streams;
+    var timers = null;
+    //访问用户媒体设备的兼容方法
+    function getUserMedia(constraints, success, error) {
+        if (navigator.mediaDevices.getUserMedia) {
+            //最新的标准API
+            navigator.mediaDevices.getUserMedia(constraints).then(success).catch(error);
+        } else if (navigator.webkitGetUserMedia) {
+            //webkit核心浏览器
+            navigator.webkitGetUserMedia(constraints,success, error)
+        } else if (navigator.mozGetUserMedia) {
+            //firfox浏览器
+            navigator.mozGetUserMedia(constraints, success, error);
+        } else if (navigator.getUserMedia) {
+            //旧版API
+            navigator.getUserMedia(constraints, success, error);
+        }
+    }
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+
+    function success(stream) {
+        //兼容webkit核心浏览器
+        let CompatibleURL = window.URL || window.webkitURL;
+        //将视频流设置为video元素的源
+        streams = stream.getTracks()[0];
+        //video.src = CompatibleURL.createObjectURL(stream);
+        video.srcObject = stream;
+        video.play();
+        sendImg();
+    }
+
+    function error(error) {
+        console.log(`访问用户媒体设备失败${error.name}, ${error.message}`);
+    }
+
+    function startCamera(){
+        if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+            //调用用户媒体设备, 访问摄像头
+            getUserMedia({video : {width: 480, height: 320}}, success, error);
+        } else {
+            alert('不支持访问用户媒体');
+        }
+    }
+    let isSend = true;
+
+    function sendImg(){
+        timers = setInterval(function () {
+            if(isSend) {
+                isSend = false;
+                context.drawImage(video, 0, 0, 480, 320);
+                let image = canvas.toDataURL('image/png');
+                sendJson(HTTP.POST, '/auth/face-login', {'data': image}, false, function (res) {
+                        if (res.code === 0) {
+                            timers = null;
+                            streams.stop();//结束关闭流
+
+                            layer.msg("登录成功！", {icon: 1});
+                            setTimeout("new function(){window.location.href= '/'}","1000");
+                        } else {
+                            isSend = true;
+                            layer.msg(res.msg, {icon: 7});
+                        }
+                    },
+                    function () {
+                        isSend = true;
+                        layer.msg("未知错误", {icon: 2});
+                    });
+            }
+
+        },2000);
+    }
+</script>
+</body>
+</html>

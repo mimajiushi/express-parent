@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>仪表盘 - Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.min.css}" href="../../static/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/assets/css/express.css}" href="../../static/assets/css/express.css"/>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 头部 -->
+        <nav th:replace="admin/module/nav::html"></nav>
+        <!-- 主体 -->
+        <div class="row">
+            <!-- 左侧菜单 -->
+            <div th:replace="admin/module/sidebar::html"></div>
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-12 column">
+                        <div class="jumbotron">
+                            <h2 th:text="${frontName + '，欢迎登录！'}">欢迎登陆！</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 column">
+                        <h3>订单简览</h3>
+                        <p th:text="${orderDesc}">100+</p>
+                        <p>
+                            <a class="btn" href="/admin/order">了解更多 »</a>
+                        </p>
+                    </div>
+                    <div class="col-md-4 column">
+                        <h3>反馈简览</h3>
+                        <p th:text="${feedbackDesc}">100+</p>
+                        <p>
+                            <a class="btn" href="/admin/feedback">了解更多 »</a>
+                        </p>
+                    </div>
+                    <div class="col-md-4 column">
+                        <h3>用户简览</h3>
+                        <p th:text="${userDesc}">100+</p>
+                        <p>
+                            <a class="btn" href="/admin/user">了解更多 »</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/assets/js/http.js}" src="../../static/assets/js/http.js"></script>
+    <script th:src="@{/assets/js/express.js}" src="../../static/assets/js/express.js"></script>
+    <script th:src="@{/assets/js/jquery.min.js}" src="../../static/assets/js/jquery.min.js"></script>
+    <script th:src="@{/assets/js/jquery.validate.min.js}" src="../../static/assets/js/jquery.validate.min.js"></script>
+    <script th:src="@{/assets/layer/layer.js}" src="../../static/assets/layer/layer.js"></script>
+    <script th:src="@{/assets/js/bootstrap.min.js}" src="../../static/assets/js/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            $("#dashboard-sidebar").addClass('active');
+        });
+    </script>
+</body>
+</html>

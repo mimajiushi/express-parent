@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>立即下单 - Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" th:href="@{/public/assets/css/bootstrap.min.css}" href="../../public/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/public/assets/css/express.css}" href="../../public/assets/css/express.css"/>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 头部 -->
+        <nav th:replace="user/module/nav::html"></nav>
+        <!-- 主体 -->
+        <div class="row">
+            <!-- 左侧菜单 -->
+            <div th:replace="user/module/sidebar::html"></div>
+            <!-- 下单主体 -->
+            <div class="col-md-10">
+                <form class="form-horizontal" id="expressForm" method="post" action="">
+                    <div class="form-group">
+                        <label for="inputName" class="col-sm-1 control-label">取件姓名</label>
+                        <div class="col-sm-11">
+                            <input type="text" class="form-control" id="inputName" name="recName" placeholder="请输入取件姓名">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTel" class="col-sm-1 control-label">联系电话</label>
+                        <div class="col-sm-11">
+                            <input type="tel" class="form-control" id="inputTel" name="recTel" placeholder="请输入联系电话">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputOdd" class="col-sm-1 control-label">快递单号</label>
+                        <div class="col-sm-11">
+                            <input type="tel" class="form-control" id="inputOdd" name="odd" placeholder="请输入快递单号">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCompany" class="col-sm-1 control-label">快递公司</label>
+                        <div class="col-sm-11">
+                            <select name="company" id="inputCompany" class="form-control">
+                                <option value="">--请选择快递公司--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="type" class="col-sm-1 control-label">寄/取件</label>
+                        <div class="col-sm-11">
+                            <select name="type" id="type" class="form-control">
+                                <option value="0">送件上门</option>
+                                <option value="1">上门取件</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputAddress" class="col-sm-1 control-label">快递寄达地址</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control dis_change_textarea" id="inputAddress" name="address" rows="5"
+                                      placeholder="此地址为快递公司的配送地址"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRecAddress" class="col-sm-1 control-label">收件地址</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control dis_change_textarea" id="inputRecAddress" name="recAddress" rows="5"
+                                      placeholder="此地址为本平台将为您派送的地址"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRemark" class="col-sm-1 control-label">备注（可选）</label>
+                        <div class="col-sm-11">
+                            <textarea class="form-control dis_change_textarea" id="inputRemark" name="remark" rows="5"
+                                      placeholder="如果有特殊要求，请备注于此"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRecAddress" class="col-sm-1 control-label">预估重量</label>
+                        <div class="col-sm-3">
+                            <input class="form-control dis_change_textarea" type="number" id="weight" name="weight"
+                                   onchange="updatePrice()" onkeyup="updatePrice()" placeholder="预估重量" />
+                        </div>
+                        <span class="col-sm-3" id="price">预估价格：0元</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputRecAddress" class="col-sm-4 control-label">< 500g/件：2元；< 1kg/件：3元；> 1kg/kg：4元</label>
+                    </div>
+                    <!--<div class="form-group">-->
+                        <!--<label for="inputVerify" class="col-sm-1 control-label">验证码</label>-->
+                        <!--<div class="col-sm-6">-->
+                            <!--<input type="text" class="form-control" id="inputVerify" name="verify" placeholder="请输入验证码">-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-5" style="margin-top: 10px">-->
+                            <!--<img id="verifyCode" src="/auth/code/getVerifyCode" title="看不清，请点我" onclick="refresh(this)"-->
+                                 <!--onmouseover="mouseover(this)"/>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <div class="form-group" style="text-align: center">
+                        <button role="button" class="btn btn-primary" type="button" onclick="createOrder()">创建订单</button>
+                        <button class="btn btn-warning" type="reset">重新填写</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/public/assets/js/http.js}" src="../../public/assets/js/http.js"></script>
+    <script th:src="@{/public/assets/js/express.js}" src="../../public/assets/js/express.js"></script>
+    <script th:src="@{/public/assets/js/jquery.min.js}" src="../../public/assets/js/jquery.min.js"></script>
+    <script th:src="@{/public/assets/js/jquery.validate.min.js}" src="../../public/assets/js/jquery.validate.min.js"></script>
+    <script th:src="@{/public/assets/layer/layer.js}" src="../../public/assets/layer/layer.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap.min.js}" src="../../public/assets/js/bootstrap.min.js"></script>
+    <!-- 公用头部JS start -->
+    <div th:replace="~{common/configJS :: configJS}">...</div>
+    <!-- 公用头部JS end -->
+    <script>
+        let areaUrl = $('#areaUrl').val();
+        let paymentUrl = $('#paymentUrl').val();
+        let createOrderUrl = $('#createOrderUrl').val();
+        $(function () {
+            $("#order-sidebar").addClass('active');
+            // $("#expressForm").attr('action', createOrderUrl);
+
+            // 加载快递公司数据
+            sendJson(HTTP.GET, areaUrl, null, false, function (res) {
+                let html = '', data = res;
+                for(let i = 0; i<data.length; i++) {
+                    html += '<option value="'+data[i].id+'">'+data[i].name+ ' | ' + data[i].code + '</option>\n';
+                }
+                $("#inputCompany").html(html);
+            }, function () {
+                layer.msg("未知错误，加载快递公司数据失败!", {icon: 2});
+            });
+        });
+
+        // function refresh(obj) { obj.src = "/auth/code/getVerifyCode?" + Math.random(); }
+        //
+        // function mouseover(obj) { obj.style.cursor = "pointer"; }
+
+
+        // 创建订单
+        function createOrder() {
+            let expressFormData = $('#expressForm').serialize();
+            let index = layer.load(1,{shade: [0.1,'#fff']});
+            // alert(createOrderUrl);
+            let uid = getCookieValue('uid');
+            let token = "Bearer " + uid;
+            // alert(token);
+            $.ajax({
+                type: 'POST',
+                url: createOrderUrl,
+                dataType: 'json',
+                data: expressFormData,
+                beforeSend: function(XHR){
+                    XHR.setRequestHeader('Authorization',token)
+                },
+                success: function (res) {
+                    layer.close(index);
+                    if (res.code == 10000) {
+                        layer.msg("订单创建成功！3秒后跳转结算页面");
+                        setTimeout(function(){window.location.href=paymentUrl+res.data},3000);
+                    }else {
+                        layer.msg("订单创建失败！" + res.data, {icon:5});
+                    }
+                },
+                error: function (error) {
+                    layer.close(index);
+                    layer.msg("未知错误",{icon:5});
+                }
+            });
+        }
+        
+        // 更新价格
+        function updatePrice() {
+            let total = 0;
+            let weight = $('#weight').val();
+            if(weight !== "") {
+                if(!isNaN(weight)) {
+                    weight = parseFloat(weight);
+                    let tmp = 0;
+                    // 如果小于500g，2元
+                    if(weight < 0.5)
+                        tmp = 2;
+                    else if(weight < 1)
+                        tmp = 3;
+                    else if(weight >= 1)
+                    // 向上取整
+                        tmp = 4 * Math.ceil(weight);
+                    total += tmp;
+                } else {
+                    // 如果不是数字，将input值修改为空
+                    $('#weight').val("");
+                }
+            }
+            // 两位小数，四舍五入
+            total = total.toFixed(2);
+            $('#price').text("预估价格：普通会员 " + total + " 元，vip " + (total*0.9).toFixed(2) + " 元， 集团邮客 " + (total*0.8).toFixed(2) + " 元");
+        }
+
+        $().ready(function() {
+            $("#expressForm").validate({
+                rules: {
+                    recName: {
+                        required: true,
+                        maxlength: 64
+                    },
+                    recTel: {
+                        required: true,
+                        minlength: 11
+                    },
+                    recAddress: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    address: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    odd: {
+                        required: true,
+                        maxlength: 128
+                    },
+                    company: {
+                        required: true
+                    },
+                    type: {
+                        required: true
+                    },
+                    remark: {
+                        maxlength: 255
+                    },
+                    verify: "required"
+                },
+                messages: {
+                    recName: {
+                        required: "取件姓名不能为空",
+                        maxlength: "取件姓名超过限制长度"
+                    },
+                    recTel: {
+                        required: "联系电话不能为空",
+                        minlength: "手机号码不少于11位"
+                    },
+                    recAddress: {
+                        required: "收件地址不能为空",
+                        maxlength: "收件地址超过限制长度"
+                    },
+                    address: {
+                        required: "快递寄达地址不能为空",
+                        maxlength: "快递寄达地址超过限制长度"
+                    },
+                    odd: {
+                        required: "快递单号不能为空",
+                        maxlength: "快递单号超过限制长度"
+                    },
+                    company: {
+                        required: "请选择快递公司"
+                    },
+                    type:{
+                        required: "请选择服务类型"
+                    },
+                    remark: {
+                        maxlength: "憋住超过限制长度"
+                    },
+                    verify: "验证码不能为空"
+                },
+                submitHandler: function (form) {
+                    sendJson(HTTP.POST, "/auth/code/check-img", {"code": $("#inputVerify").val()}, false, function (res) {
+                        if (res.code !== 0) {
+                            layer.msg(res.msg,{icon:2});
+                        } else {
+                            form.submit();
+                        }
+                    }, function () {
+                        layer.msg("未知错误",{icon:2});
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

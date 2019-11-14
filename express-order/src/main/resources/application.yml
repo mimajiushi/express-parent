@@ -1,0 +1,182 @@
+##########################################################
+##
+## 端口，app名字
+##
+##########################################################
+server:
+  port: ${PORT:40200}
+  servlet:
+    context-path: /order
+spring:
+  application:
+    name: express-order
+  ##########################################################
+  ##
+  ## mysql 数据源配置
+  ##
+  ##########################################################
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.129.133:3306/express_order?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-timeout: 30000
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 60000
+      pool-name: DatebookHikariCP
+      max-lifetime: 28740000
+      #连接在连接池的最小生存时间（毫秒）
+      connection-test-query: SELECT 1
+  ##########################################################
+  ##
+  ## redis 数据源配置
+  ##
+  ##########################################################
+  redis:
+    host: 192.168.129.133
+    database: 0
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1ms # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 8 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 3000ms # 连接超时时间（毫秒）
+  ##########################################################
+  ##
+  ## nacos，sentinel配置
+  ##
+  ##########################################################
+  cloud:
+    nacos:
+      discovery:
+        # 指定nacos server的地址
+        server-addr: localhost:8848
+        cluster-name: EXPRESS
+    # 配置sentinel
+    sentinel:
+      filter:
+        # 打开/关闭掉对Spring MVC端点的保护
+        enabled: true
+      transport:
+        # 指定sentinel 控制台的地址
+        dashboard: localhost:8080
+  main:
+    allow-bean-definition-overriding: true
+
+##########################################################
+##
+## rocketmq 数据源配置
+##
+##########################################################
+rocketmq:
+  name-server: 192.168.129.133:9876
+  producer:
+    group: CANCEL_ORDER_GROUP
+    # 30秒超时
+    send-message-timeout: 30000
+    # 消息超过4kb则压缩
+    compress-message-body-threshold: 4096
+    # 消息最大为4kb
+    max-message-size: 4194304
+    # 生产环境请配置ACL
+##########################################################
+##
+## 远程调用相关 配置
+##
+##########################################################
+# 开启饥饿加载
+ribbon:
+  eager-load:
+    enabled: true
+feign:
+  sentinel:
+    # 为feign整合sentinel
+    enabled: true
+  client:
+    config:
+      # 全局配置
+      default:
+        # 打印详细日志(需要feign日志级别为debug)
+        loggerLevel: full
+        # 配置拦截器，微服务间认证需要
+        requestInterceptors:
+        - com.cwj.express.common.Interceptor.FeignInterceptor
+  httpclient:
+    # 让feign使用apache httpclient做请求；而不是默认的urlconnection
+    enabled: true
+    # feign的最大连接数
+    max-connections: 200
+    # feign单个路径的最大连接数(一个@GetMapping就是一个路径)
+    max-connections-per-route: 50
+##########################################################
+##
+## actuate 配置
+##
+##########################################################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+##########################################################
+##
+## mybatis-plus 配置
+##
+##########################################################
+mybatis-plus:
+  mapper-locations: classpath*:mapping/*.xml
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+    # 是否显示mybatis-plus图标
+    banner: false
+  typeEnumsPackage: com.cwj.express.common.enums
+  # SQL 执行log，调试时可打开
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false
+
+##########################################################
+##
+## 日志 配置
+##
+##########################################################
+logging.file: logs/${spring.application.name}.log
+logging:
+  file:
+    max-size: 10MB
+    max-history: 20
+  level:
+    org.springframework.web.client.RestTemplate: debug
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%-40.40logger{39}) %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39}[lineno:%line]: %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+
+
+  # 支付宝支付
+alipay:
+  # 商户UID
+  uid: 2088102179254465
+  # APPID
+  app-id: 2016101200669795
+  # 加密算法
+  sign-type: RSA2
+  # 支付宝网关
+  gateway-url: https://openapi.alipaydev.com/gateway.do
+  # 商户私钥，使用密钥生成工具得到
+  merchant-private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDdLVoztaKTu38dv+t6VHRIWcF7ZsC+S0Ww5i2kPzKsCc2UH2odneoeAOWrfqHxXJ4wGIt6nbF2gkM7541sUjVa7MwrHjjbFgj42Ps7Zgk+eRgSERs45XmZnOW4Q8cnTmxOLwF+oDV1g+uCTIyAgd/j1a4JrR5csayOrnxcLXZYsTBHTmxwE9ZpHd3mLuspa17f4OdiAqePv4DFiHAbC00C8gKk2MBuVLwmWpCAImYSRMup9aDJB07SzZKtPnEjVXBhI7purAOJ9d6bQHs67wmZOcYjqInU0oWSVyxH0ondxQ7ULhqygOI6c96oj6Lpt6eTF3k1aCNI2ImzXOS3sj3xAgMBAAECggEAPoP/JvaECXXJrEL+8AjHBVw5UAPvHtpvzFyDMhWa4P20WdW3TL/B2NEwGZUleO9Q1w9Y/UNtUa3oCxqb4q4p3pVn8BgOwf4scwoBmPxySHI514F2TFKwWDb8x2SA+h80hbTLm1r1QU4UVzQD0p7jBab0FlAUcObXe0zeYb+H3/FOog307hYT6yIBvHWZcbjErvXLNHvd/qzdU46UhFmYyoeyoe2prE+mcTJria262BVdknj2aoOgP6jhamc1pwhU0Eg7QHEB8LnmfhpGQnQ9rqW5R/hfbAsgpjH4xe66kq1vDU2tm4g2VMMbvtNJJmXk7GOdLLLQ6ERqXfQIk4Nl8QKBgQD5+p0J/Q2TPPb+p9fA0f1yJpqRiU6lDxdWy2F5L2PIrKtyvDChkmjRBGEH+03Ig663xAMslbK4BEL/18zlMZXXyMQL5chZP5kW0UkeisG8yShKvVjOyoGcvs+nCepUcw6G1xoky9lImrmLW0zcT5uYmj7pBNP0qXJy5dstvS9bDwKBgQDigSUndyD9crejLP3q8fXvRTVjzP8n5Elb/9joni2qM6nwWWxQQHT5U++Ee2pcW3MePN3u0WbnW+5WpOY9v3jI9NeW+e6+VUE06TBLipuGmGjvdqa/yeFKUj/WSHjse8tZBLJL5j4Zzc+oBM15BXnSdu5ur5yP+5ZBqsIGehjW/wKBgQCcS6WEaUPjm2qTLj4nwSPGC3z5IfCaIyVkjyUSsB6jidJommGNpA0FIsfIRcgMZskG/Pc/GRn1FDUP4c2qP6aAlHZ/OdxacPk22wPspLUdZGhc0qaEJPmFF4id2AU7Z/TdOgCOoSXpz1PTXfJgjSWr9EUBTJN5lbiJPk4b+v1w4QKBgDE9T/1nWWWflapEcqKrnQI58mRSwTlD2GrGkLnpARZaCtx0JCbCDGvTQmNzjOis/LabFsf+/7bV9lchm+fagwB0sZVhmfQIhpdhBh218R9ubIl6Kr/QvEgy3yvPL3KBavBcJAJ5+BAV/MmS2bQwa45ESosHZCqsz7pQy8MqsdGzAoGBAMOYC/XQ9GGfpXv4GVz4zs20HZTOWhNnx4wz1h25YH/Ymo590PVZs65QhFkA5QH0TrYyUKdpVx3X34Wzgz+XAn80kQbvtgqZxwzFZN3cIrzQyZSP8XM09i4D0mr2PKI2NjLrUlqfsldn0EMJdDw5SQ9lnXCyP97XkBtISBIaqZlL
+  # 支付宝公钥
+  alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk6ITEWXX0Kb+sOHy2cR5qQ/bXGDLVcoQqkISap/Xu/cTofcgbWp21/Fo4Iq4xNaEsuEnfpOA9odIN3TiBS0pbzC+yfkMN27eIpJEpc/VylfrzVe0PBqK1Kb3W0RSuF4p/PsuGLjKYK7HPrOiLGGOjWtuambmWJ4L+bHSAySy0TR8LDK9uoRc4HCefmSwTlvz2Vt55TTL4n7U4WdsWzoZRKiwK0SIpFvu4TAE1zKBM5ozgISwSZA4+3oCQmH7OJeOrLlFgMhjSEUFQg3oDQdz79e5tQbtiEK+tdztBn3X1cvbwQYw7UFc+wZWX1w48j9ed7sWyuCHboUCbZtwfOBqzQIDAQAB
+  notify-url: http://wenjie.nat200.top/order/alipay/notify # 支付异步通知URL，需公网能够访问
+  return-url: http://localhost:40200/order/alipay/return # 同步通知URL，无需公网访问

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cwj.express.order.dao.OrderPaymentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cwj.express.domain.order.OrderPayment">
+        <id column="order_id" property="orderId" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="payment" property="payment" />
+        <result column="payment_id" property="paymentId" />
+        <result column="seller" property="seller" />
+        <result column="remark" property="remark" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+</mapper>

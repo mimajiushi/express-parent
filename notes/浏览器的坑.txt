@@ -1,0 +1,4 @@
+当配置本地host express.com 解析成 127.0.0.1 时
+访问 express.com:40400/auth/index 时，浏览器是禁止调用摄像头的
+必须修改浏览器的启动命令， 在目标后加上 空格 + --unsafely-treat-insecure-origin-as-secure="http://express.com:40400"
+详情请百度： http无法调用摄像头

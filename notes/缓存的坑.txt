@@ -1,0 +1,11 @@
+类似于
+    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+    public void A(String userId) {
+        B();
+    }
+
+    @CacheEvict(cacheNames = RedisConfig.xxx, key = "#xxx")
+    public void B(String xxx){
+        xxx;
+    }
+这种，B上面的注解是失效的，即使都加上beforeInvocation = true也还是失效

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cwj.express.order.dao.OrderEvaluateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cwj.express.domain.order.OrderEvaluate">
+        <id column="id" property="id" />
+        <result column="has_open" property="hasOpen" />
+        <result column="user_id" property="userId" />
+        <result column="user_score" property="userScore" />
+        <result column="user_evaluate" property="userEvaluate" />
+        <result column="user_date" property="userDate" />
+        <result column="courier_id" property="courierId" />
+        <result column="courier_score" property="courierScore" />
+        <result column="courier_evaluate" property="courierEvaluate" />
+        <result column="courier_date" property="courierDate" />
+        <result column="update_date" property="updateDate" />
+    </resultMap>
+
+</mapper>

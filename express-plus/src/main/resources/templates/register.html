@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>注册 - Express</title>
+    <link th:href="@{/assets/css/bootstrap.min.css}" href="../static/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/assets/css/register.css}" href="../static/assets/css/register.css" rel="stylesheet">
+    <link th:href="@{/assets/css/express.css}" href="../static/assets/css/express.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h3 class="title">用户注册</h3>
+    <div class="main">
+        <div class="mt10 pull-right">
+            <a href="/index"><i class="glyphicon glyphicon-backward"></i>返回登陆</a>
+        </div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#registryUsername" aria-controls="username" role="tab" data-toggle="tab">用户名注册</a></li>
+            <li role="presentation"><a href="#registryTel" aria-controls="tel" role="tab" data-toggle="tab">手机号注册</a></li>
+            <li role="presentation"><a href="#registryFace" aria-controls="face" role="tab" data-toggle="tab">人脸注册</a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="registryUsername">
+                <form class="form-horizontal" id="registryUsernameForm">
+                    <input type="hidden" name="type" value="1">
+                    <div class="form-group">
+                        <label for="username" class="col-sm-3 control-label">用户名</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="col-sm-3 control-label">密码</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1" class="col-sm-3 control-label">确认密码</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="password1" name="password1" placeholder="确认密码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn btn-success btn-block">注册</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="registryTel">
+                <form role="form" class="form-horizontal" id="registryTelForm">
+                    <input type="hidden" name="type" value="2">
+                    <div class="form-group">
+                        <label for="inputTel" class="col-sm-3 control-label">手机号</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="inputTel" name="tel" placeholder="请输入手机号">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="telCode" class="col-sm-3 control-label">验证码</label>
+                        <div class="col-sm-9">
+                            <div class="row" >
+                                <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 " >
+                                    <input type="text" class="form-control" id="telCode" name="code" placeholder="请输入验证码">
+                                </div>
+                                <div class="col-md-6 col-sm-12 col-lg-6 col-xs-12 telCode">
+                                    <button type="button" class="btn btn-info btn-block" id="getTelCode" >获取验证码</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg btn-block">注册</button>
+                </form>
+            </div>
+            <div  role="tabpanel" class="tab-pane"  id="registryFace">
+                <div class="capture">
+                    <video id="video" autoplay style="width: 80%;margin: 0 auto;"></video>
+                    <canvas id="canvas" width="480" height="320" style="display: none;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/assets/js/http.js}" src="../static/assets/js/http.js"></script>
+<script th:src="@{/assets/js/express.js}" src="../static/assets/js/express.js"></script>
+<script th:src="@{/assets/js/jquery.min.js}" src="../static/assets/js/jquery.min.js"></script>
+<script th:src="@{/assets/js/jquery.validate.min.js}" src="../static/assets/js/jquery.validate.min.js"></script>
+<script th:src="@{/assets/layer/layer.js}" src="../static/assets/layer/layer.js"></script>
+<script th:src="@{/assets/js/bootstrap.min.js}" src="../static/assets/js/bootstrap.min.js"></script>
+<script>
+    let cookieName = 'registryCookie';
+    let  countdown;
+    $(function(){
+        // 验证码
+        $("#getTelCode").click(function () {
+            sendCode($("#getTelCode"));
+        });
+        let v = getCookieValue(cookieName);//获取cookie值
+        if (v > 0) {
+            setTime($("#getTelCode"));//开始倒计时
+        }
+    });
+    // 发送验证码
+    function sendCode(obj) {
+        let phoneNum = $("#inputTel").val();
+        if (!isPoneAvailable(phoneNum)) {
+            layer.msg("手机号码不合法", {icon: 7});
+            return false;
+        }
+        sendJson(HTTP.GET, '/auth/code/sms?mobile=' + phoneNum, null, false, function (res) {
+                if (res.code === 0) {
+                    layer.msg("短信发送成功", {icon: 1});
+                    addCookie(cookieName, 60, 60);//添加cookie记录,有效时间60s
+                    setTime(obj);//开始倒计
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            },
+            function () {
+                layer.msg("未知错误", {icon: 2});
+            });
+    }
+
+    //开始倒计时
+    function setTime(obj) {
+
+        countdown = getCookieValue(cookieName);
+        if (countdown == 0) {
+            obj.removeAttr("disabled");
+            document.getElementById("getTelCode").innerText = '重新获取验证码';
+            return;
+        } else {
+            obj.attr("disabled", true);
+            document.getElementById("getTelCode").innerText = countdown + 's之后重新发送';
+            countdown--;
+            editCookie(cookieName, countdown, countdown + 1);
+        }
+        setTimeout(function () {
+            setTime(obj)
+        }, 1000) //每1000毫秒执行一次
+    }
+
+    $().ready(function() {
+        $("#registryUsernameForm").validate({
+            rules: {
+                username: {
+                    required: true
+                },
+                password: {
+                    required: true,
+                    equalTo: "#password1"
+                },
+                password1: {
+                    required: true,
+                    equalTo: "#password"
+                }
+            },
+            messages: {
+                username: {
+                    required:"用户名不能为空"
+                },
+                password: {
+                    required: "密码不能为空",
+                    equalTo: "两次密码输入不一致"
+                },
+                password1: {
+                    required: "密码不能为空",
+                    equalTo: "两次密码输入不一致"
+                }
+            },
+            submitHandler: function (form) {
+                sendJson(HTTP.POST, "/auth/register", $("#registryUsernameForm").serialize() , false, function (res) {
+                    if (res.code === 0) {
+                        layer.msg("注册成功", {icon: 1});
+                        setTimeout("new function(){window.location.href='/'}","3000");
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, function () {
+                    layer.msg("未知错误", {icon: 2});
+                });
+            }
+        });
+
+        $("#registryTelForm").validate({
+            rules: {
+                tel: {
+                    required: true,
+                    number: true
+                },
+                code: {
+                    required: true,
+                    number: true
+                }
+            },
+            messages: {
+                tel: {
+                    required: "手机号码不能为空",
+                    number: "非法字符"
+                },
+                code: {
+                    required: "验证码不能为空",
+                    number: "非法字符"
+                }
+            },
+            submitHandler: function (form) {
+                sendJson(HTTP.POST, "/auth/register", $("#registryTelForm").serialize(), false, function (res) {
+                    if (res.code === 0) {
+                        layer.msg("注册成功", {icon: 1});
+                        setTimeout("new function(){window.location.href='/'}","3000");
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, function () {
+                    layer.msg("未知错误", {icon: 2});
+                });
+            }
+        });
+    });
+
+
+
+    let videoTimer = null;
+    $(function(){
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            let activeTab = $(e.target).text();
+            // 获取前一个激活的标签页的名称
+            if (activeTab == "人脸注册") {
+                startCamera();
+            } else {
+                if(streams) {
+                    streams.stop();
+                    videoTimer = null;
+                }
+                clearInterval(timers)
+            }
+            let previousTab = $(e.relatedTarget).text();
+            $(".active-tab span").html(activeTab);
+            $(".previous-tab span").html(previousTab);
+        });
+    });
+    // 获取摄像头使用权限
+    let file ,streams;
+    var timers = null;
+    //访问用户媒体设备的兼容方法
+    function getUserMedia(constraints, success, error) {
+        if (navigator.mediaDevices.getUserMedia) {
+            //最新的标准API
+            navigator.mediaDevices.getUserMedia(constraints).then(success).catch(error);
+        } else if (navigator.webkitGetUserMedia) {
+            //webkit核心浏览器
+            navigator.webkitGetUserMedia(constraints,success, error)
+        } else if (navigator.mozGetUserMedia) {
+            //firfox浏览器
+            navigator.mozGetUserMedia(constraints, success, error);
+        } else if (navigator.getUserMedia) {
+            //旧版API
+            navigator.getUserMedia(constraints, success, error);
+        }
+    }
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+
+    function success(stream) {
+        //兼容webkit核心浏览器
+        let CompatibleURL = window.URL || window.webkitURL;
+        //将视频流设置为video元素的源
+        streams = stream.getTracks()[0];
+        //video.src = CompatibleURL.createObjectURL(stream);
+        video.srcObject = stream;
+        video.play();
+        sendImg();
+    }
+
+    function error(error) {
+        console.log(`访问用户媒体设备失败${error.name}, ${error.message}`);
+    }
+
+    function startCamera(){
+        if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
+            //调用用户媒体设备, 访问摄像头
+            getUserMedia({video : {width: 480, height: 320}}, success, error);
+        } else {
+            alert('不支持访问用户媒体');
+        }
+    }
+    let isSend = true;
+
+    function sendImg(){
+        timers = setInterval(function () {
+            if(isSend) {
+                isSend = false;
+                context.drawImage(video, 0, 0, 480, 320);
+                let image = canvas.toDataURL('image/png');
+                sendJson(HTTP.POST, '/auth/face-check', {'data': image}, false, function (res) {
+                        if (res.code === 0) {
+                            layer.confirm("识别成功，是否将其作为人脸数据注册", {
+                                btn: ['确定','取消']
+                            }, function() {
+                                timers = null;
+                                streams.stop();//结束关闭流
+
+                                sendJson(HTTP.POST, "/auth/register", {"type": 3}, false, function (res) {
+                                    if(res.code === 0) {
+                                        layer.msg("注册成功", {icon: 1});
+                                        setTimeout("new function(){window.location.href='/'}","3000");
+                                    }
+                                }, function () {
+                                    layer.msg("未知错误",{icon:2});
+                                });
+                            }, function(){
+                                isSend = true;
+                            });
+                        } else {
+                            isSend = true;
+                            layer.msg(res.msg, {icon: 7});
+                        }
+
+                    },
+                    function () {
+                        isSend = true;
+                        layer.msg("未知错误", {icon: 2});
+                    });
+            }
+
+        },2000);
+    }
+</script>
+</body>
+</html>
