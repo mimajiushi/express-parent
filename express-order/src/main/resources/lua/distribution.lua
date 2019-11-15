@@ -21,3 +21,4 @@ if res_courier_id  then
     end
 end
 return res_courier_id
+--- 客户端执行： redis-cli -a 123456 --eval distribution.lua qid1 , orderid  600
