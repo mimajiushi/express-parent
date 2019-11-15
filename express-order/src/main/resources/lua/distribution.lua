@@ -1,9 +1,9 @@
 --- 学校所属id
 local school_id = KEYS[1]
 --- 订单id
-local order_id = ARGV[1]
+local order_id = KEYS[2]
 --- 有效时间
-local expire = ARGV[2]
+local expire = ARGV[1]
 
 --- 获取分数最高配送员
 local res_courier_id = redis.call("ZREVRANGE", school_id, 0, 0)

@@ -8,7 +8,7 @@ import org.springframework.scripting.support.ResourceScriptSource;
 
 /**
  * lua脚本配置类
- * todo 还没进行单元测试
+ * todo 还没进行测试
  */
 
 @Configuration
@@ -16,7 +16,7 @@ public class LuaConfiguration {
     @Bean
     public DefaultRedisScript<String> redisScript() {
         DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
-        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("lua/distribution")));
+        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("lua/distribution.lua")));
         redisScript.setResultType(String.class);
         return redisScript;
     }
