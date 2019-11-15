@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2019-11-15 12:47:37
+Date: 2019-11-15 13:08:06
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -56,7 +56,7 @@ CREATE TABLE `order_info` (
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
   `courier_id` varchar(128) DEFAULT '' COMMENT '配送员ID',
   `type` tinyint(2) NOT NULL COMMENT '(0 - 送件上门， 1- 上门收件)',
-  `status` int(11) DEFAULT NULL COMMENT '订单状态（1-等待节点 2-派送中 3-订单完成 4-订单异常 5-订单取消）',
+  `status` int(11) DEFAULT NULL COMMENT '订单状态（1-等待节点 2-派送中 3-订单完成 4-订单异常 5-订单取消 6-等待揽收）',
   `courier_remark` varchar(255) DEFAULT NULL COMMENT '配送员备注',
   `has_delete` int(1) DEFAULT '0',
   `delete_type` int(1) DEFAULT '0' COMMENT '删除原因',
