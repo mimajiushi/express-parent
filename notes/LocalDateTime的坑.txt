@@ -1,1 +1,2 @@
-用自定义的LocalDateTimeUtils转换后可能出现差一秒的现象
+LocalDateTime必须和数据库datetime类型对应，用timestamp在某些情况下会出现差一秒的情况
+导致订单乐观锁更新失败
