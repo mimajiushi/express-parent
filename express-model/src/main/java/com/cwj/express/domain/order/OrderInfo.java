@@ -63,8 +63,6 @@ public class OrderInfo extends Model<OrderInfo> {
     @ApiModelProperty(value = "备注")
     private String remark;
 
-    @ApiModelProperty(value = "总价格")
-    private BigDecimal price;
 
     @ApiModelProperty(value = "配送员ID")
     private String courierId;

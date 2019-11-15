@@ -130,7 +130,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         SysRolesLevel roleMsgByUserId = ucenterFeignClient.getRoleMsgByUserId();
         BigDecimal discount = roleMsgByUserId.getDiscount();
         totalPrice = totalPrice.multiply(discount);
-        orderInfo.setPrice(totalPrice);
+//        orderInfo.setPrice(totalPrice);
         // 保存数据库
         boolean success1 = SqlHelper.retBool(orderInfoMapper.insert(orderInfo));
         // 保存订单支付记录
@@ -139,7 +139,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                         orderId(orderInfo.getId()).
                         paymentStatus(PaymentStatusEnum.WAIT_BUYER_PAY).
                         paymentType(PaymentTypeEnum.AliPay).
-                        payment(orderInfo.getPrice()).
+                        payment(totalPrice).
                         createDate(now).
                         updateDate(now).
                         seller(aliPayConfig.getUid()).build()
