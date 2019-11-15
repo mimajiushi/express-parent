@@ -35,7 +35,11 @@ public class TestController extends BaseController {
     private final StringRedisTemplate stringRedisTemplate;
 
 
-    @GetMapping("/test")
+    /**
+     * 测试lua脚本
+     * 记得先初始化一些数据
+     */
+    @GetMapping("/luaTest")
     public String test(){
         List<String> keys = Arrays.asList("qid1", "orderid");
         String res = stringRedisTemplate.execute(redisScript, keys, "600");
