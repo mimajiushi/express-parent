@@ -9,3 +9,4 @@
         xxx;
     }
 这种，B上面的注解是失效的，即使都加上beforeInvocation = true也还是失效
+这时候只能自己手写代码清除缓存
