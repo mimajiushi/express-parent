@@ -18,6 +18,11 @@ public enum  OrderStatusEnum  implements IEnum<Integer> {
     WAIT_DIST("等待接单", 1),
 
     /**
+     * 等待揽收
+     */
+    WAIT_PICK_UP("等待揽收", 6),
+
+    /**
      * 派送中
      */
     TRANSPORT("派送中", 2),
