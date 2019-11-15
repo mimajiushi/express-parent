@@ -27,8 +27,7 @@ public class OrderInfoVO {
     @NotBlank(message = "收件电话 必填")
     private String recTel;
 
-    @ApiModelProperty(value = "快递单号", required = true)
-    @NotBlank(message = "快递单号 必填")
+    @ApiModelProperty(value = "快递单号")
     private String odd;
 
     @ApiModelProperty(value = "快递公司", required = true)

@@ -49,7 +49,7 @@
                     <div class="form-group">
                         <label for="type" class="col-sm-1 control-label">寄/取件</label>
                         <div class="col-sm-11">
-                            <select name="type" id="type" class="form-control">
+                            <select name="type" id="type" class="form-control" onchange="changeType()">
                                 <option value="0">送件上门</option>
                                 <option value="1">上门取件</option>
                             </select>
@@ -139,6 +139,16 @@
         //
         // function mouseover(obj) { obj.style.cursor = "pointer"; }
 
+
+        // 当选择上门取件时，不用填写订单号，todo 后台暂时不做检验
+        function changeType() {
+            let type = $('#type').val();
+            if (type == '1'){
+                $('#inputOdd').attr('disabled', true);
+            }else {
+                $('#inputOdd').attr('disabled', false);
+            }
+        }
 
         // 创建订单
         function createOrder() {
