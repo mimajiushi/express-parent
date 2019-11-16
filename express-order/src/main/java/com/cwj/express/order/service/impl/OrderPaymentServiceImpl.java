@@ -44,8 +44,7 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
     private final OrderInfoMapper orderInfoMapper;
     private final AliPayConfig aliPayConfig;
 //    @Qualifier("distribuitionCourier")
-    @Autowired
-    private RocketMQTemplate rocketMQTemplate;
+    private final RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
 
 
@@ -115,7 +114,7 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
         if (PaymentStatusEnum.TRADE_SUCCESS == orderVo.getPaymentStatusEnum()){
             rocketMQTemplate.sendMessageInTransaction(
                     RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
-                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC + ":" + RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
                     MessageBuilder.withPayload(orderInfo.getId()).setHeader("orderId", orderInfo.getId()).build(),
                     orderInfo.getId()
             );

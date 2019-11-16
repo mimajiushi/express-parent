@@ -74,4 +74,9 @@ public class RedisConfig {
      * 配送员区域权重信息存储头
      */
     public static final String COURIER_WEIGHT_DATA = "COURIER_WEIGHT_DATA";
+
+    /**
+     * 分配配送员的订单id存储头，存储方式：存储头:orderId(key) 配送员id(value)
+     */
+    public static final String ORDER_COURIER_DATA = "ORDER_COURIER_DATA";
 }

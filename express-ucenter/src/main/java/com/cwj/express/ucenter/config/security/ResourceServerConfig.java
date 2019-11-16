@@ -71,8 +71,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         String[] ignoreUrls = {
 //                 "/**",
-                "/ucenter/getAllCouriers", // 获取所有配送员信息接口，暂不验证权限
+                "/ucenter/getById/**",
+                "/ucenter/getAllCouriers",
                 "/alipay/notify",
+                // 以上接口暂不进行拦截，可以考虑网关进行拦截，指定ip白名单才能调用
                 // todo 该模块理论上没有公开的接口，如果有请记得在此处加上
                 // swagger
                 "/",

@@ -72,4 +72,9 @@ public class TestController extends BaseController {
         }
         return "init has been successfully!";
     }
+
+    @GetMapping("/getUserById/{userId}")
+    public SysUser getUserById(@PathVariable String userId){
+        return ucenterFeignClient.getById(userId);
+    }
 }

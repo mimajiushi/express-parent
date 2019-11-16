@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -68,6 +65,12 @@ public class UcenterController extends BaseController implements UcenterControll
     @GetMapping("/getAllCouriers")
     public List<SysUser> getAllCouriers() {
         return sysUserService.getAllCouriers();
+    }
+
+    @Override
+    @GetMapping("/getById/{userId}")
+    public SysUser getById(@PathVariable String userId) {
+        return sysUserService.getById(userId);
     }
 
 }

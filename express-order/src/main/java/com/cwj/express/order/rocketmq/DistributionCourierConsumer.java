@@ -1,7 +1,12 @@
 package com.cwj.express.order.rocketmq;
 
+import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
+import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.order.feignclient.ucenter.UcenterFeignClient;
+import com.cwj.express.order.service.DistributionCourierService;
 import com.cwj.express.order.service.OrderInfoService;
+import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.LocalDateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author cwj
@@ -22,10 +28,16 @@ import java.time.LocalDateTime;
 @Slf4j
 public class DistributionCourierConsumer implements RocketMQListener<String> {
 
-    private final OrderInfoService orderInfoService;
+    private final DistributionCourierService distributionCourierService;
+    private final RedisService redisService;
 
     @Override
     public void onMessage(String orderId) {
-        log.info(orderId);
+        // 分配配送员业务
+        distributionCourierService.distributionCourier(orderId);
+
+        // 删除redis日志 （可以不删）
+        String logKey = RedisConfig.ORDER_COURIER_DATA + "::" + orderId;
+        redisService.remove(logKey);
     }
 }

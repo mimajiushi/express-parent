@@ -5,6 +5,7 @@ import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 
 @FeignClient(
-        name = ExpressServiceListConstant.EXPRESS_UCENTER,
-        fallbackFactory = UcenterFeignClientFallbackFactory.class
+        name = ExpressServiceListConstant.EXPRESS_UCENTER
+//        fallbackFactory = UcenterFeignClientFallbackFactory.class
 )
 public interface UcenterFeignClient {
     @PostMapping("/ucenter/getRoleMsgByUserId")
@@ -25,5 +26,8 @@ public interface UcenterFeignClient {
 
     @GetMapping("/ucenter/getAllCouriers")
     public List<SysUser> getAllCouriers();
+
+    @GetMapping("/ucenter/getById/{userId}")
+    public SysUser getById(@PathVariable("userId") String userId);
 
 }

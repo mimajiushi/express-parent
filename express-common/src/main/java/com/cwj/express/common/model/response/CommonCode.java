@@ -56,7 +56,9 @@ public enum CommonCode implements ResultCode{
 
 
     ALI_PAY_GATEWAY_ERROR(false, 50001, "支付宝接口调用失败！"),
-    ALI_PAY_SIGN_ERROR(false, 50002, "支付宝签证验证失败！")
+    ALI_PAY_SIGN_ERROR(false, 50002, "支付宝签证验证失败！"),
+
+    COURIER_NOT_EXIST(false, 60001, "该区域没有配送员！")
 
     ;
 //    private static ImmutableMap<Integer, CommonCode> codes ;

@@ -19,12 +19,19 @@ public class UcenterFeignClientFallbackFactory implements FallbackFactory<Ucente
             @Override
             public SysRolesLevel getRoleMsgByUserId() {
                 log.error("用户中心远程调用异常！获取用户权限信息失败！异常信息：{}", throwable.getMessage());
-                return SysRolesLevel.builder().roleName("服务器出错").roleDesc("服务器出错").build();
+                return null;
             }
 
             @Override
             public List<SysUser> getAllCouriers() {
                 log.error("用户中心远程调用异常！获取所有配送员信息失败！异常信息：{}", throwable.getMessage());
+                return null;
+            }
+
+            @Override
+            public SysUser getById(String userId) {
+                throwable.printStackTrace();
+                log.error("用户中心远程调用异常！根据用户id获取用户信息失败！异常信息：{}", throwable.getMessage());
                 return null;
             }
         };

@@ -74,6 +74,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 // "/alipay/return"
                 "/initScore",
                 "/luaTest",
+                "/getUserById/**",
                 "/alipay/notify",
                 // swagger
                 "/",

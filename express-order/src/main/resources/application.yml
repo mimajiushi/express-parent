@@ -104,6 +104,10 @@ feign:
     config:
       # 全局配置
       default:
+        # 超时最好同时设置，否则会被ribbon覆盖(这里是map，但是却能让idea识别)
+        connectTimeout: 300000
+        readTimeout: 300000
+        ConnectTimeout: 300000
         # 打印详细日志(需要feign日志级别为debug)
         loggerLevel: full
         # 配置拦截器，微服务间认证需要
@@ -162,6 +166,7 @@ logging:
     org.springframework.web.client.RestTemplate: debug
     com.cwj.express.order.rocketmq.DistributionCourierTransactionListener: debug
     org.apache.rocketmq.spring.core.RocketMQTemplate: debug
+    com.cwj.express.order.feignclient.ucenter.UcenterFeignClient: debug
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%-40.40logger{39}) %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39}[lineno:%line]: %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"

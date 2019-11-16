@@ -19,4 +19,7 @@ public interface UcenterControllerApi {
 
     @ApiOperation(value = "获取所有配送员信息", notes = "为了开发方便，此接口暂时不需要权限验证")
     public List<SysUser> getAllCouriers();
+
+    @ApiOperation(value = "根据用户id获取用户信息")
+    public SysUser getById(@PathVariable String userId);
 }

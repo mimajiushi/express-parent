@@ -52,8 +52,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private final OrderPaymentService orderPaymentService;
     private final OrderPaymentMapper orderPaymentMapper;
 //    @Qualifier("cancelOrder")
-    @Autowired
-    private RocketMQTemplate rocketMQTemplate;
+    private final RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
     private final AliPayConfig aliPayConfig;
     private final UcenterFeignClient ucenterFeignClient;
@@ -119,7 +118,6 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         // < 0.5kg都是2元
         // > 0.5 && < 1 3元
         // > 1 重量向上取整 每kg4元
-        // todo 之后再考虑如何动态调整价格,课设文档也没这需求，而且这个价格理论上是长期不变的
         double weight = orderInfoVO.getWeight();
         if (weight < 0.5){
             totalPrice = new BigDecimal(2);
@@ -152,7 +150,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
             // 发送10分钟延时消息
             rocketMQTemplate.syncSend(RocketmqConfig.CANCEL_ORDER_TOPIC,
                     MessageBuilder.withPayload(orderInfo.getId() + "@@" + userId + "@@" + timeString).build()
-                    , timeout, MessageDelayLevel.TIME_1S.level);
+                    , timeout, MessageDelayLevel.TIME_10M.level);
             // todo 发送分配配送员的消息
             // 设置ttl为延时消息时间（10分钟）的redis缓存
             String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + userId;
