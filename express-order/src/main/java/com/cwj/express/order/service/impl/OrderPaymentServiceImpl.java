@@ -5,7 +5,9 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.cwj.express.common.config.redis.RedisConfig;
+import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.OrderStatusEnum;
+import com.cwj.express.common.enums.PaymentStatusEnum;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.order.config.alipay.AliPayConfig;
@@ -17,9 +19,13 @@ import com.cwj.express.order.service.RedisService;
 import com.cwj.express.vo.order.UpdateOrderVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +43,9 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
     private final OrderPaymentMapper orderPaymentMapper;
     private final OrderInfoMapper orderInfoMapper;
     private final AliPayConfig aliPayConfig;
+//    @Qualifier("distribuitionCourier")
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
 
 
@@ -102,6 +111,15 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
                 paymentId(orderVo.getTrade_no()).
                 paymentStatus(orderVo.getPaymentStatusEnum()).build();
         updatePaymentByid(orderPayment);
+        // 付款成功则发送安排配送员的mq
+        if (PaymentStatusEnum.TRADE_SUCCESS == orderVo.getPaymentStatusEnum()){
+            rocketMQTemplate.sendMessageInTransaction(
+                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC + ":" + RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+                    MessageBuilder.withPayload(orderInfo.getId()).setHeader("orderId", orderInfo.getId()).build(),
+                    orderInfo.getId()
+            );
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

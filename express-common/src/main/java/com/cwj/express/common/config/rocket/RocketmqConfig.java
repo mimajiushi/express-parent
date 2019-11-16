@@ -12,10 +12,16 @@ public class RocketmqConfig {
     /**
      * 配置订阅、发布主题
      */
-    public static final String EXPRESS_TOPIC = "EXPRESS_TOPIC";
+    public static final String CANCEL_ORDER_TOPIC = "CANCEL_ORDER_TOPIC";
+    public static final String DISTRIBUTION_COURIER_TOPIC = "DISTRIBUTION_COURIER_TOPIC";
 
     /**
-     * 配置组
+     * 配置取消订单消息组
      */
     public static final String CANCEL_ORDER_GROUP = "CANCEL_ORDER_GROUP";
+
+    /**
+     * 配置分配配送员消息组
+     */
+    public static final String DISTRIBUTION_COURIER_GROUP = "DISTRIBUTION_COURIER_GROUP";
 }

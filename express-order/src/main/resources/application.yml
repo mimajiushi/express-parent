@@ -67,8 +67,8 @@ spring:
       transport:
         # 指定sentinel 控制台的地址
         dashboard: localhost:8080
-  main:
-    allow-bean-definition-overriding: true
+#  main:
+#    allow-bean-definition-overriding: true
 
 ##########################################################
 ##
@@ -78,7 +78,6 @@ spring:
 rocketmq:
   name-server: 192.168.129.133:9876
   producer:
-    group: CANCEL_ORDER_GROUP
     # 30秒超时
     send-message-timeout: 30000
     # 消息超过4kb则压缩
@@ -86,6 +85,8 @@ rocketmq:
     # 消息最大为4kb
     max-message-size: 4194304
     # 生产环境请配置ACL
+    group: CANCEL_ORDER_GROUP
+#    customized-trace-topic: EXPRESS_TOPIC
 ##########################################################
 ##
 ## 远程调用相关 配置
@@ -159,6 +160,8 @@ logging:
     max-history: 20
   level:
     org.springframework.web.client.RestTemplate: debug
+    com.cwj.express.order.rocketmq.DistributionCourierTransactionListener: debug
+    org.apache.rocketmq.spring.core.RocketMQTemplate: debug
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%-40.40logger{39}) %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39}[lineno:%line]: %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"

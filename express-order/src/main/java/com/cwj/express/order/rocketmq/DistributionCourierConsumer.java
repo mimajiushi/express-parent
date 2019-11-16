@@ -18,19 +18,14 @@ import java.time.LocalDateTime;
  */
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@RocketMQMessageListener(consumerGroup = RocketmqConfig.CANCEL_ORDER_GROUP, topic = RocketmqConfig.CANCEL_ORDER_TOPIC)
+@RocketMQMessageListener(consumerGroup = RocketmqConfig.DISTRIBUTION_COURIER_GROUP, topic = RocketmqConfig.DISTRIBUTION_COURIER_TOPIC)
 @Slf4j
-public class CancelOrderConsumer implements RocketMQListener<String> {
+public class DistributionCourierConsumer implements RocketMQListener<String> {
 
     private final OrderInfoService orderInfoService;
 
     @Override
-    public void onMessage(String orderIdAndUserId) {
-        log.info(orderIdAndUserId);
-        String[] params = orderIdAndUserId.split("@@");
-        String orderId = params[0];
-        String userId = params[1];
-        LocalDateTime timeVersion = LocalDateTimeUtils.ymdhmsParseToLocalDataTime(params[2]);
-        orderInfoService.cancelOrder(orderId, userId, timeVersion);
+    public void onMessage(String orderId) {
+        log.info(orderId);
     }
 }

@@ -24,10 +24,12 @@ import com.cwj.express.vo.order.OrderDashboardVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.omg.CORBA.TIMEOUT;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -49,7 +51,9 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private final OrderInfoMapper orderInfoMapper;
     private final OrderPaymentService orderPaymentService;
     private final OrderPaymentMapper orderPaymentMapper;
-    private final RocketMQTemplate rocketMQTemplate;
+//    @Qualifier("cancelOrder")
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
     private final AliPayConfig aliPayConfig;
     private final UcenterFeignClient ucenterFeignClient;
@@ -146,9 +150,9 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         ));
         if (success1 && success2){
             // 发送10分钟延时消息
-            rocketMQTemplate.syncSend(RocketmqConfig.EXPRESS_TOPIC,
+            rocketMQTemplate.syncSend(RocketmqConfig.CANCEL_ORDER_TOPIC,
                     MessageBuilder.withPayload(orderInfo.getId() + "@@" + userId + "@@" + timeString).build()
-                    , timeout, MessageDelayLevel.TIME_10M.level);
+                    , timeout, MessageDelayLevel.TIME_1S.level);
             // todo 发送分配配送员的消息
             // 设置ttl为延时消息时间（10分钟）的redis缓存
             String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + userId;
