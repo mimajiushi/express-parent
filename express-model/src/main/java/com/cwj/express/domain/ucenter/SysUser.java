@@ -50,12 +50,12 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
      * 用户角色
      */
     @TableField("role_id")
-//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private SysRoleEnum role;
     /**
      * 性别
      */
-//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private SexEnum sex;
 
     /**
@@ -85,7 +85,7 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
      * 三方登陆类型
      */
     @TableField("third_login_type")
-//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private ThirdLoginTypeEnum thirdLogin;
     /**
      * 三方登陆ID

@@ -57,19 +57,19 @@ public class TestController extends BaseController {
     }
 
     /**
-     * 初始化所有配送员分数为10000
+     * 初始化所有配送员分数为10000，会覆盖原有数据
      */
     @GetMapping("/initScore")
     public String initScore(){
         // 查询所有配送员信息(所有，包括请假)，之后还会再加一张请假表，远程调用
         List<SysUser> allCouriers = ucenterFeignClient.getAllCouriers();
         if (ObjectUtils.isEmpty(allCouriers)){
-            return "配送员数量为0， 无法初始化";
+            return "not couriers";
         }
         for (SysUser courier : allCouriers) {
             String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
             redisService.zadd(key, courier.getId(), 10000);
         }
-        return "success！";
+        return "init has been successfully!";
     }
 }
