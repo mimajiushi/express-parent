@@ -26,6 +26,21 @@ public interface RedisService {
     boolean setKeyValTTL(String key, String value, long ttl);
 
     /**
+     * zset插入操作
+     */
+    public void zadd(String key, String menber, double score);
+
+    /**
+     * zset改变分数操作
+     */
+    double zincrby(String key, String menber, double score);
+
+    /**
+     *  移除zset中的指定元素
+     */
+    void zrem(String key, Object... menbers);
+
+    /**
      * 设置超期时间
      */
     boolean expire(String key, long expire);

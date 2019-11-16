@@ -71,7 +71,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         String[] ignoreUrls = {
 //                 "/**",
-                // "/alipay/return",
+                "/ucenter/getAllCouriers", // 获取所有配送员信息接口，暂不验证权限
                 "/alipay/notify",
                 // todo 该模块理论上没有公开的接口，如果有请记得在此处加上
                 // swagger

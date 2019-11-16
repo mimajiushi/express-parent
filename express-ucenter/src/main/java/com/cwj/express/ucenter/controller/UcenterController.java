@@ -7,6 +7,7 @@ import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.ucenter.service.SysRolesLevelService;
+import com.cwj.express.ucenter.service.SysUserService;
 import com.cwj.express.utils.ExpressOauth2Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author Administrator
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UcenterController extends BaseController implements UcenterControllerApi {
 
     private final SysRolesLevelService sysRolesLevelService;
+    private final SysUserService sysUserService;
 
 //    @Value("${rocketmq.producer.send-message-timeout}")
 //    private Long timeout;
@@ -58,6 +62,12 @@ public class UcenterController extends BaseController implements UcenterControll
          }
 
          return sysRolesLevelService.getByUserId(id.getId());
+    }
+
+    @Override
+    @GetMapping("/getAllCouriers")
+    public List<SysUser> getAllCouriers() {
+        return sysUserService.getAllCouriers();
     }
 
 }

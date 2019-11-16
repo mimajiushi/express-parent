@@ -20,6 +20,11 @@ public class RedisConfig {
     public static final long ORDER_INFO_TTL = 60*60;
 
     /**
+     * 分配配送员redis日志有效时间 一周
+     */
+    public static final long DISTRIBUTION_LOG_TIME_OUT = 60*60*24*7;
+
+    /**
      * 短信存储头
      */
     public static final String SMS_HEAD = "SMS_LOGIN";
@@ -64,4 +69,9 @@ public class RedisConfig {
      * 订单支付信息存储头
      */
     public static final String ORDER_PAYMENT_DATA = "ORDER_PAYMENT_DATA";
+
+    /**
+     * 配送员区域权重信息存储头
+     */
+    public static final String COURIER_WEIGHT_DATA = "COURIER_WEIGHT_DATA";
 }

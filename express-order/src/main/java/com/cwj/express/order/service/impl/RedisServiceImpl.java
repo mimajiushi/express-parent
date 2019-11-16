@@ -43,6 +43,21 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public void zadd(String key, String menber, double score) {
+        stringRedisTemplate.opsForZSet().add(key, menber, score);
+    }
+
+    @Override
+    public double zincrby(String key, String menber, double score) {
+        return stringRedisTemplate.opsForZSet().incrementScore(key, menber, score);
+    }
+
+    @Override
+    public void zrem(String key, Object... menbers) {
+        stringRedisTemplate.opsForZSet().remove(key, menbers);
+    }
+
+    @Override
     public boolean expire(String key, long expire) {
         return stringRedisTemplate.expire(key, expire, TimeUnit.SECONDS);
     }

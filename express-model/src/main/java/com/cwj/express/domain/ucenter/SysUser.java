@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.cwj.express.common.enums.SexEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.enums.ThirdLoginTypeEnum;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.security.core.CredentialsContainer;
@@ -36,35 +38,43 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
     /**
      * 人脸唯一标识
      */
+    @JsonIgnore
     private String faceToken;
     /**
      * 用户角色
      */
     @TableField("role_id")
-    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private SysRoleEnum role;
     /**
      * 性别
      */
-    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private SexEnum sex;
+
     /**
      * 真实姓名
      */
+    @JsonIgnore
     private String realName;
+
     /**
      * 身份证号
      */
+    @JsonIgnore
     private String idCard;
+
     /**
      * 学生证号
      */
     private String studentIdCard;
+
 
     private String tel;
     /**
@@ -75,11 +85,12 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
      * 三方登陆类型
      */
     @TableField("third_login_type")
-    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
+//    @JSONField(serialzeFeatures= SerializerFeature.WriteEnumUsingToString)
     private ThirdLoginTypeEnum thirdLogin;
     /**
      * 三方登陆ID
      */
+    @JsonIgnore
     private String thirdLoginId;
     /**
      * 是否启用
@@ -123,6 +134,7 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
     }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<GrantedAuthority>(){{
             add(new SimpleGrantedAuthority(getRole().getName()));
@@ -133,6 +145,7 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
      * 是否未冻结
      */
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         if(ObjectUtils.isEmpty(this.lockDate)) {
             return true;
@@ -145,21 +158,25 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
      * 是否启用
      */
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return this.hasEnable == 1;
     }
 
     @Override
+    @JsonIgnore
     public void eraseCredentials() {
         this.password = null;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }

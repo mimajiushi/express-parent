@@ -2,6 +2,8 @@ package com.cwj.express.ucenter.service;
 
 import com.cwj.express.domain.ucenter.SysUser;
 
+import java.util.List;
+
 /**
  * @author chenwenjie
  */
@@ -22,5 +24,10 @@ public interface SysUserService {
     public SysUser getById(String id);
 
 
+    /**
+     * 获取全部配送员信息接口
+     * @return 配送员信息列表
+     */
+    public List<SysUser> getAllCouriers();
 
 }

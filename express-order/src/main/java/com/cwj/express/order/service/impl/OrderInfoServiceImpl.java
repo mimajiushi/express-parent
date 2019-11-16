@@ -149,6 +149,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
             rocketMQTemplate.syncSend(RocketmqConfig.EXPRESS_TOPIC,
                     MessageBuilder.withPayload(orderInfo.getId() + "@@" + userId + "@@" + timeString).build()
                     , timeout, MessageDelayLevel.TIME_10M.level);
+            // todo 发送分配配送员的消息
             // 设置ttl为延时消息时间（10分钟）的redis缓存
             String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + userId;
             redisService.setKeyValTTL(key, JSON.toJSONString(orderInfo), RedisConfig.CREATE_ORDER_TTL);

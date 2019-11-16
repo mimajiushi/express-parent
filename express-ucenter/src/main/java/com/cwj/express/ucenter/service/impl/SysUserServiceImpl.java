@@ -1,6 +1,7 @@
 package com.cwj.express.ucenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.ucenter.dao.SysUserMapper;
 import com.cwj.express.ucenter.service.SysUserService;
@@ -9,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import java.util.List;
 
 /**
  * @author cwj
@@ -34,6 +37,11 @@ public class SysUserServiceImpl implements SysUserService {
     public SysUser getById(String id) {
         // todo 设置redis缓存
         return sysUserMapper.selectById(id);
+    }
+
+    @Override
+    public List<SysUser> getAllCouriers() {
+        return sysUserMapper.selectList(new QueryWrapper<SysUser>().eq("role_id", SysRoleEnum.COURIER.getType()));
     }
 
 }
