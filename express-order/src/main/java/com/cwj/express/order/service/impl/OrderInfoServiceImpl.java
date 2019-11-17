@@ -2,34 +2,37 @@ package com.cwj.express.order.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.*;
 import com.cwj.express.common.enums.rocketmq.MessageDelayLevel;
 import com.cwj.express.common.model.response.ResponseResult;
+import com.cwj.express.domain.order.OrderEvaluate;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.order.config.alipay.AliPayConfig;
+import com.cwj.express.order.dao.OrderEvaluateMapper;
 import com.cwj.express.order.dao.OrderInfoMapper;
 import com.cwj.express.order.dao.OrderPaymentMapper;
+import com.cwj.express.order.feignclient.area.AreaFeignClient;
 import com.cwj.express.order.feignclient.ucenter.UcenterFeignClient;
 import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.order.service.RedisService;
-import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.utils.LocalDateTimeUtils;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.table.BootstrapTableVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.omg.CORBA.TIMEOUT;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,11 +40,14 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -51,11 +57,13 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private final OrderInfoMapper orderInfoMapper;
     private final OrderPaymentService orderPaymentService;
     private final OrderPaymentMapper orderPaymentMapper;
+    private final OrderEvaluateMapper orderEvaluateMapper;
 //    @Qualifier("cancelOrder")
     private final RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
     private final AliPayConfig aliPayConfig;
     private final UcenterFeignClient ucenterFeignClient;
+    private final AreaFeignClient areaFeignClient;
 
     @Value("${rocketmq.producer.send-message-timeout}")
     private Long timeout;
@@ -191,12 +199,83 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     }
 
     @Override
-    @Transactional
-    public void updateOrder(OrderInfo orderInfo) {
-        //清除订单详情缓存
-        String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + orderInfo.getUserId();
-        redisService.remove(key);
-        orderInfo.setUserId(null);
-        orderInfoMapper.updateById(orderInfo);
+    public BootstrapTableVO<OrderHistoryVO> orderList(Page<OrderInfo> page, String userId, SysRoleEnum roleEnum, OrderHistoryVO orderHistoryVO) {
+        QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        if (-1 != orderHistoryVO.getOrderStatus()){
+            orderInfoQueryWrapper.eq("status", OrderStatusEnum.getByStatus(orderHistoryVO.getOrderStatus()));
+        }
+        if (!StringUtils.isEmpty(orderHistoryVO.getId())){
+            orderInfoQueryWrapper.eq("id", orderHistoryVO.getId());
+        }
+        if (!StringUtils.isEmpty(orderHistoryVO.getStartDate())){
+            orderInfoQueryWrapper.ge("create_date", orderHistoryVO.getStartDate());
+        }
+        if (!StringUtils.isEmpty(orderHistoryVO.getEndDate())){
+            orderInfoQueryWrapper.le("create_date", orderHistoryVO.getEndDate());
+        }
+        switch (roleEnum){
+            // 管理员
+            case ADMIN:
+                if (-1 != orderHistoryVO.getPaymentStatus()){
+                    // todo 根据支付状态查询
+                }
+                break;
+            // 配送员
+            case COURIER:
+                break;
+            // 其它角色即付费角色
+            default:
+                IPage<OrderInfo> iPage = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
+                List<OrderHistoryVO> rows = converter(iPage.getRecords(), userId, roleEnum);
+                return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(iPage.getTotal()).build();
+        }
+        return null;
     }
+
+
+    private List<OrderHistoryVO> converter(List<OrderInfo> orderInfoList, String userId, SysRoleEnum roleEnum){
+        if (ObjectUtils.isEmpty(orderInfoList)){
+            return new ArrayList<>();
+        }
+        return orderInfoList.stream().map(item -> {
+            OrderHistoryVO orderHistoryVO1 = new OrderHistoryVO();
+            BeanUtils.copyProperties(item, orderHistoryVO1);
+            // 获取支付信息
+            OrderPayment payment = getPaymenyById(item.getId());
+            // 查看订单是否能评分
+            orderHistoryVO1.setCanScore(canEvaluate(item.getId(), userId, roleEnum));
+            // 支付状态
+            orderHistoryVO1.setPaymentStatus(payment.getPaymentStatus().getStatus());
+            // 支付金额
+            orderHistoryVO1.setPayment(String.valueOf(payment.getPayment()));
+            // 订单状态
+            orderHistoryVO1.setOrderStatus(item.getOrderStatus().getStatus());
+            // 查询快递公司
+            orderHistoryVO1.setCompany(areaFeignClient.getCompanyById(item.getCompany()).getName());
+            return orderHistoryVO1;
+        }).collect(Collectors.toList());
+    }
+
+    // 查询订单是否能评分（付费角色和配送员）
+    private String canEvaluate(String orderId, String userId, SysRoleEnum roleEnum){
+        if (roleEnum == SysRoleEnum.COURIER){
+            // 配送员
+            int count = orderEvaluateMapper.selectCount(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("courier_id", userId));
+            return count == 0?"1":"0";
+        }else if (roleEnum != SysRoleEnum.ADMIN){
+            // 普通用户
+            int count = orderEvaluateMapper.selectCount(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("user_id", userId));
+            return count == 0?"1":"0";
+        }
+        return "0";
+    }
+
+    // 查询支付状态
+    private OrderPayment getPaymenyById(String orderId){
+        return orderPaymentMapper.selectById(orderId);
+    }
+
+    // todo 配送员查询订单列表
+    // todo 管理员查询订单列表
+    // todo 根据id获取快递公司名字（远程调用）
 }

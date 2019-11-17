@@ -5,13 +5,16 @@ import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.table.BootstrapTableVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
@@ -35,4 +38,9 @@ public interface OrderControllerApi {
 
     @ApiOperation("根据订单id获取订单支付状态信息")
     public OrderPayment getPaymentById(@PathVariable String orderId);
+
+    @ApiOperation(value = "获取用户的历史订单记录，角色不同获取到的记录也不同")
+    public BootstrapTableVO<OrderHistoryVO> orderList(@RequestParam(defaultValue = "1", required = false) Integer current,
+                                                      @RequestParam(defaultValue = "10", required = false) Integer size,
+                                                      OrderHistoryVO orderHistoryVO);
 }

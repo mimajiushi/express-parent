@@ -1,9 +1,13 @@
 package com.cwj.express.order.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.table.BootstrapTableVO;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -46,9 +50,13 @@ public interface OrderInfoService {
     void cancelOrder(String orderId, String userId, LocalDateTime timeVersion);
 
     /**
-     * 更新订单
-     * @param orderInfo 订单信息，订单id和用户id不能为空
+     * 获取订单列表
+     * @param page 分页信息
+     * @param orderHistoryVO 查询条件
+     * @param roleEnum 权限信息
+     * @param userId 用户id
+     * @return 订单信息列表
      */
-    void updateOrder(OrderInfo orderInfo);
+    BootstrapTableVO<OrderHistoryVO> orderList(Page<OrderInfo> page, String userId, SysRoleEnum roleEnum, OrderHistoryVO orderHistoryVO);
 
 }

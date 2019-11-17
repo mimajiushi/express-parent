@@ -10,19 +10,40 @@
                 <a href="/ucenter/orderPage">立即下单<i class="glyphicon glyphicon-cloud-download pull-right"></i></a>
             </li>
 
-            <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')" id="history-sidebar">
-                <a href="/user/history">我的订单<i class="glyphicon glyphicon-list-alt pull-right"></i></a>
+            <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER','ROLE_COURIER')" id="history-sidebar">
+                <a href="/ucenter/orderListPage">我的订单<i class="glyphicon glyphicon-list-alt pull-right"></i></a>
             </li>
 
-            <li id="recycle-sidebar">
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="orderManager-sidebar">
+                <a href="/admin/order">订单管理<i class="glyphicon glyphicon-cloud-download pull-right"></i></a>
+            </li>
+
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="orderRecycle-sidebar">
+                <a href="/admin/recycle">订单回收<i class="glyphicon glyphicon-trash pull-right"></i></a>
+            </li>
+
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="user-sidebar">
+                <a href="/admin/user">用户管理<i class="glyphicon glyphicon-user pull-right"></i></a>
+            </li>
+
+            <!--订单改成由系统分配，这个应该不需要了-->
+            <!--<li sec:authorize="hasAnyRole('ROLE_COURIER')" id="getorder-sidebar">-->
+                <!--<a href="/courier/order">接单大厅<i class="glyphicon glyphicon-cloud-download pull-right"></i></a>-->
+            <!--</li>-->
+
+            <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')" id="recycleStore-sidebar">
                 <a href="/user/recycle">回收站<i class="glyphicon glyphicon-trash pull-right"></i></a>
             </li>
 
-            <li id="feedback-sidebar">
-                <a href="/user/feedback">反馈建议<i class="glyphicon glyphicon-comment pull-right"></i></a>
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_COURIER')" id="adminFeedback-sidebar">
+                <a href="/admin/feedback">反馈管理<i class="glyphicon glyphicon-comment pull-right"></i></a>
             </li>
 
-            <li id="evaluate-sidebar">
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="profit-sidebar" class="disabled">
+                <a href="#">收益管理<i class="glyphicon glyphicon-yen pull-right"></i></a>
+            </li>
+
+            <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER','ROLE_COURIER')" id="evaluate-sidebar">
                 <a href="/user/evaluate">评价中心<i class="glyphicon glyphicon-edit pull-right"></i></a>
             </li>
 

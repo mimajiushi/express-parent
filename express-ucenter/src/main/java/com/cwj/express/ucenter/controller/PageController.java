@@ -160,4 +160,20 @@ public class PageController extends BaseController {
         map.put("payStatus", payment.getPaymentStatus().getName());
         return "user/payment";
     }
+
+    @GetMapping("/orderListPage")
+    public String orderListPage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+        switch (sysUser.getRole()){
+            case ADMIN:
+                return "admin/history";
+            case COURIER:
+                return "courier/history";
+            default:
+                return "user/history";
+        }
+    }
 }

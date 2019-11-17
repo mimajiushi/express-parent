@@ -24,13 +24,14 @@
                 <div class="panel-heading">
                     <form class="form-inline">
                         <div class="form-group">
-                            <label for="inputStatus">订单状态</label>
-                            <select id="inputStatus" class="form-control">
+                            <label for="orderStatus">订单状态</label>
+                            <select id="orderStatus" class="form-control">
                                 <option value=-1>所有状态</option>
                                 <option value=1>等待接单</option>
                                 <option value=2>派送中</option>
                                 <option value=3>订单完成</option>
                                 <option value=4>订单异常</option>
+                                <option value=5>订单取消</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -63,6 +64,7 @@
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <strong>撤销订单：</strong> 订单状态需为 【等待接单】
                         <strong>删除订单：</strong> 订单状态需为 【订单完成】 或 【订单异常】
+                        <strong>订单取消：</strong> 创建订单后10分钟以内不支付
                     </div>
                     <table id="tb_history"></table>
                 </div>
@@ -225,7 +227,13 @@
     <script th:src="@{/public/assets/js/bootstrap-table-zh-CN.min.js}" src="../../public/assets/js/bootstrap-table-zh-CN.min.js"></script>
     <script th:src="@{/public/assets/js/tableExport.min.js}" src="../../public/assets/js/tableExport.min.js"></script>
     <script th:src="@{/public/assets/js/star-rating.min.js}" src="../../public/assets/js/star-rating.min.js"></script>
+    <!-- 公用头部JS start -->
+    <div th:replace="~{common/configJS :: configJS}">...</div>
+    <!-- 公用头部JS end -->
     <script>
+        let orderListUrl = $('#orderListUrl').val();
+        let uid = getCookieValue('uid');
+        let token = "Bearer " + uid;
         $(function () {
             $("#history-sidebar").addClass('active');
 
@@ -260,7 +268,12 @@
             //初始化Table
             oTableInit.Init = function () {
                 $('#tb_history').bootstrapTable({
-                    url: '/api/v1/order/list',          //请求后台的URL（*）
+                    ajaxOptions: {
+                        headers: {
+                            'Authorization':token
+                        }
+                    },
+                    url: orderListUrl,          //请求后台的URL（*）
                     method: HTTP.GET,                   //请求方式（*）
                     toolbar: '#toolbar',                //工具按钮组id
                     striped: true,                      //是否显示行间隔色
@@ -315,7 +328,7 @@
                         title: '操作',
                         width: 120,
                         formatter: actionFormatter
-                    }]
+                    }],
                 });
             };
 
@@ -327,7 +340,7 @@
                     type: 0,
                     // 筛选参数
                     id: $("#inputId").val(),
-                    status: $("#inputStatus").val(),
+                    orderStatus: $("#orderStatus").val(),
                     startDate: $("#inputStartDate").val(),
                     endDate:$("#inputEndDate").val(),
                 };
@@ -425,6 +438,8 @@
                 return '<span style="color:#42afff">派送中</span>';
             else if (value === 1)
                 return '<span style="color:grey">等待接单</span>';
+            else if (value === 5)
+                return '<span style="color:grey">订单取消</span>';
         }
         // 支付状态的格式化
         function paymentFormatter(value, row, index) {
@@ -439,7 +454,14 @@
         }
 
         function flushTable() {
-            $("#tb_history").bootstrapTable('refresh',{url : '/api/v1/order/list'} );
+            $("#tb_history").bootstrapTable('refresh',{
+                ajaxOptions: {
+                    headers: {
+                        'Authorization':token
+                    }
+                },
+                url : orderListUrl
+            } );
         }
 
         function refreshStatus(id) {
