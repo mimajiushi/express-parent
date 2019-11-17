@@ -58,7 +58,6 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private final OrderPaymentService orderPaymentService;
     private final OrderPaymentMapper orderPaymentMapper;
     private final OrderEvaluateMapper orderEvaluateMapper;
-//    @Qualifier("cancelOrder")
     private final RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
     private final AliPayConfig aliPayConfig;
