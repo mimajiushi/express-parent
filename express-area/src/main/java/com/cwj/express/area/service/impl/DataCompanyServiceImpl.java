@@ -37,12 +37,12 @@ public class DataCompanyServiceImpl implements DataCompanyService {
 
     @Override
     public DataCompany getById(Integer id) {
-        String key = RedisConfig.COMPANY_DATA + ":" + id;
+        String key = RedisConfig.COMPANY_DATA + "::" + id;
         String value = redisService.get(key);
         if (StringUtils.isEmpty(value)){
             DataCompany dataCompany = dataCompanyMapper.selectById(id);
             if (!ObjectUtils.isEmpty(dataCompany)){
-                redisService.setKeyValTTL(key, JSON.toJSONString(dataCompany), 60*30);
+                redisService.setKeyValTTL(key, JSON.toJSONString(dataCompany), RedisConfig.AREA_TTL);
             }
             // todo 其它服务调用注意可能出现空的状况
             return dataCompany;

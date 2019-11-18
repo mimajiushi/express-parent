@@ -27,6 +27,10 @@ public class OrderHistoryVO implements Serializable {
      */
     private String company;
 
+    /**
+     * 服务类型
+     */
+    private String serverType;
 
     /**
      * 收件人

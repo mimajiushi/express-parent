@@ -17,4 +17,11 @@ public interface DataSchoolService{
      */
     List<Integer> selectProvincIdDistinct();
 
+    /**
+     * 根据id获取学校信息
+     */
+    DataSchool getById(String id);
+
+    List<DataSchool> getAllSchool();
+
 }

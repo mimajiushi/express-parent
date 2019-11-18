@@ -20,6 +20,11 @@ public class RedisConfig {
     public static final long ORDER_INFO_TTL = 60*60;
 
     /**
+     * 地址缓存过期时间
+     */
+    public static final long AREA_TTL = 60*60*24;
+
+    /**
      * 分配配送员redis日志有效时间 一周
      */
     public static final long DISTRIBUTION_LOG_TIME_OUT = 60*60*24*7;
@@ -43,6 +48,7 @@ public class RedisConfig {
     /**
      * 学校数据存储头
      */
+    public static final String SCHOOL_DATA_LIST = "SCHOOL_DATA_LIST";
     public static final String SCHOOL_DATA = "SCHOOL_DATA";
 
     /**

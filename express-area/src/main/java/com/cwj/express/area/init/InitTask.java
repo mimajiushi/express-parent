@@ -57,9 +57,9 @@ public class InitTask {
             log.info("开始加载快递公司数据...");
             List<Integer> parentIdDistinct = dataAreaService.selectParentIdDistinct();
             for (Integer parentId : parentIdDistinct) {
-                String key = RedisConfig.AREA_HEAD + ":" + parentId;
+                String key = RedisConfig.AREA_HEAD + "::" + parentId;
                 List<DataArea> areasByParentId = dataAreaService.getAreasByParentId(parentId);
-                redisService.setKeyValTTL(key, JSON.toJSONString(areasByParentId), CACHE_TIME);
+                redisService.setKeyValTTL(key, JSON.toJSONString(areasByParentId), RedisConfig.AREA_TTL);
             }
             log.info("加载快递公司数据结束...");
 
@@ -70,8 +70,8 @@ public class InitTask {
             log.info("开始加载快递公司数据...");
             List<DataCompany> dataCompanies = dataCompanyService.listAll();
             for (DataCompany dataCompany : dataCompanies) {
-                String key = RedisConfig.COMPANY_DATA + ":" + dataCompany.getId();
-                redisService.setKeyValTTL(key, JSON.toJSONString(dataCompany), CACHE_TIME);
+                String key = RedisConfig.COMPANY_DATA + "::" + dataCompany.getId();
+                redisService.setKeyValTTL(key, JSON.toJSONString(dataCompany), RedisConfig.AREA_TTL);
             }
             redisTemplate.delete(RedisConfig.COMPANY_DATA_LIST);
             redisTemplate.opsForList().rightPushAll(RedisConfig.COMPANY_DATA_LIST, dataCompanies);
@@ -83,12 +83,18 @@ public class InitTask {
             log.info("开始加载校园数据...");
             List<Integer> provincIdDistinct = dataSchoolService.selectProvincIdDistinct();
             for (Integer  provincId : provincIdDistinct) {
-                String key = RedisConfig.SCHOOL_DATA + ":" + provincId;
+                String key = RedisConfig.SCHOOL_DATA_LIST + "::" + provincId;
                 List<DataSchool> listByProvinceId = dataSchoolService.getListByProvinceId(provincId);
-                redisService.setKeyValTTL(key, JSON.toJSONString(listByProvinceId), CACHE_TIME);
+                redisService.setKeyValTTL(key, JSON.toJSONString(listByProvinceId), RedisConfig.AREA_TTL);
+            }
+
+            List<DataSchool> allSchool = dataSchoolService.getAllSchool();
+            for (DataSchool dataSchool : allSchool) {
+                String key = RedisConfig.SCHOOL_DATA + "::" + dataSchool.getId();
+                redisService.setKeyValTTL(key, JSON.toJSONString(dataSchool), RedisConfig.AREA_TTL);
             }
             log.info("加载校园数据结束...");
-        }, 0, 30, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.DAYS);
 
 
 

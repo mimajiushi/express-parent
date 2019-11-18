@@ -29,14 +29,14 @@ public class DataSchoolServiceImpl implements DataSchoolService {
 
     @Override
     public List<DataSchool> getListByProvinceId(Integer provinceId) {
-        String key = RedisConfig.SCHOOL_DATA + ":" + provinceId;
+        String key = RedisConfig.SCHOOL_DATA_LIST + "::" + provinceId;
         String value = redisService.get(key);
         if (StringUtils.isEmpty(value)){
             List<DataSchool> dataSchools = dataSchoolMapper.selectList(
                     new QueryWrapper<DataSchool>().eq("province_id", provinceId)
             );
             if (!ObjectUtils.isEmpty(dataSchools)){
-                redisService.setKeyValTTL(key, JSON.toJSONString(dataSchools), 60*30);
+                redisService.setKeyValTTL(key, JSON.toJSONString(dataSchools), RedisConfig.AREA_TTL);
             }
             return dataSchools;
         }
@@ -50,5 +50,22 @@ public class DataSchoolServiceImpl implements DataSchoolService {
     @Override
     public List<Integer> selectProvincIdDistinct(){
         return dataSchoolMapper.selectProvincIdDistinct();
+    }
+
+    @Override
+    public DataSchool getById(String id) {
+        String key = RedisConfig.SCHOOL_DATA + "::" + id;
+        String value = redisService.get(key);
+        if (StringUtils.isEmpty(value)){
+            DataSchool dataSchool = dataSchoolMapper.selectById(id);
+            redisService.setKeyValTTL(key, JSON.toJSONString(dataSchool), RedisConfig.AREA_TTL);
+            return dataSchool;
+        }
+        return JSON.parseObject(value, DataSchool.class);
+    }
+
+    @Override
+    public List<DataSchool> getAllSchool() {
+        return dataSchoolMapper.selectList(null);
     }
 }

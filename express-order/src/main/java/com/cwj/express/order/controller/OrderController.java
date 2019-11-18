@@ -15,6 +15,7 @@ import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderDetailVO;
 import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
@@ -82,6 +83,14 @@ public class OrderController extends BaseController implements OrderControllerAp
         SysUser sysUser = ucenterFeignClient.getById(id.getId());
         Page<OrderInfo> page = new Page<>(current, size);
         return orderInfoService.orderList(page, sysUser.getId(), sysUser.getRole(), orderHistoryVO);
+    }
+
+    @Override
+    @GetMapping("/orderDetail/{orderId}")
+    public ResponseResult orderDetail(@PathVariable String orderId) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        return null;
     }
 
 }

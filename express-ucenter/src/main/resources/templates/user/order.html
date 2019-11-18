@@ -56,17 +56,17 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputAddress" class="col-sm-1 control-label">快递寄达地址</label>
+                        <label for="inputAddress" class="col-sm-1 control-label">快递寄达地址(送件上门，快递中心？东门？南门？ / (上门取件，校外地址))/</label>
                         <div class="col-sm-11">
                             <textarea class="form-control dis_change_textarea" id="inputAddress" name="address" rows="5"
-                                      placeholder="此地址为快递公司的配送地址"></textarea>
+                                      placeholder=""></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputRecAddress" class="col-sm-1 control-label">收件地址</label>
+                        <label for="inputRecAddress" class="col-sm-1 control-label">收件地址(送件上门，宿舍号？办公楼 / )</label>
                         <div class="col-sm-11">
                             <textarea class="form-control dis_change_textarea" id="inputRecAddress" name="recAddress" rows="5"
-                                      placeholder="此地址为本平台将为您派送的地址"></textarea>
+                                      placeholder=""></textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -145,8 +145,12 @@
             let type = $('#type').val();
             if (type == '1'){
                 $('#inputOdd').attr('disabled', true);
+                $('#inputAddress').attr('placeholder', '校内地址/快递中心/哪个门');
+                $('#inputRecAddress').attr('placeholder', '宿舍号/办公楼号');
             }else {
                 $('#inputOdd').attr('disabled', false);
+                $('#inputAddress').attr('placeholder', '校外寄达地址');
+                $('#inputRecAddress').attr('placeholder', '宿舍号/办公楼号');
             }
         }
 

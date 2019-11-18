@@ -63,6 +63,12 @@ public class AreaController extends BaseController implements AreaControllerApi 
         return dataSchoolService.getListByProvinceId(provinceId);
     }
 
+    @GetMapping("/school/info/{schoolId}")
+    @Override
+    public DataSchool getSchoolInfoById(@PathVariable String schoolId) {
+        return dataSchoolService.getById(schoolId);
+    }
+
 
     /**
      * 测试mvc是否生效的接口

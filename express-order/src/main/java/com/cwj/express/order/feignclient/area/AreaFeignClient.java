@@ -2,9 +2,12 @@ package com.cwj.express.order.feignclient.area;
 
 import com.cwj.express.common.constant.ExpressServiceListConstant;
 import com.cwj.express.domain.area.DataCompany;
+import com.cwj.express.domain.area.DataSchool;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 /**
  * @author cwj
@@ -19,4 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface AreaFeignClient {
     @GetMapping("/area/company/{id}")
     public DataCompany getCompanyById(@PathVariable("id") Integer id);
+
+    @GetMapping("/area/school/info/{schoolId}")
+    public DataSchool getSchoolInfoById(@PathVariable("schoolId") String schoolId);
 }

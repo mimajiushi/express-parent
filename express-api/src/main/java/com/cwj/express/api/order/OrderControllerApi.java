@@ -5,6 +5,7 @@ import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderDetailVO;
 import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
@@ -43,4 +44,7 @@ public interface OrderControllerApi {
     public BootstrapTableVO<OrderHistoryVO> orderList(@RequestParam(defaultValue = "1", required = false) Integer current,
                                                       @RequestParam(defaultValue = "10", required = false) Integer size,
                                                       OrderHistoryVO orderHistoryVO);
+
+    @ApiOperation("根据订单id查询订单详情信息")
+    public ResponseResult orderDetail(@PathVariable String orderId);
 }

@@ -5,6 +5,7 @@ import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderDetailVO;
 import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
@@ -58,5 +59,15 @@ public interface OrderInfoService {
      * @return 订单信息列表
      */
     BootstrapTableVO<OrderHistoryVO> orderList(Page<OrderInfo> page, String userId, SysRoleEnum roleEnum, OrderHistoryVO orderHistoryVO);
+
+    /**
+     * 根据订单id，用户id，用户权限获取订单详情，
+     * 管理员不需要比对userId
+     * @param orderId 订单id
+     * @param userId 用户id
+     * @param roleEnum 用户角色
+     * @return 订单详情
+     */
+    OrderDetailVO orderDetail(String orderId, String userId, SysRoleEnum roleEnum);
 
 }

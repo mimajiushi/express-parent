@@ -10,10 +10,13 @@ import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.*;
 import com.cwj.express.common.enums.rocketmq.MessageDelayLevel;
 import com.cwj.express.common.model.response.ResponseResult;
+import com.cwj.express.domain.area.DataCompany;
+import com.cwj.express.domain.area.DataSchool;
 import com.cwj.express.domain.order.OrderEvaluate;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
+import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.order.config.alipay.AliPayConfig;
 import com.cwj.express.order.dao.OrderEvaluateMapper;
 import com.cwj.express.order.dao.OrderInfoMapper;
@@ -25,6 +28,7 @@ import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.LocalDateTimeUtils;
 import com.cwj.express.vo.order.OrderDashboardVO;
+import com.cwj.express.vo.order.OrderDetailVO;
 import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
@@ -231,7 +235,44 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         return null;
     }
 
+    @Override
+    public OrderDetailVO orderDetail(String orderId, String userId, SysRoleEnum roleEnum) {
+        QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        orderInfoQueryWrapper.eq("id", orderId);
+        switch (roleEnum){
+            case ADMIN:
+                break;
+            case COURIER:
+                orderInfoQueryWrapper.eq("courier_id",userId);
+                break;
+            default:
+                orderInfoQueryWrapper.eq("user_id", userId);
+                break;
+        }
+        OrderInfo orderInfo = orderInfoMapper.selectOne(orderInfoQueryWrapper);
+    }
 
+    /**
+     * 查询封装返回的订单详情
+     */
+    private OrderDetailVO orderDetail(OrderInfo orderInfo){
+        if (ObjectUtils.isEmpty(orderInfo)){
+            return null;
+        }
+        // 获取寄件人信息，远程调用(学校id及手机号码)
+        SysUser user = ucenterFeignClient.getById(orderInfo.getUserId());
+        SysUser courier = ucenterFeignClient.getById(orderInfo.getCourierId());
+        // 获取快递公司信息和学校信息，远程调用
+        DataCompany company = areaFeignClient.getCompanyById(orderInfo.getCompany());
+        DataSchool school = areaFeignClient.getSchoolInfoById(String.valueOf(user.getSchoolId()));
+
+        return null
+
+    }
+
+    /**
+     * 查询封装返回的订单列表
+     */
     private List<OrderHistoryVO> converter(List<OrderInfo> orderInfoList, String userId, SysRoleEnum roleEnum){
         if (ObjectUtils.isEmpty(orderInfoList)){
             return new ArrayList<>();
@@ -239,6 +280,8 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         return orderInfoList.stream().map(item -> {
             OrderHistoryVO orderHistoryVO1 = new OrderHistoryVO();
             BeanUtils.copyProperties(item, orderHistoryVO1);
+            // 服务类型
+            orderHistoryVO1.setServerType(item.getOrderTypeEnum().getDesc());
             // 获取支付信息
             OrderPayment payment = getPaymenyById(item.getId());
             // 查看订单是否能评分
@@ -255,7 +298,9 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         }).collect(Collectors.toList());
     }
 
-    // 查询订单是否能评分（付费角色和配送员）
+    /**
+     * 查询订单是否能评分（付费角色和配送员）
+     */
     private String canEvaluate(String orderId, String userId, SysRoleEnum roleEnum){
         if (roleEnum == SysRoleEnum.COURIER){
             // 配送员
@@ -269,7 +314,9 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         return "0";
     }
 
-    // 查询支付状态
+    /**
+     * 查询支付状态
+     */
     private OrderPayment getPaymenyById(String orderId){
         return orderPaymentMapper.selectById(orderId);
     }

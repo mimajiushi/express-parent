@@ -26,7 +26,7 @@ public class DataAreaServiceImpl implements DataAreaService {
 
     @Override
     public List<DataArea> getAreasByParentId(Integer parentId) {
-        String key = RedisConfig.AREA_HEAD + ":" + parentId;
+        String key = RedisConfig.AREA_HEAD + "::" + parentId;
         String redisRes = redisService.get(key);
         if (StringUtils.isEmpty(redisRes)){
             List<DataArea> dataAreas = dataAreaMapper.
@@ -34,7 +34,7 @@ public class DataAreaServiceImpl implements DataAreaService {
                             new QueryWrapper<DataArea>().select("parent_id", "name").eq("parent_id", parentId).orderByAsc("sort"));
             if (!ObjectUtils.isEmpty(dataAreas)){
                 String value = JSON.toJSONString(dataAreas);
-                redisService.set(key, value);
+                redisService.setKeyValTTL(key, value, RedisConfig.AREA_TTL);
             }
             return dataAreas;
         }

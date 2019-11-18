@@ -25,4 +25,7 @@ public interface AreaControllerApi {
 
     @ApiOperation("根据行政id（provinceId）获取该区的学校信息列表")
     public List<DataSchool> getSchoolByProvinceId(@PathVariable Integer provinceId);
+
+    @ApiOperation("根据id获取学校详细信息")
+    public DataSchool getSchoolInfoById(@PathVariable String schoolId);
 }
