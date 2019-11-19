@@ -17,8 +17,8 @@ import java.util.List;
  */
 
 @FeignClient(
-        name = ExpressServiceListConstant.EXPRESS_UCENTER
-//        fallbackFactory = UcenterFeignClientFallbackFactory.class
+        name = ExpressServiceListConstant.EXPRESS_UCENTER,
+        fallbackFactory = UcenterFeignClientFallbackFactory.class
 )
 public interface UcenterFeignClient {
     @PostMapping("/ucenter/getRoleMsgByUserId")

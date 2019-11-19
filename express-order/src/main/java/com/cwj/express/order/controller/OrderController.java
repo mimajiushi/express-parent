@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.api.order.OrderControllerApi;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
 import com.cwj.express.common.enums.SysRoleEnum;
+import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.order.OrderInfo;
@@ -26,6 +27,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -90,7 +92,11 @@ public class OrderController extends BaseController implements OrderControllerAp
     public ResponseResult orderDetail(@PathVariable String orderId) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
         SysUser sysUser = ucenterFeignClient.getById(id.getId());
-        return null;
+        OrderDetailVO orderDetailVO = orderInfoService.orderDetail(orderId, sysUser.getId(), sysUser.getRole());
+        if (ObjectUtils.isEmpty(orderDetailVO)){
+            return ResponseResult.FAIL(CommonCode.ORDER_NOT_EXIST_ERROR);
+        }
+        return ResponseResult.SUCCESS(orderDetailVO);
     }
 
 }

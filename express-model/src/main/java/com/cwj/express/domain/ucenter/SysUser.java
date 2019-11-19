@@ -61,7 +61,7 @@ public class SysUser implements UserDetails, CredentialsContainer, Serializable 
     /**
      * 真实姓名
      */
-    @JsonIgnore
+//    @JsonIgnore
     private String realName;
 
     /**

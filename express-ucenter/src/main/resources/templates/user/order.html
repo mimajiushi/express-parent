@@ -56,14 +56,14 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputAddress" class="col-sm-1 control-label">快递寄达地址(送件上门，快递中心？东门？南门？ / (上门取件，校外地址))/</label>
+                        <label for="inputAddress" class="col-sm-1 control-label">快递寄达地址</label>
                         <div class="col-sm-11">
                             <textarea class="form-control dis_change_textarea" id="inputAddress" name="address" rows="5"
                                       placeholder=""></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="inputRecAddress" class="col-sm-1 control-label">收件地址(送件上门，宿舍号？办公楼 / )</label>
+                        <label for="inputRecAddress" class="col-sm-1 control-label">收件地址</label>
                         <div class="col-sm-11">
                             <textarea class="form-control dis_change_textarea" id="inputRecAddress" name="recAddress" rows="5"
                                       placeholder=""></textarea>
@@ -124,7 +124,7 @@
             // $("#expressForm").attr('action', createOrderUrl);
 
             // 加载快递公司数据
-            sendJson(HTTP.GET, areaUrl, null, false, function (res) {
+            sendJson(HTTP.GET, areaUrl, null, null, false, function (res) {
                 let html = '', data = res;
                 for(let i = 0; i<data.length; i++) {
                     html += '<option value="'+data[i].id+'">'+data[i].name+ ' | ' + data[i].code + '</option>\n';

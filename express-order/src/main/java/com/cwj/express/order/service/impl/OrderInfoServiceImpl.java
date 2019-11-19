@@ -250,12 +250,13 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 break;
         }
         OrderInfo orderInfo = orderInfoMapper.selectOne(orderInfoQueryWrapper);
+        return getOrderDetail(orderInfo);
     }
 
     /**
      * 查询封装返回的订单详情
      */
-    private OrderDetailVO orderDetail(OrderInfo orderInfo){
+    private OrderDetailVO getOrderDetail(OrderInfo orderInfo){
         if (ObjectUtils.isEmpty(orderInfo)){
             return null;
         }
@@ -265,9 +266,29 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         // 获取快递公司信息和学校信息，远程调用
         DataCompany company = areaFeignClient.getCompanyById(orderInfo.getCompany());
         DataSchool school = areaFeignClient.getSchoolInfoById(String.valueOf(user.getSchoolId()));
-
-        return null
-
+        // 获取支付信息
+        OrderPayment payment = getPaymenyById(orderInfo.getId());
+        // 基础订单信息
+        return OrderDetailVO.builder()
+                .orderId(orderInfo.getId())
+                .orderStatus(orderInfo.getOrderStatus().getName())
+                .serverType(orderInfo.getOrderTypeEnum().getDesc())
+                .userRemark(orderInfo.getRemark())
+                .schoolName(school.getName())
+                .recName(orderInfo.getRecName())
+                .recTel(orderInfo.getRecTel())
+                .recAddress(orderInfo.getRecAddress())
+                .senderName(user.getRealName())
+                .senderTel(user.getTel())
+                .senderAddress(orderInfo.getAddress())
+                .odd(orderInfo.getOdd())
+                .companyName(company.getName())
+                .paymentType(payment.getPaymentType().getName())
+                .payment(String.valueOf(payment.getPayment()))
+                .paymentStatus(payment.getPaymentStatus().getName())
+                .courierName(null != courier? courier.getRealName():"无")
+                .courierTel(null != courier? courier.getTel():"无")
+                .courierRemark(orderInfo.getCourierRemark()).build();
     }
 
     /**

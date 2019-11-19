@@ -20,8 +20,9 @@ var HTTP = {
     _successCallback：执行成功回调方法
     _errorCallback：执行失败回调方法
  */
-function sendJson(_type, _url, _data, _async, _successCallback, _errorCallback) {
+function sendJson(_type, _url, _headers, _data, _async, _successCallback, _errorCallback) {
     $.ajax({
+        headers: _headers,
         type: _type,
         async: _async,
         url: _url,
@@ -36,8 +37,9 @@ function sendJson(_type, _url, _data, _async, _successCallback, _errorCallback) 
     });
 }
 
-function sendArray(_type, _url, _data, _async, _successCallback, _errorCallback) {
+function sendArray(_type, _url, _headers, _data, _async, _successCallback, _errorCallback) {
     $.ajax({
+        headers: _headers,
         type: _type,
         async: _async,
         url: _url,
@@ -61,8 +63,9 @@ function sendArray(_type, _url, _data, _async, _successCallback, _errorCallback)
     _successCallback：执行成功回调方法
     _errorCallback：执行失败回调方法
  */
-function sendFile(_url, _data, _async, _successCallback, _errorCallback) {
+function sendFile(_url, _data, _headers, _async, _successCallback, _errorCallback) {
     $.ajax({
+        headers: _headers,
         type: "post",
         async: _async,
         url: _url,

@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2019-11-15 12:47:45
+Date: 2019-11-19 14:30:32
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -150,22 +150,22 @@ INSERT INTO `sys_roles_level` VALUES ('5', '集团邮客', 'ROLE_SVIP_USER', '0.
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `id` varchar(128) NOT NULL COMMENT '用户ID',
-  `username` varchar(64) DEFAULT '' COMMENT '用户名',
-  `password` varchar(128) DEFAULT '' COMMENT '密码',
-  `face_token` varchar(255) DEFAULT '' COMMENT '人脸唯一标识',
-  `sex` int(1) DEFAULT NULL COMMENT '性别',
-  `real_name` varchar(64) DEFAULT NULL COMMENT '真实姓名',
-  `id_card` varchar(64) DEFAULT NULL COMMENT '身份证号',
-  `student_id_card` varchar(64) DEFAULT NULL COMMENT '学生证号',
+  `username` varchar(64) NOT NULL DEFAULT '' COMMENT '用户名',
+  `password` varchar(128) NOT NULL DEFAULT '' COMMENT '密码',
+  `face_token` varchar(255) NOT NULL DEFAULT '' COMMENT '人脸唯一标识',
+  `sex` int(1) NOT NULL COMMENT '性别',
+  `real_name` varchar(64) NOT NULL DEFAULT '' COMMENT '真实姓名',
+  `id_card` varchar(64) NOT NULL DEFAULT '' COMMENT '身份证号',
+  `student_id_card` varchar(64) NOT NULL DEFAULT '' COMMENT '学生证号',
   `role_id` int(11) NOT NULL COMMENT '权限id',
-  `tel` varchar(64) DEFAULT '' COMMENT '手机号',
-  `school_id` varchar(255) DEFAULT NULL COMMENT '所属学校',
-  `third_login_type` int(11) DEFAULT '0' COMMENT '三方登陆类型（0：未绑定三方登陆）',
-  `third_login_id` varchar(128) DEFAULT NULL COMMENT '三方登陆ID',
+  `tel` varchar(64) NOT NULL DEFAULT '' COMMENT '手机号',
+  `school_id` varchar(255) NOT NULL DEFAULT '' COMMENT '所属学校',
+  `third_login_type` int(11) NOT NULL DEFAULT '0' COMMENT '三方登陆类型（0：未绑定三方登陆）',
+  `third_login_id` varchar(128) NOT NULL DEFAULT '' COMMENT '三方登陆ID',
   `has_enable` int(1) DEFAULT '1' COMMENT '是否启用（0：禁用；1：启用）',
   `lock_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '解冻时间',
-  `create_date` datetime DEFAULT NULL,
-  `update_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_tel` (`tel`) USING BTREE COMMENT '手机号码唯一',
   KEY `idx_id_card` (`id_card`) USING BTREE COMMENT '身份证号码',
@@ -175,14 +175,15 @@ CREATE TABLE `sys_user` (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('1', 'user1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', null, '0', '1', '1', '123', '3', '17623014429', '2032', '0', null, '1', '2019-10-27 00:55:00', '2019-04-17 23:10:21', '2019-11-13 23:13:49');
-INSERT INTO `sys_user` VALUES ('123', 'vip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '', '', '1740128357', '4', '', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-13 23:13:16');
+INSERT INTO `sys_user` VALUES ('1', 'user1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '0', '1', '1', '123', '3', '17623014429', '2032', '0', '', '1', '2019-10-27 00:55:00', '2019-04-17 23:10:21', '2019-11-14 12:38:28');
+INSERT INTO `sys_user` VALUES ('123', 'vip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '张三', '', '1740128357', '4', '', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-16 02:22:23');
 INSERT INTO `sys_user` VALUES ('1234', 'admin', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '', '', '1740128359', '1', '12312312312', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-13 23:13:39');
-INSERT INTO `sys_user` VALUES ('12345', 'svip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '', '12342342', '1740128359', '5', '12312312313', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-13 23:13:12');
-INSERT INTO `sys_user` VALUES ('270658f71ac110ec6cce0e08b1039b4d', 'chenwenjie', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '4c96fff933a1996d7453e262e0e56f3d', '1', null, null, '1740128356', '3', '15920323196', '3237', '0', null, '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-13 23:13:07');
-INSERT INTO `sys_user` VALUES ('4139cb9237a7852e694f3569b9030b2c', 'admin1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', null, '1', '拉布拉多', '440102198001021230', '777777777', '1', '15521245562', '1367', '0', null, '1', '2019-10-27 00:55:07', '2019-05-03 02:03:48', '2019-11-13 23:13:44');
-INSERT INTO `sys_user` VALUES ('77d014e9455b27c0696eb9f969f87912', 'user2', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', null, '1', null, null, '2222', '3', null, '1382', '0', null, '1', '2019-10-27 00:55:07', null, '2019-11-13 23:13:47');
-INSERT INTO `sys_user` VALUES ('f10960e7392847a2c691ad066e2a87c4', 'courier1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', null, '1', 'zhangsan', '12345', '11', '2', null, '0', '0', null, '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-13 23:13:41');
+INSERT INTO `sys_user` VALUES ('12345', 'svip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '配送员1', '12342342', '1740128359', '5', '12312312313', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-16 02:22:01');
+INSERT INTO `sys_user` VALUES ('123456', 'courier1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', 'zhangsan', '12346', '11', '2', '15521245565', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-15 02:02:08');
+INSERT INTO `sys_user` VALUES ('270658f71ac110ec6cce0e08b1039b4d', 'chenwenjie', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '4c96fff933a1996d7453e262e0e56f3d', '1', '陈文杰', '', '1740128356', '3', '15920323196', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-16 02:21:50');
+INSERT INTO `sys_user` VALUES ('4139cb9237a7852e694f3569b9030b2c', 'admin1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '拉布拉多', '440102198001021230', '777777777', '1', '15521245562', '1367', '0', '', '1', '2019-10-27 00:55:07', '2019-05-03 02:03:48', '2019-11-14 12:38:32');
+INSERT INTO `sys_user` VALUES ('77d014e9455b27c0696eb9f969f87912', 'user2', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '李四', '', '2222', '3', '15521245563', '1382', '0', '', '1', '2019-10-27 00:55:07', '2019-05-03 02:03:48', '2019-11-16 02:22:27');
+INSERT INTO `sys_user` VALUES ('f10960e7392847a2c691ad066e2a87c4', 'courier1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', 'zhangsan', '12345', '11', '2', '15521245564', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-15 02:02:10');
 
 -- ----------------------------
 -- Table structure for user_evaluate
