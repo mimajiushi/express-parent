@@ -49,7 +49,7 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
 
 
     @Override
-    @Cacheable(cacheNames = RedisConfig.ORDER_PAYMENT_DATA, key = "#orderId")
+//    @Cacheable(cacheNames = RedisConfig.ORDER_PAYMENT_DATA, key = "#orderId")
     public OrderPayment getByOrderId(String orderId) {
         return orderPaymentMapper.selectById(orderId);
     }

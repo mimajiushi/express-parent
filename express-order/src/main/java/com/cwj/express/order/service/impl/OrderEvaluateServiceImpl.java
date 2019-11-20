@@ -20,7 +20,7 @@ public class OrderEvaluateServiceImpl implements OrderEvaluateService {
     private final OrderEvaluateMapper orderEvaluateMapper;
 
     @Override
-    @Cacheable(cacheNames = RedisConfig.COUNT_EVALUATE_DATA, key = "#id")
+//    @Cacheable(cacheNames = RedisConfig.COUNT_EVALUATE_DATA, key = "#id")
     public int countEvaluate(String id, Integer roleId) {
         Integer count = 0;
         if (SysRoleEnum.USER.getType() == roleId){

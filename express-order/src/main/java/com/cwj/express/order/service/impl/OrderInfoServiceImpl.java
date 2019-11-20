@@ -72,7 +72,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private Long timeout;
 
     @Override
-    @Cacheable(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+//    @Cacheable(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     public OrderDashboardVO getUserDashboardData(String userId) {
         int waitPayMentCount = 0, waitCount = 0, transportCount = 0;
         List<OrderInfo> orderInfos = orderInfoMapper.selectList(
@@ -121,7 +121,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED ,rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+//    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     @Override
     public ResponseResult createOrder(OrderInfoVO orderInfoVO, String userId) {
         // 有时候格式化之后的时间会出现差一秒的情况，所以一来一回的转换用作担保
@@ -201,7 +201,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
+//    @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     public void cancelOrder(String orderId, String userId, LocalDateTime timeVersion) {
         OrderInfo orderInfo = OrderInfo.builder().id(orderId).orderStatus(OrderStatusEnum.CANCEL).updateDate(timeVersion).build();
         OrderPayment orderPayment = OrderPayment.builder().orderId(orderId).paymentStatus(PaymentStatusEnum.TRADE_CLOSED).updateDate(timeVersion).build();
