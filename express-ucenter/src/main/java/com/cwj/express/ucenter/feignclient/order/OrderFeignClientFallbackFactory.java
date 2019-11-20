@@ -20,12 +20,15 @@ public class OrderFeignClientFallbackFactory implements FallbackFactory<OrderFei
             }
 
             @Override
-            public OrderDashboardVO getUserDashboardData(String userId) {
-                log.error("获取用户仪表盘订单信息异常，用户id:{}，异常信息:{}", userId, throwable.getMessage());
-                return OrderDashboardVO.builder()
-                        .waitPaymentCount(-999)
-                        .transportCount(-999)
-                        .waitCount(-999).build();
+            public OrderDashboardVO getUserDashboardData() {
+                log.error("获取用户订单被评价数量异常，异常信息:{}", throwable.getMessage());
+                return new OrderDashboardVO();
+            }
+
+            @Override
+            public OrderDashboardVO getCourerDashboardData() {
+                log.error("获取配送员仪表盘订单信息异常，异常信息:{}", throwable.getMessage());
+                return new OrderDashboardVO();
             }
 
             @Override

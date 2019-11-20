@@ -104,6 +104,22 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 .build();
     }
 
+    @Override
+    public OrderDashboardVO getCourerDashboardData(String courierId) {
+        // 获取等待揽收的订单数量
+        int waitPickupCount = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("courier_id", courierId)
+                .eq("status", OrderStatusEnum.WAIT_PICK_UP.getStatus()));
+        // 获取等待配送的订单数量
+        int transportCount = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("courier_id", courierId)
+                .eq("status", OrderStatusEnum.TRANSPORT.getStatus()));
+        return OrderDashboardVO.builder()
+                .transportCount(transportCount)
+                .waitPickUpCount(waitPickupCount).build();
+
+    }
+
     @Transactional(propagation = Propagation.REQUIRED ,rollbackFor = Exception.class)
     @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     @Override

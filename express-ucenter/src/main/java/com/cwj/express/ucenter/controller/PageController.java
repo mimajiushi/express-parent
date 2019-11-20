@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.annotations.ApiIgnore;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
 
 
 @Controller
@@ -67,7 +68,7 @@ public class PageController extends BaseController {
                     response.sendRedirect("/ucenter/admin");
                     return;
                 case COURIER:
-                    response.sendRedirect("/ucenter/dashboard");
+                    response.sendRedirect("/ucenter/courierDashboard");
                     return;
                 default:
                     response.sendRedirect(URLConstant.LOGIN_PAGE_URL);
@@ -79,7 +80,7 @@ public class PageController extends BaseController {
 
 
     /**
-     * 控制台页面
+     * 控制台页面(付费用户)
      * 这里不能使用缓存
      */
     @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
@@ -93,12 +94,13 @@ public class PageController extends BaseController {
 
         UserEvaluate scoreById = userEvaluateService.getScoreById(sysUser.getId());
         BigDecimal score = scoreById == null?new BigDecimal(0):scoreById.getScore();
-        int evaluateCount = orderFeignClient.countEvaluate(sysUser.getId(), sysUser.getRole().getType());
+//        int evaluateCount = orderFeignClient.countEvaluate(sysUser.getId(), sysUser.getRole().getType());
+        int evaluateCount = scoreById.getCount();
 
         String userDesc = "您共收到：" + evaluateCount + "条评价，您的综合评分为：" + score + "分";
         map.put("evaluateDesc", userDesc);
 
-        OrderDashboardVO userDashboardData = orderFeignClient.getUserDashboardData(sysUser.getId());
+        OrderDashboardVO userDashboardData = orderFeignClient.getUserDashboardData();
         String orderDesc = "未支付订单数：：" + userDashboardData.getWaitPaymentCount() +
                 "，等待接单数：：" + userDashboardData.getWaitCount() +
                 "，正在派送数：" + userDashboardData.getTransportCount();
@@ -113,15 +115,36 @@ public class PageController extends BaseController {
         return "user/dashboard";
     }
 
-    /**
-     * 管理员页面示例 todo 目前仅用作权限演示用
-     */
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/admin")
-    public String adminPage(ModelMap map){
-        return "user/admintest";
-    }
+    @PreAuthorize("hasRole('ROLE_COURIER')")
+    @GetMapping("/courierDashboard")
+    public String courierDashboard(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
 
+        map.put("roleName", sysUser.getRole().getCnName());
+        map.put("frontName", sysUser.getUsername());
+
+        UserEvaluate scoreById = userEvaluateService.getScoreById(sysUser.getId());
+        BigDecimal score = scoreById == null?new BigDecimal(0):scoreById.getScore();
+        int evaluateCount = scoreById.getCount();
+
+        String userDesc = "您共收到：" + evaluateCount + "条评价，您的综合评分为：" + score + "分";
+        map.put("evaluateDesc", userDesc);
+
+
+        OrderDashboardVO courerDashboardData = orderFeignClient.getCourerDashboardData();
+        String orderDesc = "等待揽收数：" + courerDashboardData.getWaitPickUpCount() +
+                "，正在配送数：" + courerDashboardData.getTransportCount();
+        map.put("orderDesc", orderDesc);
+
+//        Map<String, Integer> data2 = feedbackService.getCourierDashboardData();
+//        String feedbackDesc = "今日系统新增反馈数：" + data2.get("today") +
+//                "，系统等待处理数：" + data2.get("wait");
+        String feedbackDesc = "暂时不写";
+        map.put("feedbackDesc", feedbackDesc);
+
+        return "courier/dashboard";
+    }
 
     @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
     @GetMapping("/orderPage")
@@ -176,4 +199,5 @@ public class PageController extends BaseController {
                 return "user/history";
         }
     }
+
 }

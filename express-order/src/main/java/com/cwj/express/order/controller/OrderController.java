@@ -42,16 +42,25 @@ public class OrderController extends BaseController implements OrderControllerAp
     private final OrderPaymentService orderPaymentService;
     private final UcenterFeignClient ucenterFeignClient;
 
+//    @Override
+//    @GetMapping("/countEvaluate/{id}/{roleId}")
+//    public int countEvaluate(@PathVariable String id, @PathVariable Integer roleId) {
+//        return orderEvaluateService.countEvaluate(id, roleId);
+//    }
+
     @Override
-    @GetMapping("/countEvaluate/{id}/{roleId}")
-    public int countEvaluate(@PathVariable String id, @PathVariable Integer roleId) {
-        return orderEvaluateService.countEvaluate(id, roleId);
+    @GetMapping("/userDashboardData")
+    public OrderDashboardVO getUserDashboardData() {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        return orderInfoService.getUserDashboardData(id.getId());
     }
 
     @Override
-    @GetMapping("/userDashboardData/{userId}")
-    public OrderDashboardVO getUserDashboardData(@PathVariable String userId) {
-        return orderInfoService.getUserDashboardData(userId);
+    @PreAuthorize("hasRole('ROLE_COURIER')")
+    @GetMapping("/courierDashboardData")
+    public OrderDashboardVO getCourerDashboardData() {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        return orderInfoService.getCourerDashboardData(id.getId());
     }
 
     @Override

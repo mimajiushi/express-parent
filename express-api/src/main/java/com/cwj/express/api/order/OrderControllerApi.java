@@ -21,15 +21,18 @@ import javax.validation.Valid;
 
 @Api(value="获取订单信息api",tags = "订单controller")
 public interface OrderControllerApi {
-    @ApiOperation("获取用户收到的评价条数（用户分为配送员和下单用户）")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户id"),
-            @ApiImplicitParam(name = "roleId", value = "用户角色id")
-    })
-    public int countEvaluate(@PathVariable String id, @PathVariable Integer roleId);
+//    @ApiOperation("获取用户收到的评价条数（用户分为配送员和下单用户）")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "id", value = "用户id"),
+//            @ApiImplicitParam(name = "roleId", value = "用户角色id")
+//    })
+//    public int countEvaluate(@PathVariable String id, @PathVariable Integer roleId);
 
     @ApiOperation("获取下单用户仪表盘的订单信息")
-    public OrderDashboardVO getUserDashboardData(@PathVariable String userId);
+    public OrderDashboardVO getUserDashboardData();
+
+    @ApiOperation("获取配送员仪表盘的订单信息")
+    public OrderDashboardVO getCourerDashboardData();
 
     @ApiOperation("创建订单接口")
     public ResponseResult createOrder(@Valid OrderInfoVO orderInfoVO);

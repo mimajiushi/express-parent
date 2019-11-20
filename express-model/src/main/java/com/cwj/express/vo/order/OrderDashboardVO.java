@@ -25,6 +25,9 @@ public class OrderDashboardVO implements Serializable {
     @ApiModelProperty(value = "等待配送员配送的订单(付费用户，配送员)")
     private int waitCount;
 
+    @ApiModelProperty(value = "等待配送员揽收的订单(配送员)")
+    private int waitPickUpCount;
+
     @ApiModelProperty(value = "正在配送的订单（付费用户，配送员）")
     private int transportCount;
 }

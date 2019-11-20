@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
 
@@ -25,20 +26,13 @@ public class UserEvaluateServiceImpl implements UserEvaluateService {
 
     @Override
     public UserEvaluate getScoreById(String id) {
-        String key = RedisConfig.USER_EVALUATE_DATA + ":" + id;
-        // 从缓存获取
-//        String value = redisService.get(key);
-        // 缓存没有则数据库
-//        if (StringUtils.isEmpty(value)){
-            UserEvaluate userEvaluate = userEvaluateMapper.selectById(id);
-//            if (!ObjectUtils.isEmpty(userEvaluate)){
-//                redisService.set(key, JSON.toJSONString(userEvaluate));
-//            }else {
-//                 没有则默认满分
-                userEvaluate.setScore(new BigDecimal(10));
-//            }
-            return userEvaluate;
-//        }
-//        return JSON.parseObject(value, UserEvaluate.class);
+
+        UserEvaluate userEvaluate = userEvaluateMapper.selectById(id);
+        if (ObjectUtils.isEmpty(userEvaluate)) {
+            userEvaluate = new UserEvaluate();
+            userEvaluate.setScore(new BigDecimal(10));
+            userEvaluate.setCount(0);
+        }
+        return userEvaluate;
     }
 }

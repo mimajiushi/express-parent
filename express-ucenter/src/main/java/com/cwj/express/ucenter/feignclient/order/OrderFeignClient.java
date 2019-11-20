@@ -23,8 +23,11 @@ public interface OrderFeignClient {
     @GetMapping("/order/countEvaluate/{id}/{roleId}")
     public int countEvaluate(@PathVariable("id") String id, @PathVariable("roleId") Integer roleId);
 
-    @GetMapping("/order/userDashboardData/{userId}")
-    public OrderDashboardVO getUserDashboardData(@PathVariable("userId") String userId);
+    @GetMapping("/order/userDashboardData")
+    public OrderDashboardVO getUserDashboardData();
+
+    @GetMapping("/order/courierDashboardData")
+    public OrderDashboardVO getCourerDashboardData();
 
     @PostMapping("/order/getOrder/{orderId}")
     public OrderInfo getOrderById(@PathVariable("orderId") String orderId);

@@ -28,6 +28,13 @@ public interface OrderInfoService {
      OrderDashboardVO getUserDashboardData(String userId);
 
     /**
+     * 获取配送员的仪表盘订单信息
+     * @param courierId 配送员id
+     * @return 配送员仪表盘订单星系
+     */
+    OrderDashboardVO getCourerDashboardData(String courierId);
+
+    /**
      * 创建订单并发送取消订单延时消息
      * @param orderInfoVO 订单信息
      * @return 成功则返回订单id， 失败则返回操作失败
