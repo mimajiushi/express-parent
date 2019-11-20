@@ -4,6 +4,12 @@ package com.cwj.express.common.config.redis;
  * redis相关配置
  */
 public class RedisConfig {
+
+    /**
+     * 配送员变动分数
+     */
+    public static final double COURIER_SCORE = 10;
+
     /**
      * 短信过期时间，单位秒
      */

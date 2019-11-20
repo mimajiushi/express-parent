@@ -53,4 +53,7 @@ public interface OrderControllerApi {
 
     @ApiOperation("配送员揽收订单")
     public ResponseResult pickUpOrder(@PathVariable String orderId, String courierRemark);
+
+    @ApiOperation("配送员完成订单")
+    public ResponseResult finishOrder(@PathVariable String orderId, String courierRemark);
 }

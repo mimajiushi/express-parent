@@ -51,9 +51,12 @@ public interface RedisService {
     void remove(String key);
 
     /**
-     * 自增操作
-     * @param delta 自增步长
+     * zet更改分数
+     * @param key key
+     * @param menber 成员值
+     * @param delta 分数变动（可为正负数）
+     * @return 更改后的分数
      */
-    Long increment(String key, long delta);
+    Double increment(String key, String menber, double delta);
 
 }

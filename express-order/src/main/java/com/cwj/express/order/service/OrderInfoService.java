@@ -85,4 +85,12 @@ public interface OrderInfoService {
      */
     boolean pickUpOrder(String orderId, String courierId, String courierRemark);
 
+    /**
+     * 根据订单id，配送员id，将订单由配送中/异常状态改为完成状态
+     * @param orderId 订单id
+     * @param courierId 配送员id
+     * @param courierRemark 配送员备注
+     * @return  才做是否成功
+     */
+    boolean finishOrder(String orderId, String courierId, String courierRemark);
 }

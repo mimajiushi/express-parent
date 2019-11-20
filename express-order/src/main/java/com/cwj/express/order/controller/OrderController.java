@@ -121,4 +121,16 @@ public class OrderController extends BaseController implements OrderControllerAp
         return ResponseResult.SUCCESS();
     }
 
+    @Override
+    @PostMapping("/finishOrder/{orderId}")
+    @PreAuthorize("hasRole('ROLE_COURIER')")
+    public ResponseResult finishOrder(@PathVariable String orderId, String courierRemark) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        boolean success = orderInfoService.finishOrder(orderId, id.getId(), courierRemark);
+        if (!success){
+            return ResponseResult.FAIL(CommonCode.ORDER_HAS_BEEN_CHANGEED);
+        }
+        return ResponseResult.SUCCESS();
+    }
+
 }

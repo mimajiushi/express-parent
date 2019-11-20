@@ -275,11 +275,36 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean pickUpOrder(String orderId, String courierId, String courierRemark) {
         // 乐观锁更新
-        OrderInfo updateOrderInfo = OrderInfo.builder().id(orderId).courierId(courierId).orderStatus(OrderStatusEnum.TRANSPORT).courierRemark(courierRemark).build();
+        OrderInfo updateOrderInfo = OrderInfo.builder()
+                .id(orderId)
+                .courierId(courierId)
+                .orderStatus(OrderStatusEnum.TRANSPORT)
+                .courierRemark(courierRemark).build();
         int count = orderInfoMapper.updateById(updateOrderInfo);
         return count > 0;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean finishOrder(String orderId, String courierId, String courierRemark) {
+        SysUser courier = ucenterFeignClient.getById(courierId);
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
+        OrderInfo finishOrderInfo = OrderInfo.builder()
+                .id(orderId)
+                .courierId(courierId)
+                .orderStatus(OrderStatusEnum.COMPLETE)
+                .courierRemark(courierRemark).build();
+        // 完成订单，同样是乐观锁
+        int count = orderInfoMapper.updateById(finishOrderInfo);
+        boolean success = count > 0;
+        // 操作成功则加回配送员分数
+        if (success){
+            redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
+        }
+        return success;
     }
 
     /**
