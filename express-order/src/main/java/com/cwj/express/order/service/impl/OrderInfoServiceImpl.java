@@ -244,6 +244,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 break;
             // 其它角色即付费角色
             default:
+                orderInfoQueryWrapper.eq("user_id", userId);
                 IPage<OrderInfo> iPage = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
                 List<OrderHistoryVO> rows = converter(iPage.getRecords(), userId, roleEnum);
                 return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(iPage.getTotal()).build();
