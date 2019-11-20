@@ -220,6 +220,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Override
     public BootstrapTableVO<OrderHistoryVO> orderList(Page<OrderInfo> page, String userId, SysRoleEnum roleEnum, OrderHistoryVO orderHistoryVO) {
         QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        List<OrderHistoryVO> rows = new ArrayList<>();
         if (-1 != orderHistoryVO.getOrderStatus()){
             orderInfoQueryWrapper.eq("status", OrderStatusEnum.getByStatus(orderHistoryVO.getOrderStatus()));
         }
@@ -241,12 +242,15 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 break;
             // 配送员
             case COURIER:
-                break;
+                orderInfoQueryWrapper.eq("courier_id", userId);
+                IPage<OrderInfo> courierPages = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
+                rows = converter(courierPages.getRecords(), userId, roleEnum);
+                return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(courierPages.getTotal()).build();
             // 其它角色即付费角色
             default:
                 orderInfoQueryWrapper.eq("user_id", userId);
                 IPage<OrderInfo> iPage = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
-                List<OrderHistoryVO> rows = converter(iPage.getRecords(), userId, roleEnum);
+                rows = converter(iPage.getRecords(), userId, roleEnum);
                 return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(iPage.getTotal()).build();
         }
         return null;
@@ -268,6 +272,14 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         }
         OrderInfo orderInfo = orderInfoMapper.selectOne(orderInfoQueryWrapper);
         return getOrderDetail(orderInfo);
+    }
+
+    @Override
+    public boolean pickUpOrder(String orderId, String courierId, String courierRemark) {
+        // 乐观锁更新
+        OrderInfo updateOrderInfo = OrderInfo.builder().id(orderId).courierId(courierId).orderStatus(OrderStatusEnum.TRANSPORT).courierRemark(courierRemark).build();
+        int count = orderInfoMapper.updateById(updateOrderInfo);
+        return count > 0;
     }
 
     /**

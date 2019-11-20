@@ -244,8 +244,10 @@
     <script>
         let orderListUrl = $('#orderListUrl').val();
         let orderDetailUrl = $('#orderDetailUrl').val();
+        let pickUpOrderUrl = $('#pickUpOrderUrl').val();
         let uid = getCookieValue('uid');
         let token = "Bearer " + uid;
+        // alert(token);
         $(function () {
             $("#history-sidebar").addClass('active');
 
@@ -276,7 +278,12 @@
             //初始化Table
             oTableInit.Init = function () {
                 $('#tb_history').bootstrapTable({
-                    url: '/api/v1/order/list',          //请求后台的URL（*）
+                    ajaxOptions: {
+                        headers: {
+                            'Authorization':token
+                        }
+                    },
+                    url: orderListUrl,          //请求后台的URL（*）
                     method: HTTP.GET,                   //请求方式（*）
                     toolbar: '#toolbar',                //工具按钮组id
                     striped: true,                      //是否显示行间隔色
@@ -363,11 +370,15 @@
         function actionFormatter(value, row, index) {
             let id = "'" + value + "'";
             let result = '<button class="btn btn-xs btn-info" onclick="showDetail('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n';
-
+            // 等待揽收
+            if (row.orderStatus === 6){
+                result += '<button class="btn btn-xs btn-success" onclick="pickUpOrder('+id+')" title="揽收完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n' +
+                    '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
+            }
             // 等待接单
             if(row.orderStatus === 2) {
-                result += '<button class="btn btn-xs btn-success" onclick="completeOrder('+id+')" title="完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n' +
-                    '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
+                result += '<button class="btn btn-xs btn-success" onclick="completeOrder('+id+')" title="订单完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n' +
+                    '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
             }
             // 订单完成
             if(row.orderStatus === 3 && row.canScore === "1") {
@@ -398,11 +409,18 @@
                 return '<span style="color:grey">等待揽收</span>';
         }
         function flushTable() {
-            $("#tb_history").bootstrapTable('refresh',{url : '/api/v1/order/list'} );
+            $("#tb_history").bootstrapTable('refresh',{
+                ajaxOptions: {
+                    headers: {
+                        'Authorization':token
+                    }
+                },
+                url : orderListUrl
+            } );
         }
 
         function showDetail(id) {
-            sendJson(HTTP.GET, "/api/v1/order/" + id, null, false, function (res) {
+            sendJson(HTTP.GET, orderDetailUrl + id, {"Authorization": token}, null, false, function (res) {
                 if (res.code !== 10000) {
                     layer.msg(res.data,{icon:5});
                 } else {
@@ -433,6 +451,24 @@
                 }
             }, function () {
                 layer.msg("未知错误",{icon:2});
+            });
+        }
+        
+        function pickUpOrder(id) {
+            layer.prompt({title:"揽收完成", formType:2},function(val, index) {
+                sendJson(HTTP.POST, pickUpOrderUrl + id, {"Authorization": token}, {"courierRemark": val}, false, function (res) {
+                    if (res.code === 10000){
+                        layer.msg("揽收成功！", {icon: 6});
+                        layer.close(index);
+                        flushTable();
+                    }else {
+                        layer.msg(res.data, {icon: 5});
+                        layer.close(index);
+                    }
+                },
+                function () {
+                    layer.msg("未知错误", {icon: 5});
+                })
             });
         }
 

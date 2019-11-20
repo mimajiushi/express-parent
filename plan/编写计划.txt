@@ -29,6 +29,7 @@ java代码中key记得加上存储头，便于可视化工具分离
 模拟数据：ZADD qid1 1 cid1
          ZADD qid1 2 cid2
          ZADD qid1 3 cid3
+更改配送员分数(增加10分): ZINCRBY qid 10 cid1
 
 记录日志语句： lua脚本先 set 订单id 配送员id ，然后call('expire',KEYS[1],ARGV[1])
 

@@ -34,7 +34,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
 public class OrderController extends BaseController implements OrderControllerApi {
 
     private final OrderEvaluateService orderEvaluateService;
@@ -50,6 +49,7 @@ public class OrderController extends BaseController implements OrderControllerAp
 
     @Override
     @GetMapping("/userDashboardData")
+    @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
     public OrderDashboardVO getUserDashboardData() {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
         return orderInfoService.getUserDashboardData(id.getId());
@@ -65,6 +65,7 @@ public class OrderController extends BaseController implements OrderControllerAp
 
     @Override
     @PostMapping("/createOrder")
+    @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
     public ResponseResult createOrder(@Valid OrderInfoVO orderInfoVO) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
         String userId = id.getId();
@@ -106,6 +107,18 @@ public class OrderController extends BaseController implements OrderControllerAp
             return ResponseResult.FAIL(CommonCode.ORDER_NOT_EXIST_ERROR);
         }
         return ResponseResult.SUCCESS(orderDetailVO);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_COURIER')")
+    @PostMapping("/pickUpOrder/{orderId}")
+    public ResponseResult pickUpOrder(@PathVariable String orderId, String courierRemark) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        boolean success = orderInfoService.pickUpOrder(orderId, id.getId(), courierRemark);
+        if (!success){
+            return ResponseResult.FAIL(CommonCode.ORDER_HAS_BEEN_CHANGEED);
+        }
+        return ResponseResult.SUCCESS();
     }
 
 }

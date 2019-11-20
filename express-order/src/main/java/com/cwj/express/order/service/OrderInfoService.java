@@ -77,4 +77,12 @@ public interface OrderInfoService {
      */
     OrderDetailVO orderDetail(String orderId, String userId, SysRoleEnum roleEnum);
 
+    /**
+     * 根据订单id，配送员id，将订单由揽收状态改为配送中状态
+     * @param orderId 订单id
+     * @param courierId 配送员id
+     * @return 操作是否成功
+     */
+    boolean pickUpOrder(String orderId, String courierId, String courierRemark);
+
 }

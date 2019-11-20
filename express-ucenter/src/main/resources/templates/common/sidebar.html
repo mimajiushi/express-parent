@@ -2,8 +2,11 @@
 <html lang="zh-cn" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
     <div class="col-md-2"  th:fragment="html">
         <ul class="nav nav-pills nav-stacked" id="nav">
-            <li id="dashboard-sidebar">
+            <li id="dashboard-sidebar" sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')">
                 <a href="/ucenter/dashboard/">仪表盘<i class="glyphicon glyphicon-dashboard pull-right"></i></a>
+            </li>
+            <li id="courierDashboard-sidebar" sec:authorize="hasAnyRole('ROLE_COURIER')">
+                <a href="/ucenter/courierDashboard/">仪表盘<i class="glyphicon glyphicon-dashboard pull-right"></i></a>
             </li>
 
             <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')" id="order-sidebar">

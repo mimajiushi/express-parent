@@ -50,4 +50,7 @@ public interface OrderControllerApi {
 
     @ApiOperation("根据订单id查询订单详情信息")
     public ResponseResult orderDetail(@PathVariable String orderId);
+
+    @ApiOperation("配送员揽收订单")
+    public ResponseResult pickUpOrder(@PathVariable String orderId, String courierRemark);
 }

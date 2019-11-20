@@ -53,6 +53,7 @@ public enum CommonCode implements ResultCode{
 
     ORDER_NOT_EXIST_ERROR(false, 40001, "订单不存在！"),
     PAYMENT_NOT_EXIST_ERROR(false, 40002, "订单支付信息不存在！"),
+    ORDER_HAS_BEEN_CHANGEED(false, 40003, "订单状态更新失败！有可能是订单状态已被改变！"),
 
 
     ALI_PAY_GATEWAY_ERROR(false, 50001, "支付宝接口调用失败！"),
