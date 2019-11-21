@@ -1,3 +1,5 @@
+【暂时关闭所有缓存功能，便于开发阶段发现问题】
+
 @Cacheable(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
 public OrderDashboardVO getUserDashboardData(String userId)
 删除缓存：
