@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 /**
  * 反馈类型枚举
- * @date 2019年04月17日 0:11
  */
 @Getter
 public enum FeedbackTypeEnum implements IEnum<Integer> {

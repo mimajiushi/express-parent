@@ -71,6 +71,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         String[] ignoreUrls = {
 //                 "/**",
+                "/ucenter/hello",
                 "/ucenter/getById/**",
                 "/ucenter/getAllCouriers",
                 "/alipay/notify",

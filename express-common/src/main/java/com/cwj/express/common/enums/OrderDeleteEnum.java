@@ -5,7 +5,6 @@ import lombok.Getter;
 
 /**
  * 订单删除类型枚举
- * @date 2019年04月16日 23:21
  */
 @Getter
 public enum OrderDeleteEnum implements IEnum<Integer> {

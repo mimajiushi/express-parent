@@ -5,7 +5,6 @@ import lombok.Getter;
 
 /**
  * 支付方式枚举
- * @date 2019年04月16日 23:15
  */
 @Getter
 public enum PaymentTypeEnum implements IEnum<Integer> {

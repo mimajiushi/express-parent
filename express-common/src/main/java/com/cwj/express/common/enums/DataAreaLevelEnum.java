@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.core.enums.IEnum;
 import lombok.Getter;
 
 /**
- * @author xiangsheng.wu
- * @date 2019年04月21日 12:49
+ * 地理级别枚举
  */
 @Getter
 public enum DataAreaLevelEnum implements IEnum<Integer> {

@@ -5,7 +5,6 @@ import lombok.Getter;
 /**
  * 错误码枚举
  * @author root
- * @date 2019/4/16 23:51
  */
 @Getter
 public enum ResponseErrorCodeEnum {

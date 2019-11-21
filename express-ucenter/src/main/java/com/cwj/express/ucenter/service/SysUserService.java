@@ -1,6 +1,7 @@
 package com.cwj.express.ucenter.service;
 
 import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.vo.ucenter.UserInfoVo;
 
 import java.util.List;
 
@@ -30,4 +31,10 @@ public interface SysUserService {
      */
     public List<SysUser> getAllCouriers();
 
+    /**
+     * 获取用户信息
+     * @param userId 用户id
+     * @return 用户信息
+     */
+    public UserInfoVo getUserInfo(String userId);
 }

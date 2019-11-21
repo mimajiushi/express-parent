@@ -36,9 +36,20 @@ public interface RedisService {
     void remove(String key);
 
     /**
-     * 自增操作
-     * @param delta 自增步长
+     * zet更改分数
+     * @param key key
+     * @param menber 成员值
+     * @param delta 分数变动（可为正负数）
+     * @return 更改后的分数
      */
-    Long increment(String key, long delta);
+    Double increment(String key, String menber, double delta);
+
+    /**
+     * 获取指定成员的分数(主要用于判断该成员是否存在)
+     * @param key 键值
+     * @param menber 成员值
+     * @return 分数(成员不存在则为null)
+     */
+    Double zscore(String key, String menber);
 
 }

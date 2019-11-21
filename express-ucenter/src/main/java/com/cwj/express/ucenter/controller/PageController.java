@@ -14,11 +14,13 @@ import com.cwj.express.ucenter.service.*;
 import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.vo.order.OrderDashboardVO;
 import com.cwj.express.vo.ucenter.UserFeedbackVO;
+import com.cwj.express.vo.ucenter.UserInfoVo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -198,6 +200,19 @@ public class PageController extends BaseController {
             default:
                 return "user/history";
         }
+    }
+
+    @GetMapping("/userInfoPage")
+    public String infoPage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+
+        UserInfoVo userInfo = sysUserService.getUserInfo(sysUser.getId());
+        map.put("info", userInfo);
+        return "common/info";
+
     }
 
 }

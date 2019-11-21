@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 /**
  * 角色枚举
- * @date 2019年04月17日 0:11
  */
 @Getter
 public enum SexEnum implements IEnum<Integer> {

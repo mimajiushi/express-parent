@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 /**
  * 订单状态枚举
- * @date 2019年04月16日 23:21
  */
 @Getter
 public enum  OrderStatusEnum  implements IEnum<Integer> {

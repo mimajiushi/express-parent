@@ -1,5 +1,6 @@
 package com.cwj.express.api.ucenter;
 
+import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
 import io.swagger.annotations.Api;
@@ -22,4 +23,7 @@ public interface UcenterControllerApi {
 
     @ApiOperation(value = "根据用户id获取用户信息")
     public SysUser getById(@PathVariable String userId);
+
+    @ApiOperation(value = "配送员请假")
+    public ResponseResult courierLeave(String reason);
 }
