@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         <div class="form-group" sec:authorize="hasAnyRole('ROLE_COURIER')">
-                            <label for="leaveStatus" class="col-md-2 control-label">用户名</label>
+                            <label for="leaveStatus" class="col-md-2 control-label">状态</label>
                             <div class="col-md-10">
                                 <p class="form-control-static col-md-7" id="leaveStatus"
                                    th:style="${true == info.leave ? 'color:gray' : ''}"
