@@ -28,7 +28,7 @@ public interface RedisService {
     /**
      * zset插入操作
      */
-    public void zadd(String key, String menber, double score);
+    public Boolean zadd(String key, String menber, double score);
 
     /**
      * zset改变分数操作

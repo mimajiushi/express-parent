@@ -43,8 +43,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void zadd(String key, String menber, double score) {
-        stringRedisTemplate.opsForZSet().add(key, menber, score);
+    public Boolean zadd(String key, String menber, double score) {
+        return stringRedisTemplate.opsForZSet().add(key, menber, score);
     }
 
     @Override

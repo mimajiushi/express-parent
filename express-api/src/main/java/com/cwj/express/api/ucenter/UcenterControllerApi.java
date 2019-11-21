@@ -26,4 +26,7 @@ public interface UcenterControllerApi {
 
     @ApiOperation(value = "配送员请假")
     public ResponseResult courierLeave(String reason);
+
+    @ApiOperation(value = "配送员回到岗位")
+    public ResponseResult courierReWork();
 }

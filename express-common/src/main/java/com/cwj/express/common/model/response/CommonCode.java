@@ -62,6 +62,10 @@ public enum CommonCode implements ResultCode{
     COURIER_NOT_EXIST(false, 60001, "该区域没有配送员！"),
 
 
+    COURIER_LEAVE_FALL(false, 70001, "配送员请假失败！"),
+    COURIER_REWORK_FAIL(false, 70002, "配送员回到岗位操作失败！")
+
+
     ;
 //    private static ImmutableMap<Integer, CommonCode> codes ;
     //操作是否成功

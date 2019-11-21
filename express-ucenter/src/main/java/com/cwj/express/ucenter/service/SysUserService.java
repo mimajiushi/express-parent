@@ -37,4 +37,19 @@ public interface SysUserService {
      * @return 用户信息
      */
     public UserInfoVo getUserInfo(String userId);
+
+    /**
+     * 配送员请假接口
+     * @param sysUser 用户对象
+     * @param reason 请假原因
+     * @return true-操作成功 false-操作失败
+     */
+    public boolean courierLeave(SysUser sysUser, String reason);
+
+    /**
+     * 配送员回到岗位接口
+     * @param sysUser 用户对象
+     * 失败则抛出异常
+     */
+    public void courierReWork(SysUser sysUser);
 }

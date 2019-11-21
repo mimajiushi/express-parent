@@ -11,6 +11,11 @@ public class RedisConfig {
     public static final double COURIER_SCORE = 10;
 
     /**
+     * 配送员基准分数
+     */
+    public static final double COURIER_MAX_SCORE = 10000;
+
+    /**
      * 短信过期时间，单位秒
      */
     public static final long SMS_TIME_OUT = 300;

@@ -133,4 +133,16 @@ public class OrderController extends BaseController implements OrderControllerAp
         return ResponseResult.SUCCESS();
     }
 
+    @Override
+    @GetMapping("/countCourierScore/{courierId}")
+    @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
+    public Double countCourierScore(@PathVariable(required = false) String courierId) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        if (SysRoleEnum.ADMIN == sysUser.getRole()){
+            return orderInfoService.countCourierScore(courierId);
+        }
+        return orderInfoService.countCourierScore(id.getId());
+    }
+
 }

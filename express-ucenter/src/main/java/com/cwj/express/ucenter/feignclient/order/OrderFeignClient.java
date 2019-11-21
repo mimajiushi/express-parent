@@ -5,6 +5,7 @@ import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,4 +35,7 @@ public interface OrderFeignClient {
 
     @PostMapping("/order/getPayment/{orderId}")
     public OrderPayment getPaymentById(@PathVariable("orderId") String orderId);
+
+    @GetMapping("/order/countCourierScore/{courierId}")
+    public Double countCourierScore(@PathVariable(required = false,value = "courierId") String courierId);
 }

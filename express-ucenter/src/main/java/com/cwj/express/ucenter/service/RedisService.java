@@ -36,6 +36,11 @@ public interface RedisService {
     void remove(String key);
 
     /**
+     * zset插入操作
+     */
+    public Boolean zadd(String key, String menber, double score);
+
+    /**
      * zet更改分数
      * @param key key
      * @param menber 成员值
@@ -51,5 +56,11 @@ public interface RedisService {
      * @return 分数(成员不存在则为null)
      */
     Double zscore(String key, String menber);
+
+    /**
+     *  移除zset中的指定元素
+     * @return 返回变成成功的数量
+     */
+    Long zrem(String key, Object... menbers);
 
 }

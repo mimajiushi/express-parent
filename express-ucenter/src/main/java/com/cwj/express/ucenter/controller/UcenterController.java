@@ -43,8 +43,9 @@ public class UcenterController extends BaseController implements UcenterControll
 //    @PreAuthorize("hasAnyRole('SVIP_USER')")
     @GetMapping("/hello")
     public String hello(){
-        Double zscore = redisService.zscore("qid1", "asdas");
-        return String.valueOf(zscore);
+//        Double zscore = redisService.zscore("qid1", "asdas");
+        Long zrem = redisService.zrem("qid1", "cid1");// 返回值变更成功的数量
+        return String.valueOf(zrem);
 //        rocketMQTemplate.syncSend(
 //                "testTopic",
 //                MessageBuilder.withPayload("你好payload").build(),
@@ -82,10 +83,23 @@ public class UcenterController extends BaseController implements UcenterControll
     }
 
     @Override
-    @PostMapping
+    @PostMapping("/courierLeave")
+    @PreAuthorize("hasRole('ROLE_COURIER')")
     public ResponseResult courierLeave(String reason) {
-        // todo 编写业务层
-        return null;
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        sysUserService.courierLeave(sysUser, reason);
+        return ResponseResult.SUCCESS();
+    }
+
+    @Override
+    @PostMapping("/courierReWork")
+    @PreAuthorize("hasRole('ROLE_COURIER')")
+    public ResponseResult courierReWork() {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        sysUserService.courierReWork(sysUser);
+        return ResponseResult.SUCCESS();
     }
 
 }

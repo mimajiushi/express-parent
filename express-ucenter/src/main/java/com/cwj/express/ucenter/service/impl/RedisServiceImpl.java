@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * redis操作Service的实现类
- * Created by macro on 2018/8/7.
  */
 @Service
 public class RedisServiceImpl implements RedisService {
@@ -53,6 +52,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Boolean zadd(String key, String menber, double score) {
+        return stringRedisTemplate.opsForZSet().add(key, menber, score);
+    }
+
+    @Override
     public Double increment(String key, String menber, double delta) {
         return stringRedisTemplate.opsForZSet().incrementScore(key, menber, delta);
     }
@@ -60,5 +64,10 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Double zscore(String key, String menber) {
         return stringRedisTemplate.opsForZSet().score(key, menber);
+    }
+
+    @Override
+    public Long zrem(String key, Object... menbers) {
+        return stringRedisTemplate.opsForZSet().remove(key, menbers);
     }
 }

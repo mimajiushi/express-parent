@@ -242,13 +242,13 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 break;
             // 配送员
             case COURIER:
-                orderInfoQueryWrapper.eq("courier_id", userId);
+                orderInfoQueryWrapper.eq("courier_id", userId).eq("has_delete",0);
                 IPage<OrderInfo> courierPages = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
                 rows = converter(courierPages.getRecords(), userId, roleEnum);
                 return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(courierPages.getTotal()).build();
             // 其它角色即付费角色
             default:
-                orderInfoQueryWrapper.eq("user_id", userId);
+                orderInfoQueryWrapper.eq("user_id", userId).eq("has_delete",0);
                 IPage<OrderInfo> iPage = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
                 rows = converter(iPage.getRecords(), userId, roleEnum);
                 return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(iPage.getTotal()).build();
@@ -305,6 +305,16 @@ public class OrderInfoServiceImpl implements OrderInfoService {
             redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
         }
         return success;
+    }
+
+    @Override
+    public Double countCourierScore(String courierId) {
+        Integer count = 0;
+        count = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("courier_id", courierId)
+                .eq("has_delete", 0)
+                .in("status", OrderStatusEnum.WAIT_PICK_UP.getStatus(), OrderStatusEnum.TRANSPORT.getStatus()));
+        return (RedisConfig.COURIER_MAX_SCORE - count*RedisConfig.COURIER_SCORE);
     }
 
     /**

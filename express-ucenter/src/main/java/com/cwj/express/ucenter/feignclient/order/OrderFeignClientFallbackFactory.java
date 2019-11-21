@@ -42,6 +42,12 @@ public class OrderFeignClientFallbackFactory implements FallbackFactory<OrderFei
                 log.error("获取订单支付信息异常，订单id:{}，异常信息:{}", orderId, throwable.getMessage());
                 return null;
             }
+
+            @Override
+            public Double countCourierScore(String courierId) {
+                log.error("获取配送员校准分数异常！异常信息:{}", throwable.getMessage());
+                return null;
+            }
         };
     }
 

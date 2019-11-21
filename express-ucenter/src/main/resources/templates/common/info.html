@@ -65,7 +65,7 @@
                                 <p class="form-control-static col-md-7" id="leaveStatus"
                                    th:style="${true == info.leave ? 'color:gray' : ''}"
                                    th:text="${true == info.leave ? '请假中' : '正 常'}"></p>
-                                <button type="button" class="btn btn-default col-md-3" th:if="${true == info.leave}" onclick="showModel(1)">重新上岗</button>
+                                <button type="button" class="btn btn-default col-md-3" th:if="${true == info.leave}" onclick="reWork()">重新上岗</button>
                                 <button type="button" class="btn btn-danger col-md-3" th:if="${true != info.leave}" onclick="leave()">请   假</button>
                             </div>
                         </div>
@@ -224,6 +224,7 @@
     <script>
         let cookieName = 'userInfoCookie';
         let leaveUrl = $('#leaveUrl').val();
+        let courierReWorkUrl = $('#courierReWorkUrl').val();
         let uid = getCookieValue('uid');
         let token = "Bearer " + uid;
 
@@ -242,13 +243,13 @@
 
         // 配送员请假
         function leave() {
-            layer.prompt({title:"请假原因(已接订单将重新分配)", formType:2},function(val, index) {
-                sendJson(HTTP.POST, leaveUrl, {"Authorization": token}, {'reason':val}, null, false, function (res) {
+            layer.prompt({title:"请假原因", formType:2},function(val, index) {
+                sendJson(HTTP.POST, leaveUrl, {"Authorization": token}, {'reason':val}, false, function (res) {
                     if (res.code === 10000) {
                         layer.msg("请假成功！",{icon:6});
                         layer.close(index);
                         setTimeout(function () {window.location.reload()}, 1000);
-                    }else {
+                    } else {
                         layer.msg("请假失败！请刷新后尝试！", {icon:5});
                     }
                 },
@@ -256,6 +257,29 @@
                     layer.msg("未知错误！", {icon:5});
                 })
             });
+        }
+
+        //配送员回到岗位
+        function reWork() {
+            layer.msg('确认要回到岗位吗？', {
+                time: 0,
+                btn: ['确认','取消'],
+                yes: function (index) {
+                    layer.close(index);
+                    sendJson(HTTP.POST, courierReWorkUrl, {"Authorization": token}, null, false, function (res) {
+                        if(res.code === 10000){
+                            layer.msg("回到岗位成功！", {icon:6});
+                            setTimeout(function () {window.location.reload()}, 1000);
+                        }else {
+                            layer.msg(res.data, {icon:5});
+                        }
+                    },
+                    function () {
+                        layer.msg("未知错误")
+                    })
+                }
+
+            })
         }
 
         // 发送验证码

@@ -93,4 +93,11 @@ public interface OrderInfoService {
      * @return  才做是否成功
      */
     boolean finishOrder(String orderId, String courierId, String courierRemark);
+
+    /**
+     * 获取配送员校准分数
+     * @param courierId 配送员id
+     * @return 分数
+     */
+    Double countCourierScore(String courierId);
 }
