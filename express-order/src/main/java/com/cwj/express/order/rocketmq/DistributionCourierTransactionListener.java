@@ -11,26 +11,41 @@ import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.ObjectUtils;
 
+/**
+ * 订单分配配送员队列
+ */
 @RocketMQTransactionListener(txProducerGroup = RocketmqConfig.DISTRIBUTION_COURIER_GROUP)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class DistributionCourierTransactionListener implements RocketMQLocalTransactionListener {
 
     private final OrderPaymentService orderPaymentService;
+    private final DataSourceTransactionManager transactionManager;
 
     /**
      * 执行本地事务
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(definition);
         try {
-            return checkPaymentStatus(msg);
+            RocketMQLocalTransactionState rocketMQLocalTransactionState = checkPaymentStatus(msg);
+            transactionManager.commit(status);
+            return rocketMQLocalTransactionState;
         }catch (Exception e){
             e.printStackTrace();
+            transactionManager.rollback(status);
             return RocketMQLocalTransactionState.ROLLBACK;
         }
     }
@@ -54,8 +69,8 @@ public class DistributionCourierTransactionListener implements RocketMQLocalTran
     private RocketMQLocalTransactionState checkPaymentStatus(Message msg){
         MessageHeaders headers = msg.getHeaders();
         String orderId = (String) headers.get("orderId");
-        log.debug(orderId);
         OrderPayment orderPayment = orderPaymentService.getByOrderId(orderId);
+        log.debug(orderId);
         if (ObjectUtils.isEmpty(orderPayment)) {
             return RocketMQLocalTransactionState.ROLLBACK;
         }

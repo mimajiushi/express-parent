@@ -42,6 +42,7 @@ public class TestController extends BaseController {
     private final DefaultRedisScript<String> redisScript;
     private final StringRedisTemplate stringRedisTemplate;
     private final UcenterFeignClient ucenterFeignClient;
+    private final OrderInfoService orderInfoService;
     private final RedisService redisService;
 
 
@@ -58,6 +59,7 @@ public class TestController extends BaseController {
 
     /**
      * 初始化所有配送员分数为10000，会覆盖原有数据
+     * todo 后期会换到启动初始化任务中
      */
     @GetMapping("/initScore")
     public String initScore(){
@@ -67,8 +69,9 @@ public class TestController extends BaseController {
             return "not couriers";
         }
         for (SysUser courier : allCouriers) {
+            Double socre = orderInfoService.countCourierScore(courier.getId());
             String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
-            redisService.zadd(key, courier.getId(), 10000);
+            redisService.zadd(key, courier.getId(), socre);
         }
         return "init has been successfully!";
     }

@@ -95,7 +95,7 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
         return true;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     @Override
     public void updatePayment(UpdateOrderVo orderVo, String userId) {

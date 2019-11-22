@@ -145,4 +145,13 @@ public class OrderController extends BaseController implements OrderControllerAp
         return orderInfoService.countCourierScore(id.getId());
     }
 
+    @Override
+    @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
+    @PostMapping("/reDistributionCourier")
+    public ResponseResult reDistributionCourier(String[] orderids) {
+        // todo 事务机制校验可能不太一样，估计要新增一个队列的事务处理
+        // 同一主题，同一消费组，不同的本地事务校验机制
+        return null;
+    }
+
 }
