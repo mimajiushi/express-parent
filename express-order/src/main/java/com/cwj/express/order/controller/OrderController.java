@@ -3,7 +3,10 @@ package com.cwj.express.order.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.api.order.OrderControllerApi;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
+import com.cwj.express.common.config.rocket.RocketmqConfig;
+import com.cwj.express.common.enums.OrderStatusEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
+import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
@@ -25,12 +28,17 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.apache.rocketmq.client.producer.LocalTransactionState;
+import org.apache.rocketmq.client.producer.TransactionSendResult;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -40,6 +48,7 @@ public class OrderController extends BaseController implements OrderControllerAp
     private final OrderInfoService orderInfoService;
     private final OrderPaymentService orderPaymentService;
     private final UcenterFeignClient ucenterFeignClient;
+    private final RocketMQTemplate rocketMQTemplate;
 
 //    @Override
 //    @GetMapping("/countEvaluate/{id}/{roleId}")
@@ -149,9 +158,28 @@ public class OrderController extends BaseController implements OrderControllerAp
     @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     @PostMapping("/reDistributionCourier")
     public ResponseResult reDistributionCourier(String[] orderids) {
-        // todo 事务机制校验可能不太一样，估计要新增一个队列的事务处理
-        // 同一主题，同一消费组，不同的本地事务校验机制
-        return null;
+        int count = 0;
+        // 校验订单是否都能更新
+        List<OrderInfo> orderInfos = orderInfoService.getOrderByIdAndStatus(orderids, OrderStatusEnum.WAIT_PICK_UP.getStatus(), OrderStatusEnum.TRANSPORT.getStatus());
+        if (orderids.length != orderInfos.size()){
+            return ResponseResult.FAIL(CommonCode.ORDER_COUNT_NOT_EQ);
+        }
+        for (OrderInfo orderInfo : orderInfos) {
+            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(
+                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
+                    MessageBuilder.withPayload(orderInfo.getId())
+                            .setHeader("type", "re")
+                            .setHeader("orderId", orderInfo.getId())
+                            .setHeader("userId", orderInfo.getUserId()).build(),
+                    null
+            );
+            LocalTransactionState localTransactionState = transactionSendResult.getLocalTransactionState();
+            if (localTransactionState == LocalTransactionState.COMMIT_MESSAGE){
+                count++;
+            }
+        }
+        return ResponseResult.SUCCESS("重新分配成功！分配订单数：" + count);
     }
 
 }

@@ -11,7 +11,7 @@ import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author cwj
@@ -101,10 +101,5 @@ public interface OrderInfoService {
      */
     Double countCourierScore(String courierId);
 
-    /**
-     * 清除配送员
-     * @param OrderIds 订单id数组
-     * @return 操作是否成功
-     */
-    boolean clearOrderCouriers(String[] OrderIds);
+    List<OrderInfo> getOrderByIdAndStatus(String[] orderids, Integer...status);
 }

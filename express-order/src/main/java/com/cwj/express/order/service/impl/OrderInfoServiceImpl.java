@@ -38,8 +38,6 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -317,9 +315,10 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         return (RedisConfig.COURIER_MAX_SCORE - count*RedisConfig.COURIER_SCORE);
     }
 
+
     @Override
-    public boolean clearOrderCouriers(String[] OrderIds) {
-        return false;
+    public List<OrderInfo> getOrderByIdAndStatus(String[] orderids, Integer... status) {
+        return orderInfoMapper.selectList(new QueryWrapper<OrderInfo>().in("id", orderids).in("status", status));
     }
 
     /**
