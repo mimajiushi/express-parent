@@ -129,9 +129,12 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
     @Transactional(rollbackFor = Exception.class)
     public void clearOrderCourier(String orderId, String courierId, String schoolId) {
         String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + schoolId;
+        Double zscore = redisService.zscore(key, courierId);
         OrderInfo orderInfo = OrderInfo.builder().id(orderId).courierId("").build();
         orderInfoMapper.updateById(orderInfo);
-        redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
+        if (!ObjectUtils.isEmpty(zscore)){
+            redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

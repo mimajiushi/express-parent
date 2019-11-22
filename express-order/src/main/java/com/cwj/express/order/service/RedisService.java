@@ -59,4 +59,12 @@ public interface RedisService {
      */
     Double increment(String key, String menber, double delta);
 
+    /**
+     * 获取指定成员的分数(主要用于判断该成员是否存在)
+     * @param key 键值
+     * @param menber 成员值
+     * @return 分数(成员不存在则为null)
+     */
+    Double zscore(String key, String menber);
+
 }

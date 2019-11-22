@@ -71,4 +71,9 @@ public class RedisServiceImpl implements RedisService {
     public Double increment(String key, String menber, double delta) {
         return stringRedisTemplate.opsForZSet().incrementScore(key, menber, delta);
     }
+
+    @Override
+    public Double zscore(String key, String menber) {
+        return stringRedisTemplate.opsForZSet().score(key, menber);
+    }
 }
