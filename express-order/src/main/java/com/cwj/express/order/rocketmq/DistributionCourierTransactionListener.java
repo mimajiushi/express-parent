@@ -1,10 +1,15 @@
 package com.cwj.express.order.rocketmq;
 
 
+import com.alibaba.fastjson.JSON;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.PaymentStatusEnum;
+import com.cwj.express.common.exception.ExceptionCast;
+import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.domain.order.OrderPayment;
+import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
+import com.cwj.express.vo.order.UpdateOrderVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
@@ -39,11 +44,22 @@ public class DistributionCourierTransactionListener implements RocketMQLocalTran
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(definition);
+        MessageHeaders headers = msg.getHeaders();
+        String userId = (String) headers.get("userId");
+        String type = (String) headers.get("type");
+        UpdateOrderVo updateOrderVo = JSON.parseObject((String) headers.get("updateOrderVo"), UpdateOrderVo.class);
         try {
-            RocketMQLocalTransactionState rocketMQLocalTransactionState = checkPaymentStatus(msg);
+            if ("first".equals(type)){
+                orderPaymentService.updatePayment(updateOrderVo, userId);
+            }else if ("re".equals(type)){
+
+            }else {
+                throw new Exception("mq事务异常");
+            }
             transactionManager.commit(status);
-            return rocketMQLocalTransactionState;
+            return RocketMQLocalTransactionState.COMMIT;
         }catch (Exception e){
+            log.error("异常信息:{}，异常订单号:{}", e.getMessage(), updateOrderVo.getOrderId());
             e.printStackTrace();
             transactionManager.rollback(status);
             return RocketMQLocalTransactionState.ROLLBACK;
@@ -58,6 +74,9 @@ public class DistributionCourierTransactionListener implements RocketMQLocalTran
         try {
             return checkPaymentStatus(msg);
         }catch (Exception e){
+            MessageHeaders headers = msg.getHeaders();
+            String orderId = (String)headers.get("orderId");
+            log.error("异常订单号:{}", orderId);
             e.printStackTrace();
             return RocketMQLocalTransactionState.ROLLBACK;
         }

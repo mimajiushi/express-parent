@@ -7,6 +7,7 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.cwj.express.api.order.PayControllerApi;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
+import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.OrderStatusEnum;
 import com.cwj.express.common.enums.PaymentStatusEnum;
 import com.cwj.express.common.exception.ExceptionCast;
@@ -21,7 +22,13 @@ import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.vo.order.UpdateOrderVo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.LocalTransactionState;
+import org.apache.rocketmq.client.producer.TransactionSendResult;
+import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,12 +45,14 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class PayController extends BaseController implements PayControllerApi {
 
     private final OrderPaymentService orderPaymentService;
     private final OrderInfoService orderInfoService;
     private final AliPayConfig aliPayConfig;
     private final AlipayClient alipayClient;
+    private final RocketMQTemplate rocketMQTemplate;
 
     /**
      * 支付宝支付接口
@@ -130,7 +139,19 @@ public class PayController extends BaseController implements PayControllerApi {
                     trade_no(tradeNo).
                     orderStatusEnum(OrderStatusEnum.WAIT_DIST).
                     paymentStatusEnum(PaymentStatusEnum.TRADE_SUCCESS).build();
-            orderPaymentService.updatePayment(updateOrderVo, userId);
+            // todo 改成发送消息
+            TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(
+                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
+                    MessageBuilder.withPayload(orderId)
+                            .setHeader("type", "first")
+                            .setHeader("userId", userId)
+                            .setHeader("updateOrderVo", JSON.toJSONString(updateOrderVo)).build(),
+                    null
+            );
+            LocalTransactionState localTransactionState = transactionSendResult.getLocalTransactionState();
+            log.info(String.valueOf(localTransactionState));
+//            orderPaymentService.updatePayment(updateOrderVo, userId);
         }else {
             ExceptionCast.cast(CommonCode.ALI_PAY_SIGN_ERROR);
         }

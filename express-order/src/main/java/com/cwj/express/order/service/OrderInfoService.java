@@ -100,4 +100,11 @@ public interface OrderInfoService {
      * @return 分数
      */
     Double countCourierScore(String courierId);
+
+    /**
+     * 清除配送员
+     * @param OrderIds 订单id数组
+     * @return 操作是否成功
+     */
+    boolean clearOrderCouriers(String[] OrderIds);
 }

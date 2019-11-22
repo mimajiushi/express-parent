@@ -95,7 +95,7 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
         return true;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @CacheEvict(cacheNames = RedisConfig.ORDER_INFO_DASHBOARD_DATA, key = "#userId")
     @Override
     public void updatePayment(UpdateOrderVo orderVo, String userId) {
@@ -111,14 +111,14 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
                 paymentStatus(orderVo.getPaymentStatusEnum()).build();
         updatePaymentByid(orderPayment);
         // 付款成功则发送安排配送员的mq
-        if (PaymentStatusEnum.TRADE_SUCCESS == orderVo.getPaymentStatusEnum()){
-            rocketMQTemplate.sendMessageInTransaction(
-                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
-                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
-                    MessageBuilder.withPayload(orderInfo.getId()).setHeader("orderId", orderInfo.getId()).build(),
-                    orderInfo.getId()
-            );
-        }
+//        if (PaymentStatusEnum.TRADE_SUCCESS == orderVo.getPaymentStatusEnum()){
+//            rocketMQTemplate.sendMessageInTransaction(
+//                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
+//                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
+//                    MessageBuilder.withPayload().setHeader("orderId", orderInfo.getId()).build(),
+//                    orderInfo.getId()
+//            );
+//        }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
