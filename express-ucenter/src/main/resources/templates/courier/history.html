@@ -49,6 +49,11 @@
                     </form>
                 </div>
                 <div class="panel-body">
+                    <div id="toolbar" class="btn-group">
+                        <button id="btn_cancel" type="button" class="btn btn-warning" onclick="reDistributionCourier()">
+                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> 重新分配
+                        </button>
+                    </div>
                     <div class="alert alert-info alert-dismissible fade in" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <strong>完成订单：</strong> 订单状态需为 【派送中】 或 【订单异常】
@@ -246,6 +251,7 @@
         let orderDetailUrl = $('#orderDetailUrl').val();
         let pickUpOrderUrl = $('#pickUpOrderUrl').val();
         let finishOrderUrl = $('#finishOrderUrl').val();
+        let reDistributionCourierUrl = $('#reDistributionCourierUrl').val();
         let uid = getCookieValue('uid');
         let token = "Bearer " + uid;
         // alert(token);
@@ -409,6 +415,7 @@
             else if (value === 6)
                 return '<span style="color:grey">等待揽收</span>';
         }
+
         function flushTable() {
             $("#tb_history").bootstrapTable('refresh',{
                 ajaxOptions: {
@@ -418,6 +425,40 @@
                 },
                 url : orderListUrl
             } );
+        }
+
+        // 重新分配配送员
+        function reDistributionCourier() {
+            // debugger;
+            let row = $('#tb_history').bootstrapTable("getSelections");
+            if(row.length > 0) {
+                let ids = new Array();
+                for (let i = 0; i < row.length; i++) {
+                    if (row[i].orderStatus === 2 || row[i].orderStatus === 6) {
+                        ids.push(row[i].id);
+                    }
+                }
+                if (ids.length === 0) {
+                    layer.msg("选中项不包含可重新分配的订单(派送中/等待揽收)",{icon:5});
+                    return;
+                }else {
+                    layer.confirm("重新分配订单号(不是请假状态可能还会分配到自己)：" + ids + "，确认执行？", {btn:["确认","取消"]},
+                        function () {
+                            sendArray(HTTP.POST, reDistributionCourierUrl, {"Authorization": token}, {"orderIds":ids}, false,
+                                function (res) {
+                                    if (res.code === 10000){
+                                        layer.msg(res.data,{icon:6});
+                                        flushTable();
+                                    }else {
+                                        layer.msg("操作失败！",{icon:5});
+                                    }
+                                },
+                                function () {
+                                    layer.msg("未知错误!", {icon:5});
+                                })
+                        });
+                }
+            }
         }
 
         function showDetail(id) {

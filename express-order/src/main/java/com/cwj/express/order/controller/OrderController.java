@@ -157,21 +157,25 @@ public class OrderController extends BaseController implements OrderControllerAp
     @Override
     @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     @PostMapping("/reDistributionCourier")
-    public ResponseResult reDistributionCourier(String[] orderids) {
+    public ResponseResult reDistributionCourier(String[] orderIds) {
         int count = 0;
         // 校验订单是否都能更新
-        List<OrderInfo> orderInfos = orderInfoService.getOrderByIdAndStatus(orderids, OrderStatusEnum.WAIT_PICK_UP.getStatus(), OrderStatusEnum.TRANSPORT.getStatus());
-        if (orderids.length != orderInfos.size()){
+        List<OrderInfo> orderInfos = orderInfoService.getOrderByIdAndStatus(orderIds, OrderStatusEnum.WAIT_PICK_UP.getStatus(), OrderStatusEnum.TRANSPORT.getStatus());
+        if (orderIds.length != orderInfos.size()){
             return ResponseResult.FAIL(CommonCode.ORDER_COUNT_NOT_EQ);
         }
         for (OrderInfo orderInfo : orderInfos) {
+            SysUser courier = ucenterFeignClient.getById(orderInfo.getCourierId());
             TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(
                     RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
                     RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
-                    MessageBuilder.withPayload(orderInfo.getId())
+                    MessageBuilder.withPayload(orderInfo.getId() + "@@re")
                             .setHeader("type", "re")
                             .setHeader("orderId", orderInfo.getId())
-                            .setHeader("userId", orderInfo.getUserId()).build(),
+                            // userId用于后期清除缓存的
+                            .setHeader("userId", orderInfo.getUserId())
+                            .setHeader("courierId", courier.getId())
+                            .setHeader("schoolId", courier.getSchoolId()).build(),
                     null
             );
             LocalTransactionState localTransactionState = transactionSendResult.getLocalTransactionState();

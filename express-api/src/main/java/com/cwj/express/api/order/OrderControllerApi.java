@@ -61,5 +61,5 @@ public interface OrderControllerApi {
     public Double countCourierScore(@PathVariable(required = false) String courierId);
 
     @ApiOperation("重新分配订单配送员接口")
-    public ResponseResult reDistributionCourier(String[] orderids);
+    public ResponseResult reDistributionCourier(String[] orderIds);
 }

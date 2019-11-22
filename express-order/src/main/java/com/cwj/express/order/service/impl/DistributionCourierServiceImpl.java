@@ -41,9 +41,14 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
     private final StringRedisTemplate stringRedisTemplate;
     private final UcenterFeignClient ucenterFeignClient;
 
+    /**
+     * 实现思路请参考编写计划.txt，这里就不过多写注释了，相信我，纯理论看起来会更舒服
+     * @param orderId 订单id
+     * @param type 执行类型 first-支付之后分配 re-手动重新分配
+     */
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public void distributionCourier(String orderId) {
+    public void distributionCourier(String orderId, String type) {
         // 查询对应订单id且配送员id为""的订单记录
         OrderInfo orderInfo = orderInfoMapper.selectOne(
                 new QueryWrapper<OrderInfo>().
@@ -55,7 +60,10 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
             String courierId = redisService.get(logKey);
             if (!StringUtils.isEmpty(courierId)){
                 orderInfo.setCourierId(courierId);
-                orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
+                // 只有支付后分配才将状态改为等待揽收
+                if ("first".equals(type)){
+                    orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
+                }
                 orderInfoMapper.updateById(orderInfo);
             }else {
                 // 查询下单者的学校id(远程调用)
@@ -68,7 +76,9 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
                     ExceptionCast.cast(CommonCode.COURIER_NOT_EXIST);
                 }
                 orderInfo.setCourierId(courierId);
-                orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
+                if ("first".equals(type)){
+                    orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
+                }
                 orderInfoMapper.updateById(orderInfo);
             }
         }

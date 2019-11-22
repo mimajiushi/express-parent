@@ -422,10 +422,8 @@
                             layer.msg("选中项不包含可删除的订单",{icon:0});
                             return false;
                         } else {
-                            layer.confirm("删除的订单号为：" + ids + "，确认执行？", {
-                                btn: ['确定','取消']
-                            }, function(){
-                                sendArray(HTTP.POST, "/api/v1/order/batch-delete", {"ids": ids}, false, function (res) {
+                            layer.confirm("删除的订单号为：" + ids + "，确认执行？", {btn: ['确定','取消']}, function(){
+                                sendArray(HTTP.POST, "/api/v1/order/batch-delete", {"header":"value"}, {"ids": ids}, false, function (res) {
                                     if(res.code === 0) {
                                         layer.msg("成功，删除" + res.data.success + "个，失败" + res.data.error + "个",{icon:1});
                                         flushTable();

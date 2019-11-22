@@ -32,4 +32,9 @@ public interface OrderPaymentService {
      * @param userId 用户id（清除缓存）
      */
     public void updatePayment(UpdateOrderVo updateOrderVo, String userId);
+
+    /**
+     * 清除订单的配送员
+     */
+    public void clearOrderCourier(String orderId, String courierId, String schoolId);
 }

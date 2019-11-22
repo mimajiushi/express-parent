@@ -143,7 +143,7 @@ public class PayController extends BaseController implements PayControllerApi {
             TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(
                     RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
                     RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
-                    MessageBuilder.withPayload(orderId)
+                    MessageBuilder.withPayload(orderId + "@@first")
                             .setHeader("type", "first")
                             .setHeader("userId", userId)
                             .setHeader("updateOrderVo", JSON.toJSONString(updateOrderVo)).build(),

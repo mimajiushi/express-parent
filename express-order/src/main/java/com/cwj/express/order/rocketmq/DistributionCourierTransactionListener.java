@@ -52,7 +52,10 @@ public class DistributionCourierTransactionListener implements RocketMQLocalTran
             if ("first".equals(type)){
                 orderPaymentService.updatePayment(updateOrderVo, userId);
             }else if ("re".equals(type)){
-
+                String orderId = (String) headers.get("orderId");
+                String courierId = (String) headers.get("courierId");
+                String schoolId = (String) headers.get("schoolId");
+                orderPaymentService.clearOrderCourier(orderId, courierId, schoolId);
             }else {
                 throw new Exception("mq事务异常");
             }

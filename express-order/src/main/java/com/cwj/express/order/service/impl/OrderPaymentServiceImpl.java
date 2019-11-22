@@ -8,6 +8,7 @@ import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.OrderStatusEnum;
 import com.cwj.express.common.enums.PaymentStatusEnum;
+import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.order.config.alipay.AliPayConfig;
@@ -119,6 +120,18 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
 //                    orderInfo.getId()
 //            );
 //        }
+    }
+
+    /**
+     * 暂时不考虑宕机可能性
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void clearOrderCourier(String orderId, String courierId, String schoolId) {
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + schoolId;
+        OrderInfo orderInfo = OrderInfo.builder().id(orderId).courierId("").build();
+        orderInfoMapper.updateById(orderInfo);
+        redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

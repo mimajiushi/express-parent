@@ -32,9 +32,12 @@ public class DistributionCourierConsumer implements RocketMQListener<String> {
     private final RedisService redisService;
 
     @Override
-    public void onMessage(String orderId) {
+    public void onMessage(String orderIdAndType) {
+        String[] values = orderIdAndType.split("@@");
+        String orderId = values[0];
+        String type = values[1];
         // 分配配送员业务
-        distributionCourierService.distributionCourier(orderId);
+        distributionCourierService.distributionCourier(orderId, type);
 
         // 删除redis日志 （可以不删）
         String logKey = RedisConfig.ORDER_COURIER_DATA + "::" + orderId;
