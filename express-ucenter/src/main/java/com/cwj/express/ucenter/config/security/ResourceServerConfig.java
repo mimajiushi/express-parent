@@ -71,6 +71,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         String[] ignoreUrls = {
 //                 "/**",
+                "/ucenter/userLogout",
                 "/ucenter/hello",
                 "/ucenter/getById/**",
                 "/ucenter/getAllCouriers",
@@ -98,7 +99,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .anyRequest().authenticated();
 
         // 添加自定义过滤器
-        http.addFilterBefore(jwtAuthenticationTokenFilter(), AbstractPreAuthenticatedProcessingFilter.class );
+        http.addFilterBefore(jwtAuthenticationTokenFilter(), AbstractPreAuthenticatedProcessingFilter.class )
+        .exceptionHandling()
+            .authenticationEntryPoint(new RestAuthenticationEntryPoint());
     }
 
     @Override

@@ -1,5 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+
+<script th:src="@{/public/assets/js/jquery.min.js}" src="../../public/assets/js/jquery.min.js"></script>
+<script th:src="@{/public/assets/layer/layer.js}" src="../../public/assets/layer/layer.js"></script>
+<script th:src="@{/public/assets/js/http.js}" src="../../public/assets/js/http.js"></script>
+<!-- 公用头部JS start -->
+<div th:replace="~{common/configJS :: configJS}">...</div>
+<!-- 公用头部JS end -->
+<script>
+    let logoutUrl = $("#logoutUrl").val();
+    let ucenterUrl = $("#ucenterUrl").val();
+    function logout(){
+        sendJson(HTTP.POST, logoutUrl, null, null, false, function (res) {
+            layer.msg("注销成功！即将回到登录页面",{icon:6});
+            setTimeout(function(){window.location.href=ucenterUrl},3000);
+        },function () {
+            layer.msg("注销成功！即将回到登录页面",{icon:6});
+            setTimeout(function(){window.location.href=ucenterUrl},3000);
+        })
+    }
+</script>
 
 <nav class="navbar navbar-default" th:fragment="html">
     <div class="container-fluid">
@@ -15,7 +35,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="/user/info">个人中心</a></li>
                         <li class="divider"></li>
-                        <li><a href="/logout">退出登录</a></li>
+                        <li><a type="button" onclick="logout()">退出登录</a></li>
                     </ul>
                 </li>
             </ul>

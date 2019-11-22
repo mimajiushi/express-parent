@@ -29,4 +29,7 @@ public interface UcenterControllerApi {
 
     @ApiOperation(value = "配送员回到岗位")
     public ResponseResult courierReWork();
+
+    @ApiOperation(value = "用户登出接口")
+    public ResponseResult userLogout();
 }

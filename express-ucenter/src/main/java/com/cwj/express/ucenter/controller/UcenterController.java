@@ -10,13 +10,17 @@ import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.ucenter.service.RedisService;
 import com.cwj.express.ucenter.service.SysRolesLevelService;
 import com.cwj.express.ucenter.service.SysUserService;
+import com.cwj.express.utils.CookieUtil;
 import com.cwj.express.utils.ExpressOauth2Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -100,6 +104,28 @@ public class UcenterController extends BaseController implements UcenterControll
         SysUser sysUser = sysUserService.getById(id.getId());
         sysUserService.courierReWork(sysUser);
         return ResponseResult.SUCCESS();
+    }
+
+    @Override
+    @PostMapping("/userLogout")
+    public ResponseResult userLogout() {
+        try {
+            clearTokenFromCookie();
+        }catch (Exception e){
+            return ResponseResult.FAIL();
+        }
+        return ResponseResult.SUCCESS();
+    }
+
+    /**
+     * 从cookie删除token
+     */
+    private void clearTokenFromCookie(){
+
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        //HttpServletResponse response,String domain,String path, String name, String value, int maxAge,boolean httpOnly
+        CookieUtil.addCookie(response,"localhost","/","uid","",0,false);
+
     }
 
 }
