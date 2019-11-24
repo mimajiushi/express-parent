@@ -44,4 +44,14 @@ public class UserInfoVo {
      * 是否请假
      */
     private boolean leave;
+
+    /**
+     * 签到状态文字
+     */
+    private String signStatusStr;
+
+    /**
+     * 签到状态
+     */
+    private int signStatus;
 }

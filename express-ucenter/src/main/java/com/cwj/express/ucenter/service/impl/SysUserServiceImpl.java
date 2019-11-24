@@ -7,10 +7,13 @@ import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.domain.ucenter.CourierLeaveLog;
+import com.cwj.express.domain.ucenter.CourierSignData;
 import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.ucenter.dao.CourierLeaveLogMapper;
+import com.cwj.express.ucenter.dao.CourierSignDataMapper;
 import com.cwj.express.ucenter.dao.SysUserMapper;
 import com.cwj.express.ucenter.feignclient.order.OrderFeignClient;
+import com.cwj.express.ucenter.service.CourierSignService;
 import com.cwj.express.ucenter.service.RedisService;
 import com.cwj.express.ucenter.service.SysUserService;
 import com.cwj.express.utils.LocalDateTimeUtils;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,6 +42,7 @@ public class SysUserServiceImpl implements SysUserService {
     private final RedisService redisService;
     private final CourierLeaveLogMapper courierLeaveLogMapper;
     private final OrderFeignClient orderFeignClient;
+    private final CourierSignService courierSignService;
 
     @Override
     public SysUser getExtByUserName(String username) {
@@ -63,22 +68,41 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public UserInfoVo getUserInfo(String userId) {
         SysUser sysUser = sysUserMapper.selectById(userId);
-        boolean leave = false;
+        UserInfoVo userInfoVo = UserInfoVo.builder()
+                .roleName(sysUser.getRole().getCnName())
+                .username(sysUser.getUsername())
+                .realName(sysUser.getRealName())
+                .sex(sysUser.getSex().getCname())
+                .tel(sysUser.getTel()).build();
         // redis取分数，如果为空则说明配送员正在请假
         if (SysRoleEnum.COURIER == sysUser.getRole()){
             String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + sysUser.getSchoolId();
             Double score = redisService.zscore(key, sysUser.getId());
             if (ObjectUtils.isEmpty(score)){
-                leave = true;
+                userInfoVo.setLeave(true);
             }
+            // 获取签到情况
+            LocalDate now = LocalDate.now();
+            LocalDate tor = now.plusDays(1);
+            // 加班记录
+            List<CourierSignData> signDataList1 = courierSignService.getSignDataList(userId, 1, now, tor);
+            if (signDataList1.size() > 0){
+                userInfoVo.setSignStatus(2);
+                userInfoVo.setSignStatusStr("加班中");
+            }else {
+                // 普通签到记录
+                List<CourierSignData> signDataList2 = courierSignService.getSignDataList(userId, 0, now, tor);
+                if (signDataList2.size() > 0){
+                    userInfoVo.setSignStatus(1);
+                    userInfoVo.setSignStatusStr("已签到");
+                }else {
+                    userInfoVo.setSignStatus(0);
+                    userInfoVo.setSignStatusStr("未签到");
+                }
+            }
+
         }
-        return UserInfoVo.builder()
-                .roleName(sysUser.getRole().getCnName())
-                .username(sysUser.getUsername())
-                .realName(sysUser.getRealName())
-                .sex(sysUser.getSex().getCname())
-                .tel(sysUser.getTel())
-                .leave(leave).build();
+        return userInfoVo;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

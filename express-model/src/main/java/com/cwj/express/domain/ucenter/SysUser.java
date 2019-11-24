@@ -33,7 +33,7 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class SysUser implements UserDetails, CredentialsContainer, Serializable {
-    @TableId(type = IdType.UUID)
+    @TableId(type = IdType.ID_WORKER_STR)
     private String id;
 
     private String username;

@@ -68,7 +68,7 @@ public class EntityGenerator {
 
         mpg.setCfg(cfg);
 
-        String[] tables = {"courier_leave_log"};
+        String[] tables = {"courier_sign_count","courier_sign_data"};
         // 策略配置
         StrategyConfig strategy = new StrategyConfig();
         strategy.setNaming(NamingStrategy.underline_to_camel);

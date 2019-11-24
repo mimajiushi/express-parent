@@ -30,6 +30,12 @@ public interface UcenterControllerApi {
     @ApiOperation(value = "配送员回到岗位")
     public ResponseResult courierReWork();
 
+    @ApiOperation(value = "配送员日常签到")
+    public ResponseResult courierSignNormal();
+
+    @ApiOperation(value = "配送员加班签到")
+    public ResponseResult courierSignOT();
+
     @ApiOperation(value = "用户登出接口")
     public ResponseResult userLogout();
 }

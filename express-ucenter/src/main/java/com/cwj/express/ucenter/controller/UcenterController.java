@@ -107,6 +107,18 @@ public class UcenterController extends BaseController implements UcenterControll
     }
 
     @Override
+    public ResponseResult courierSignNormal() {
+        // todo
+        return null;
+    }
+
+    @Override
+    public ResponseResult courierSignOT() {
+        // todo
+        return null;
+    }
+
+    @Override
     @PostMapping("/userLogout")
     public ResponseResult userLogout() {
         try {

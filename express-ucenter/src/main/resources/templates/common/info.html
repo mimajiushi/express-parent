@@ -69,6 +69,14 @@
                                 <button type="button" class="btn btn-danger col-md-3" th:if="${true != info.leave}" onclick="leave()">请   假</button>
                             </div>
                         </div>
+                        <div class="form-group" sec:authorize="hasAnyRole('ROLE_COURIER')">
+                            <label for="signStatus" class="col-md-2 control-label">签到状态</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static col-md-7" id="signStatus" th:text="${info.signStatusStr}"></p>
+                                <button type="button" class="btn btn-default col-md-3" th:if="${0 == info.signStatus}" onclick="reWork()">签到</button>
+                                <button type="button" class="btn btn-danger col-md-3" th:if="${1 == info.signStatus}" onclick="leave()">加班</button>
+                            </div>
+                        </div>
                         <!--<div class="form-group">-->
                             <!--<label for="faceLogin" class="col-md-2 control-label">人脸登录</label>-->
                             <!--<div class="col-md-10">-->

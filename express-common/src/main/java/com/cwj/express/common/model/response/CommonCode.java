@@ -64,7 +64,13 @@ public enum CommonCode implements ResultCode{
 
 
     COURIER_LEAVE_FALL(false, 70001, "配送员请假失败！"),
-    COURIER_REWORK_FAIL(false, 70002, "配送员回到岗位操作失败！")
+    COURIER_REWORK_FAIL(false, 70002, "配送员回到岗位操作失败！"),
+    COURIER_SIGN_NORMAL_EXIST(false, 70003, "配送员今日已日常签到！"),
+    COURIER_NOT_SIGN_NORMAL(false, 70004, "配送员还未进行日常签到"),
+    COURIER_SIGN_DATA_CHANGED(false, 70005, "签到失败！签到数据可能发生变化！"),
+    COURIER_SIGNOT_TIME_ERROER(false, 70006, "非加班签到时间！"),
+    COURIER_SINGOT_EXIST(false, 70007, "加班签到记录已存在！"),
+    COURIER_SIGN_NOTMAL_NOT_EXIST(false, 70008, "尚未进行普通签到！"),
 
 
     ;
