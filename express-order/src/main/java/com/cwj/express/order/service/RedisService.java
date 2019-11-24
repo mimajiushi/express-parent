@@ -67,4 +67,12 @@ public interface RedisService {
      */
     Double zscore(String key, String menber);
 
+    /**
+     * 返回指定key的成员数量
+     * @param key key值
+     * @return 成员数量
+     */
+    public Long zcard(String key);
+
+
 }

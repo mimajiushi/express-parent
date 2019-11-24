@@ -3,6 +3,7 @@ package com.cwj.express.order.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.api.order.OrderControllerApi;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
+import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.OrderStatusEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
@@ -17,6 +18,7 @@ import com.cwj.express.order.feignclient.ucenter.UcenterFeignClient;
 import com.cwj.express.order.service.OrderEvaluateService;
 import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
+import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.vo.order.OrderDashboardVO;
 import com.cwj.express.vo.order.OrderDetailVO;
@@ -49,6 +51,7 @@ public class OrderController extends BaseController implements OrderControllerAp
     private final OrderPaymentService orderPaymentService;
     private final UcenterFeignClient ucenterFeignClient;
     private final RocketMQTemplate rocketMQTemplate;
+    private final RedisService redisService;
 
 //    @Override
 //    @GetMapping("/countEvaluate/{id}/{roleId}")
@@ -77,8 +80,14 @@ public class OrderController extends BaseController implements OrderControllerAp
     @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
     public ResponseResult createOrder(@Valid OrderInfoVO orderInfoVO) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
-        String userId = id.getId();
-        return orderInfoService.createOrder(orderInfoVO, userId);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + sysUser.getSchoolId();
+        Long count = redisService.zcard(key);
+        if (count == 0){
+            return ResponseResult.FAIL(CommonCode.COURIER_NOT_EXIST);
+        }
+        return orderInfoService.createOrder(orderInfoVO, sysUser.getId());
     }
 
     @Override

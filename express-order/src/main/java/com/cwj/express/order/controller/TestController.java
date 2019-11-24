@@ -57,6 +57,13 @@ public class TestController extends BaseController {
         return res;
     }
 
+    @GetMapping("/test")
+    public String test2(){
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::3237";
+        Long count = redisService.zcard(key);
+        return String.valueOf(count);
+    }
+
     /**
      * 初始化所有配送员分数为10000，会覆盖原有数据
      * todo 后期会换到启动初始化任务中
