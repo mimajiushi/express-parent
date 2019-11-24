@@ -7,6 +7,7 @@ import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.domain.ucenter.CourierLeaveLog;
+import com.cwj.express.domain.ucenter.CourierSignCount;
 import com.cwj.express.domain.ucenter.CourierSignData;
 import com.cwj.express.domain.ucenter.SysUser;
 import com.cwj.express.ucenter.dao.CourierLeaveLogMapper;
@@ -84,15 +85,16 @@ public class SysUserServiceImpl implements SysUserService {
             LocalDate tor = now.plusDays(1);
             // 加班记录
             List<CourierSignData> signDataList1 = courierSignService.getSignDataList(userId, 1, now, tor);
+            CourierSignCount signCount = courierSignService.getSignCount(userId, 1);
             if (signDataList1.size() > 0){
                 userInfoVo.setSignStatus(2);
-                userInfoVo.setSignStatusStr("加班中");
+                userInfoVo.setSignStatusStr("加班中，连续签到：" + signCount.getSignCount() + "天");
             }else {
                 // 普通签到记录
                 List<CourierSignData> signDataList2 = courierSignService.getSignDataList(userId, 0, now, tor);
                 if (signDataList2.size() > 0){
                     userInfoVo.setSignStatus(1);
-                    userInfoVo.setSignStatusStr("已签到");
+                    userInfoVo.setSignStatusStr("已签到，已连续签到：" + signCount.getSignCount() + "天");
                 }else {
                     userInfoVo.setSignStatus(0);
                     userInfoVo.setSignStatusStr("未签到");

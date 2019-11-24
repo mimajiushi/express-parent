@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2019-11-21 16:20:06
+Date: 2019-11-24 16:34:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -25,12 +25,59 @@ CREATE TABLE `courier_leave_log` (
   `leave_resaon` varchar(128) NOT NULL COMMENT '请假原因',
   `create_date` datetime NOT NULL,
   `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`courier_id`)
+  KEY `courier_id` (`courier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of courier_leave_log
 -- ----------------------------
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-21 19:04:39', '2019-11-17 07:12:34');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '牙痛', '2019-11-21 20:18:14', '2019-11-17 07:48:11');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', 'dawdawdaw', '2019-11-21 20:53:00', '2019-11-17 08:24:10');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-22 16:42:15', '2019-11-17 15:22:30');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-22 20:23:21', '2019-11-17 19:25:44');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-22 20:36:20', '2019-11-17 19:36:06');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-22 20:36:42', '2019-11-17 19:36:30');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉屎', '2019-11-24 16:02:54', '2019-11-18 06:20:47');
+INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-24 16:28:41', '2019-11-18 06:44:59');
+
+-- ----------------------------
+-- Table structure for courier_sign_count
+-- ----------------------------
+DROP TABLE IF EXISTS `courier_sign_count`;
+CREATE TABLE `courier_sign_count` (
+  `id` varchar(128) NOT NULL,
+  `courier_id` varchar(128) NOT NULL COMMENT '配送员id',
+  `sign_count` int(11) NOT NULL COMMENT '连续签到天数',
+  `sign_count_type` tinyint(4) NOT NULL COMMENT '0 - 断签记录 1 - 正在连签',
+  `create_date` datetime NOT NULL,
+  `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `update_date` (`courier_id`,`update_date`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of courier_sign_count
+-- ----------------------------
+INSERT INTO `courier_sign_count` VALUES ('1198518276225765378', '63454354', '1', '1', '2019-11-24 16:26:39', '2019-11-24 16:26:39');
+
+-- ----------------------------
+-- Table structure for courier_sign_data
+-- ----------------------------
+DROP TABLE IF EXISTS `courier_sign_data`;
+CREATE TABLE `courier_sign_data` (
+  `id` varchar(255) NOT NULL COMMENT '主键id',
+  `courier_id` varchar(128) NOT NULL COMMENT '配送员id',
+  `sign_date` datetime NOT NULL COMMENT '签到日期',
+  `sign_data_type` tinyint(4) NOT NULL COMMENT '0-日常 1-加班',
+  PRIMARY KEY (`id`),
+  KEY `courier_id` (`courier_id`,`sign_date`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of courier_sign_data
+-- ----------------------------
+INSERT INTO `courier_sign_data` VALUES ('1198518276255125505', '63454354', '2019-11-24 16:26:39', '0');
 
 -- ----------------------------
 -- Table structure for oauth_access_token
