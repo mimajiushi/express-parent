@@ -176,7 +176,6 @@ public class OrderInfoServiceImpl implements OrderInfoService {
             rocketMQTemplate.syncSend(RocketmqConfig.CANCEL_ORDER_TOPIC,
                     MessageBuilder.withPayload(orderInfo.getId() + "@@" + userId + "@@" + timeString).build()
                     , timeout, MessageDelayLevel.TIME_10M.level);
-            // todo 发送分配配送员的消息
             // 设置ttl为延时消息时间（10分钟）的redis缓存
             String key = RedisConfig.ORDER_INFO_DATA + "::" + orderInfo.getId() + userId;
             redisService.setKeyValTTL(key, JSON.toJSONString(orderInfo), RedisConfig.CREATE_ORDER_TTL);
@@ -276,12 +275,10 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean pickUpOrder(String orderId, String courierId, String courierRemark) {
         // 乐观锁更新
-        OrderInfo updateOrderInfo = OrderInfo.builder()
-                .id(orderId)
-                .courierId(courierId)
-                .orderStatus(OrderStatusEnum.TRANSPORT)
-                .courierRemark(courierRemark).build();
-        int count = orderInfoMapper.updateById(updateOrderInfo);
+        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+        orderInfo.setOrderStatus(OrderStatusEnum.TRANSPORT);
+        orderInfo.setCourierRemark(courierRemark);
+        int count = orderInfoMapper.updateById(orderInfo);
         return count > 0;
     }
 
@@ -290,13 +287,11 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     public boolean finishOrder(String orderId, String courierId, String courierRemark) {
         SysUser courier = ucenterFeignClient.getById(courierId);
         String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
-        OrderInfo finishOrderInfo = OrderInfo.builder()
-                .id(orderId)
-                .courierId(courierId)
-                .orderStatus(OrderStatusEnum.COMPLETE)
-                .courierRemark(courierRemark).build();
+        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+        orderInfo.setOrderStatus(OrderStatusEnum.COMPLETE);
+        orderInfo.setCourierRemark(courierRemark);
         // 完成订单，同样是乐观锁
-        int count = orderInfoMapper.updateById(finishOrderInfo);
+        int count = orderInfoMapper.updateById(orderInfo);
         boolean success = count > 0;
         // 操作成功则加回配送员分数
         if (success){
