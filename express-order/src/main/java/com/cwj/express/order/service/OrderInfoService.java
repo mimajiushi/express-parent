@@ -90,9 +90,18 @@ public interface OrderInfoService {
      * @param orderId 订单id
      * @param courierId 配送员id
      * @param courierRemark 配送员备注
-     * @return  才做是否成功
+     * @return  操作是否成功
      */
     boolean finishOrder(String orderId, String courierId, String courierRemark);
+
+    /**
+     * 将订单设置为异常状态
+     * @param orderId 订单id
+     * @param courierId 配送员id
+     * @param courierRemark 配送员备注
+     * @return 操作是否成功
+     */
+    boolean setOrderExcetion(String orderId, String courierId, String courierRemark);
 
     /**
      * 获取配送员校准分数
@@ -101,5 +110,18 @@ public interface OrderInfoService {
      */
     Double countCourierScore(String courierId);
 
+    /**
+     * 根据多个订单id和指定的状态查找订单列表
+     * @param orderids 订单id数组
+     * @param status 订单状态（可为复数）
+     * @return 订单信息列表
+     */
     List<OrderInfo> getOrderByIdAndStatus(String[] orderids, Integer...status);
+
+    /**
+     * 根据订单id获取订单信息
+     * @param orderId 订单id
+     * @return 订单信息
+     */
+    OrderInfo getOrderById(String orderId);
 }

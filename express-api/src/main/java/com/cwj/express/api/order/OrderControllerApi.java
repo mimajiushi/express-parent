@@ -57,6 +57,9 @@ public interface OrderControllerApi {
     @ApiOperation("配送员完成订单")
     public ResponseResult finishOrder(@PathVariable String orderId, String courierRemark);
 
+    @ApiOperation("将订单设置为异常状态")
+    public ResponseResult setOrderException(@PathVariable String orderId, String courierRemark);
+
     @ApiOperation(value = "配送员分数校准", notes = "courierId只有管理员操作接口才需要，配送员不需要")
     public Double countCourierScore(@PathVariable(required = false) String courierId);
 

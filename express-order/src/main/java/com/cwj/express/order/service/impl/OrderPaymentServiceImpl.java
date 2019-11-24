@@ -111,15 +111,6 @@ public class OrderPaymentServiceImpl implements OrderPaymentService {
                 paymentId(orderVo.getTrade_no()).
                 paymentStatus(orderVo.getPaymentStatusEnum()).build();
         updatePaymentByid(orderPayment);
-        // 付款成功则发送安排配送员的mq
-//        if (PaymentStatusEnum.TRADE_SUCCESS == orderVo.getPaymentStatusEnum()){
-//            rocketMQTemplate.sendMessageInTransaction(
-//                    RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
-//                    RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,
-//                    MessageBuilder.withPayload().setHeader("orderId", orderInfo.getId()).build(),
-//                    orderInfo.getId()
-//            );
-//        }
     }
 
     /**

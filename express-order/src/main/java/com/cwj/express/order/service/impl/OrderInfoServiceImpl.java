@@ -38,6 +38,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -275,7 +276,10 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean pickUpOrder(String orderId, String courierId, String courierRemark) {
         // 乐观锁更新
-        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectOne(new QueryWrapper<OrderInfo>()
+                .eq("id", orderId)
+                .eq("courier_id", courierId)
+                .eq("status", OrderStatusEnum.WAIT_PICK_UP.getStatus()));
         orderInfo.setOrderStatus(OrderStatusEnum.TRANSPORT);
         orderInfo.setCourierRemark(courierRemark);
         int count = orderInfoMapper.updateById(orderInfo);
@@ -287,10 +291,34 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     public boolean finishOrder(String orderId, String courierId, String courierRemark) {
         SysUser courier = ucenterFeignClient.getById(courierId);
         String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
-        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectOne(new QueryWrapper<OrderInfo>()
+                .eq("id", orderId)
+                .eq("courier_id", courierId)
+                .eq("status", OrderStatusEnum.TRANSPORT.getStatus()));
         orderInfo.setOrderStatus(OrderStatusEnum.COMPLETE);
         orderInfo.setCourierRemark(courierRemark);
         // 完成订单，同样是乐观锁
+        int count = orderInfoMapper.updateById(orderInfo);
+        boolean success = count > 0;
+        // 操作成功则加回配送员分数
+        if (success){
+            redisService.increment(key, courierId, RedisConfig.COURIER_SCORE);
+        }
+        return success;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean setOrderExcetion(String orderId, String courierId, String courierRemark) {
+        SysUser courier = ucenterFeignClient.getById(courierId);
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
+        OrderInfo orderInfo = orderInfoMapper.selectOne(new QueryWrapper<OrderInfo>()
+                .eq("id", orderId)
+                .eq("courier_id", courierId)
+                .in("status", OrderStatusEnum.WAIT_PICK_UP.getStatus(), OrderStatusEnum.TRANSPORT.getStatus()));
+        orderInfo.setOrderStatus(OrderStatusEnum.ERROR);
+        orderInfo.setCourierRemark(courierRemark);
+        // 设置订单异常，同样是乐观锁
         int count = orderInfoMapper.updateById(orderInfo);
         boolean success = count > 0;
         // 操作成功则加回配送员分数
@@ -314,6 +342,11 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Override
     public List<OrderInfo> getOrderByIdAndStatus(String[] orderids, Integer... status) {
         return orderInfoMapper.selectList(new QueryWrapper<OrderInfo>().in("id", orderids).in("status", status));
+    }
+
+    @Override
+    public OrderInfo getOrderById(String orderId) {
+        return orderInfoMapper.selectById(orderId);
     }
 
     /**

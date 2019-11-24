@@ -143,6 +143,25 @@ public class OrderController extends BaseController implements OrderControllerAp
     }
 
     @Override
+    @PostMapping("/setOrderException/{orderId}")
+    @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
+    public ResponseResult setOrderException(@PathVariable String orderId, String courierRemark) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        boolean success = false;
+        if (SysRoleEnum.ADMIN == sysUser.getRole()){
+            OrderInfo orderInfo = orderInfoService.getOrderById(orderId);
+            success = orderInfoService.setOrderExcetion(orderId, orderInfo.getCourierId(), courierRemark);
+        }else {
+            success = orderInfoService.setOrderExcetion(orderId, sysUser.getId(), courierRemark);
+        }
+        if (!success){
+            return ResponseResult.FAIL(CommonCode.ORDER_HAS_BEEN_CHANGEED);
+        }
+        return ResponseResult.SUCCESS();
+    }
+
+    @Override
     @GetMapping("/countCourierScore/{courierId}")
     @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     public Double countCourierScore(@PathVariable(required = false) String courierId) {

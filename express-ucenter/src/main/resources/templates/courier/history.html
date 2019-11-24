@@ -393,7 +393,6 @@
             }
             // 订单异常
             if(row.orderStatus === 4) {
-                result += '<button class="btn btn-xs btn-success" onclick="completeOrder('+id+')" title="完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n';
                 if(row.canScore === "1") {
                     result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
                 }
@@ -532,19 +531,16 @@
 
         function errorComplete(id) {
             layer.prompt({title:"订单异常", formType:2},function(val, index) {
-                sendJson(HTTP.POST, "/api/v1/order/error", {
-                    "id": id,
-                    "remark": val
-                }, false, function (res) {
-                    if (res.code === 0) {
-                        layer.msg("操作成功", {icon: 1});
+                sendJson(HTTP.POST, $('#setOrderExceptionUrl').val() + id, {"Authorization": token}, {"courierRemark": val}, false, function (res) {
+                    if (res.code === 10000) {
+                        layer.msg("操作成功", {icon: 6});
                         layer.close(index);
                         flushTable();
                     } else {
-                        layer.msg(res.msg, {icon: 2});
+                        layer.msg(res.msg, {icon: 5});
                     }
                 }, function () {
-                    layer.msg("未知错误", {icon: 2});
+                    layer.msg("未知错误", {icon: 5});
                 });
             });
         }
