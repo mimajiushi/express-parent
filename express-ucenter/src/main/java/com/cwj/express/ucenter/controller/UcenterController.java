@@ -1,12 +1,14 @@
 package com.cwj.express.ucenter.controller;
 
 import com.cwj.express.api.ucenter.UcenterControllerApi;
+import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.ucenter.service.CourierSignService;
 import com.cwj.express.ucenter.service.RedisService;
 import com.cwj.express.ucenter.service.SysRolesLevelService;
 import com.cwj.express.ucenter.service.SysUserService;
@@ -36,6 +38,7 @@ public class UcenterController extends BaseController implements UcenterControll
     private final SysRolesLevelService sysRolesLevelService;
     private final SysUserService sysUserService;
     private final RedisService redisService;
+    private final CourierSignService courierSignService;
 
 //    @Value("${rocketmq.producer.send-message-timeout}")
 //    private Long timeout;
@@ -107,15 +110,27 @@ public class UcenterController extends BaseController implements UcenterControll
     }
 
     @Override
+    @PostMapping("/courierSignNormal")
+    @PreAuthorize("hasRole('ROLE_COURIER')")
     public ResponseResult courierSignNormal() {
-        // todo
-        return null;
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser courier = sysUserService.getById(id.getId());
+        if (sysUserService.isLeave(courier)){
+            return ResponseResult.FAIL(CommonCode.LEAVE_STATUS_CAN_NOT_SIGN);
+        }
+        return courierSignService.courierSignNormal(courier.getId());
     }
 
     @Override
+    @PostMapping("/courierSignOT")
+    @PreAuthorize("hasRole('ROLE_COURIER')")
     public ResponseResult courierSignOT() {
-        // todo
-        return null;
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser courier = sysUserService.getById(id.getId());
+        if (sysUserService.isLeave(courier)){
+            return ResponseResult.FAIL(CommonCode.LEAVE_STATUS_CAN_NOT_SIGN);
+        }
+        return courierSignService.courierSignOT(id.getId());
     }
 
     @Override
@@ -133,11 +148,13 @@ public class UcenterController extends BaseController implements UcenterControll
      * 从cookie删除token
      */
     private void clearTokenFromCookie(){
-
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         //HttpServletResponse response,String domain,String path, String name, String value, int maxAge,boolean httpOnly
         CookieUtil.addCookie(response,"localhost","/","uid","",0,false);
-
     }
+
+
+
+
 
 }

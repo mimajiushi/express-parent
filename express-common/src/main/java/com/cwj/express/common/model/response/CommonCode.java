@@ -71,6 +71,7 @@ public enum CommonCode implements ResultCode{
     COURIER_SIGNOT_TIME_ERROER(false, 70006, "非加班签到时间！"),
     COURIER_SINGOT_EXIST(false, 70007, "加班签到记录已存在！"),
     COURIER_SIGN_NOTMAL_NOT_EXIST(false, 70008, "尚未进行普通签到！"),
+    LEAVE_STATUS_CAN_NOT_SIGN(false, 70009, "请假状态无法签到"),
 
 
     ;

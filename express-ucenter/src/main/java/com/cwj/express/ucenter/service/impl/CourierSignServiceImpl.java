@@ -47,15 +47,17 @@ public class CourierSignServiceImpl implements CourierSignService {
         // 先查看有无前一天的签到记录
         List<CourierSignData> signDataList1 = getSignDataList(courierId, 0, yes, now);
         // 如果存在前一天记录，则取连签记录+1
-        CourierSignCount updateSignCount = null;
         if (signDataList1.size() > 0){
             // 乐观锁更新
             CourierSignCount signCount = getSignCount(courierId, 1);
             signCount.setSignCount(signCount.getSignCount() + 1);
-            updateSignCount = signCount;
+            int updateCount = courierSignCountMapper.updateById(signCount);
+            if (updateCount < 1){
+                return ResponseResult.FAIL(CommonCode.COURIER_SIGN_DATA_CHANGED);
+            }
         }else {
             // 创建新的签到记录，如果有旧的连签记录则
-            updateSignCount = CourierSignCount.builder()
+            CourierSignCount newSignCount = CourierSignCount.builder()
                     .courierId(courierId)
                     .signCount(1)
                     .signCountType(1)
@@ -65,13 +67,17 @@ public class CourierSignServiceImpl implements CourierSignService {
             CourierSignCount signCountBefore = getSignCount(courierId, 1);
             if (!ObjectUtils.isEmpty(signCountBefore)){
                 signCountBefore.setSignCountType(0);
-                courierSignCountMapper.updateById(signCountBefore);
+                int updateCount = courierSignCountMapper.updateById(signCountBefore);
+                if (updateCount < 1){
+                    return ResponseResult.FAIL(CommonCode.COURIER_SIGN_DATA_CHANGED);
+                }
+            }else {
+                courierSignCountMapper.insert(newSignCount);
             }
         }
-        int updateCount = courierSignCountMapper.updateById(updateSignCount);
-        if (updateCount < 1){
-            return ResponseResult.FAIL(CommonCode.COURIER_SIGN_DATA_CHANGED);
-        }
+        // 插入签到记录
+        courierSignDataMapper.insert(CourierSignData.builder()
+                .signDataType(0).signDate(nowDateTime).courierId(courierId).build());
         return ResponseResult.SUCCESS();
     }
 

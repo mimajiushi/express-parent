@@ -73,8 +73,8 @@
                             <label for="signStatus" class="col-md-2 control-label">签到状态</label>
                             <div class="col-md-10">
                                 <p class="form-control-static col-md-7" id="signStatus" th:text="${info.signStatusStr}"></p>
-                                <button type="button" class="btn btn-default col-md-3" th:if="${0 == info.signStatus}" onclick="reWork()">签到</button>
-                                <button type="button" class="btn btn-danger col-md-3" th:if="${1 == info.signStatus}" onclick="leave()">加班</button>
+                                <button type="button" class="btn btn-default col-md-3" th:if="${0 == info.signStatus}" onclick="courierSign(0)">签到</button>
+                                <button type="button" class="btn btn-danger col-md-3" th:if="${1 == info.signStatus}" onclick="courierSign(1)">加班</button>
                             </div>
                         </div>
                         <!--<div class="form-group">-->
@@ -248,6 +248,48 @@
                 setTime($("#getTelCode"));//开始倒计时
             }
         });
+
+        // 配送员签到
+        function courierSign(type) {
+            // 普通签到
+            if (type === 0) {
+                sendJson(HTTP.POST, $('#signNormalUrl').val(), {"Authorization": token}, null, false, function (res) {
+                        if (res.code === 10000) {
+                            layer.msg("签到成功", {icon: 6});
+                            setTimeout(function () {
+                                window.location.reload()
+                            }, 1000);
+                        } else {
+                            layer.msg(res.data, {icon: 5});
+                        }
+                    },
+                    function () {
+                        layer.msg("未知错误！", {icon: 5});
+                    })
+            } else if (type === 1) {
+                layer.msg('确认进行加班吗？(夜班不算加班)', {
+                    time: 0,
+                    btn: ['确认', '取消'],
+                    yes: function (index) {
+                        layer.close(index);
+                        // 加班签到
+                        sendJson(HTTP.POST, $('#signOTUrl').val(), {"Authorization": token}, null, false, function (res) {
+                                if (res.code === 10000) {
+                                    layer.msg("加班签到成功", {icon: 6});
+                                    setTimeout(function () {
+                                        window.location.reload()
+                                    }, 1000);
+                                } else {
+                                    layer.msg(res.data, {icon: 5});
+                                }
+                            },
+                            function () {
+                                layer.msg("未知错误！", {icon: 5});
+                            });
+                    }
+                });
+            }
+        }
 
         // 配送员请假
         function leave() {

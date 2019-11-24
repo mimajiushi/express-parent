@@ -76,9 +76,7 @@ public class SysUserServiceImpl implements SysUserService {
                 .tel(sysUser.getTel()).build();
         // redis取分数，如果为空则说明配送员正在请假
         if (SysRoleEnum.COURIER == sysUser.getRole()){
-            String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + sysUser.getSchoolId();
-            Double score = redisService.zscore(key, sysUser.getId());
-            if (ObjectUtils.isEmpty(score)){
+            if (isLeave(sysUser)){
                 userInfoVo.setLeave(true);
             }
             // 获取签到情况
@@ -151,6 +149,16 @@ public class SysUserServiceImpl implements SysUserService {
         if (ObjectUtils.isEmpty(success) || !success){
             ExceptionCast.cast(CommonCode.COURIER_REWORK_FAIL);
         }
+    }
+
+    @Override
+    public boolean isLeave(SysUser courier){
+        String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
+        Double score = redisService.zscore(key, courier.getId());
+        if (ObjectUtils.isEmpty(score)){
+            return true;
+        }
+        return false;
     }
 
 }

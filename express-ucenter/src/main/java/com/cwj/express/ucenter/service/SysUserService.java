@@ -52,4 +52,10 @@ public interface SysUserService {
      * 失败则抛出异常
      */
     public void courierReWork(SysUser sysUser);
+
+    /**
+     * 判断配送员是否请假
+     * @param courier 配送员用户对象
+     */
+    public boolean isLeave(SysUser courier);
 }
