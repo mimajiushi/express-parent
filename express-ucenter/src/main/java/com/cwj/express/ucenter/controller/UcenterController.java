@@ -8,10 +8,8 @@ import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
-import com.cwj.express.ucenter.service.CourierSignService;
-import com.cwj.express.ucenter.service.RedisService;
-import com.cwj.express.ucenter.service.SysRolesLevelService;
-import com.cwj.express.ucenter.service.SysUserService;
+import com.cwj.express.ucenter.dao.UserEvaluateMapper;
+import com.cwj.express.ucenter.service.*;
 import com.cwj.express.utils.CookieUtil;
 import com.cwj.express.utils.ExpressOauth2Util;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -38,6 +37,7 @@ public class UcenterController extends BaseController implements UcenterControll
     private final SysRolesLevelService sysRolesLevelService;
     private final SysUserService sysUserService;
     private final RedisService redisService;
+    private final UserEvaluateService userEvaluateService;
     private final CourierSignService courierSignService;
 
 //    @Value("${rocketmq.producer.send-message-timeout}")
@@ -51,15 +51,16 @@ public class UcenterController extends BaseController implements UcenterControll
     @GetMapping("/hello")
     public String hello(){
 //        Double zscore = redisService.zscore("qid1", "asdas");
-        Long zrem = redisService.zrem("qid1", "cid1");// 返回值变更成功的数量
-        return String.valueOf(zrem);
+//        Long zrem = redisService.zrem("qid1", "cid1");// 返回值变更成功的数量
+//        return String.valueOf(zrem);
 //        rocketMQTemplate.syncSend(
 //                "testTopic",
 //                MessageBuilder.withPayload("你好payload").build(),
 //                timeout,
 //                MessageDelayLevel.TIME_1S.level
 //        );
-//        return "hello";
+        userEvaluateService.updateScoreAndCount("1", new BigDecimal(5));
+        return "hello";
     }
 
     @PostMapping("/getRoleMsgByUserId")

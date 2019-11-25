@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
@@ -34,5 +35,12 @@ public class UserEvaluateServiceImpl implements UserEvaluateService {
             userEvaluate.setCount(0);
         }
         return userEvaluate;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateScoreAndCount(String userId, BigDecimal score) {
+        userEvaluateMapper.updateCount(userId);
+        userEvaluateMapper.updateScore(userId, score);
     }
 }
