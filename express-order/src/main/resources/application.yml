@@ -85,6 +85,7 @@ rocketmq:
     # 消息最大为4kb
     max-message-size: 4194304
     # 生产环境请配置ACL
+    # 必须配置组，否则启动报错
     group: CANCEL_ORDER_GROUP
 #    customized-trace-topic: EXPRESS_TOPIC
 ##########################################################

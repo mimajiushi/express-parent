@@ -8,4 +8,9 @@ public class AuthorizeConfig {
      */
     public static final String ALL_PAY_USER = "hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')";
 
+    /**
+     * 所有付费用户和配送员
+     */
+    public static final String PAY_USER_AND_COURIER = "hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER','ROLE_COURIER')";
+
 }

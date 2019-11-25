@@ -110,5 +110,7 @@ public class OrderDetailVO implements Serializable {
      */
     private String courierRemark = "";
 
+//    private Integer canScore = 0;
+
 
 }

@@ -559,16 +559,17 @@
             }
 
             let score = $("#inputScore").val(), evaluate = $("#inputEvaluate").val();
-            sendJson(HTTP.POST, "/api/v1/evaluate/order/" + orderId, {"score": score, "evaluate": evaluate}, false, function (res) {
-                if (res.code === 0) {
-                    layer.msg("评价完毕！", {icon: 1});
+            sendJson(HTTP.POST, $('#evaluateUrl').val() + orderId, {"Authorization": token}, {"score": score, "evaluate": evaluate}, false, function (res) {
+                if (res.code === 10000) {
+                    layer.msg("评价完毕！", {icon: 6});
                     $("#evaluateModel").modal('hide');
+                    $('#inputEvaluate').val('');
                     flushTable();
                 } else {
-                    layer.msg(res.msg, {icon: 2});
+                    layer.msg(res.data, {icon: 5});
                 }
             }, function () {
-                layer.msg("未知错误", {icon: 2});
+                layer.msg("未知错误", {icon: 5});
             });
         }
     </script>

@@ -14,6 +14,7 @@ public class RocketmqConfig {
      */
     public static final String CANCEL_ORDER_TOPIC = "CANCEL_ORDER_TOPIC";
     public static final String DISTRIBUTION_COURIER_TOPIC = "DISTRIBUTION_COURIER_TOPIC";
+    public static final String EVALUATE_SCORE_TOPIC = "EVALUATE_SCORE_TOPIC";
 
     /**
      * 配置取消订单消息组
@@ -24,4 +25,9 @@ public class RocketmqConfig {
      * 配置分配配送员消息组
      */
     public static final String DISTRIBUTION_COURIER_GROUP = "DISTRIBUTION_COURIER_GROUP";
+
+    /**
+     * 订单评分消费组
+     */
+    public static final String EVALUATE_SCORE_GROUP = "EVALUATE_SCORE_GROUP";
 }

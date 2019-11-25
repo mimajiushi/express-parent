@@ -445,8 +445,8 @@
             let result = '<button class="btn btn-xs btn-info" onclick="showDetail('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n' +
                 '         <button class="btn btn-xs btn-danger" onclick="refreshStatus('+id+')" title="刷新"><span class="glyphicon glyphicon-refresh"></span></button>\n';
 
-            // 订单评价
-            if(row.canScore === "1") {
+            // 订单完成
+            if(row.orderStatus === 3 && row.canScore === "1") {
                 result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
             }
 
@@ -557,16 +557,17 @@
             }
 
             let score = $("#inputScore").val(), evaluate = $("#inputEvaluate").val();
-            sendJson(HTTP.POST, "/api/v1/evaluate/order/" + orderId, {"score": score, "evaluate": evaluate}, false, function (res) {
-                if (res.code === 0) {
-                    layer.msg("评价完毕！", {icon: 1});
+            sendJson(HTTP.POST, $('#evaluateUrl').val() + orderId, {"Authorization": token}, {"score": score, "evaluate": evaluate}, false, function (res) {
+                if (res.code === 10000) {
+                    layer.msg("评价完毕！", {icon: 6});
                     $("#evaluateModel").modal('hide');
+                    $('#inputEvaluate').val('');
                     flushTable();
                 } else {
-                    layer.msg(res.msg, {icon: 2});
+                    layer.msg(res.data, {icon: 5});
                 }
             }, function () {
-                layer.msg("未知错误", {icon: 2});
+                layer.msg("未知错误", {icon: 5});
             });
         }
     </script>

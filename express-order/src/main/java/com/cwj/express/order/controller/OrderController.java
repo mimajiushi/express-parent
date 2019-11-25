@@ -171,6 +171,42 @@ public class OrderController extends BaseController implements OrderControllerAp
     }
 
     @Override
+    @PostMapping("/evaluate/{orderId}")
+    @PreAuthorize(AuthorizeConfig.PAY_USER_AND_COURIER)
+    public ResponseResult evaluate(@PathVariable String orderId, @RequestParam String score, @RequestParam String evaluate) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        // 查看订单是否完成
+        OrderInfo orderInfo = orderInfoService.getOrderById(orderId);
+        // 验证订单状态和订单所属者
+        if (SysRoleEnum.COURIER == sysUser.getRole()){
+            if (OrderStatusEnum.COMPLETE != orderInfo.getOrderStatus() ||
+                    !sysUser.getId().equals(orderInfo.getCourierId())){
+                return ResponseResult.FAIL(CommonCode.ORDER_CAN_NOT_EVALUATE);
+            }
+        }else {
+            if (OrderStatusEnum.COMPLETE != orderInfo.getOrderStatus() ||
+                    !sysUser.getId().equals(orderInfo.getUserId())){
+                return ResponseResult.FAIL(CommonCode.ORDER_CAN_NOT_EVALUATE);
+            }
+        }
+        LocalTransactionState localTransactionState = rocketMQTemplate.sendMessageInTransaction(
+                RocketmqConfig.EVALUATE_SCORE_GROUP,
+                RocketmqConfig.EVALUATE_SCORE_TOPIC,
+                MessageBuilder.withPayload(sysUser.getId() + "@@" + score)
+                        .setHeader("userId", sysUser.getId())
+                        .setHeader("orderId", orderId)
+                        .setHeader("role", sysUser.getRole().getType())
+                        .setHeader("score", score)
+                        .setHeader("evaluate", evaluate).build()
+                , null).getLocalTransactionState();
+        if (LocalTransactionState.COMMIT_MESSAGE == localTransactionState){
+            return ResponseResult.SUCCESS();
+        }
+        return ResponseResult.FAIL();
+    }
+
+    @Override
     @GetMapping("/countCourierScore/{courierId}")
     @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     public Double countCourierScore(@PathVariable(required = false) String courierId) {
@@ -200,7 +236,7 @@ public class OrderController extends BaseController implements OrderControllerAp
                     MessageBuilder.withPayload(orderInfo.getId() + "@@re")
                             .setHeader("type", "re")
                             .setHeader("orderId", orderInfo.getId())
-                            // userId用于后期清除缓存的
+                            // userId可能用于后期清除缓存的
                             .setHeader("userId", orderInfo.getUserId())
                             .setHeader("courierId", courier.getId())
                             .setHeader("schoolId", courier.getSchoolId()).build(),
