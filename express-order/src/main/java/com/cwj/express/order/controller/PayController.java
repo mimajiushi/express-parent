@@ -139,7 +139,6 @@ public class PayController extends BaseController implements PayControllerApi {
                     trade_no(tradeNo).
                     orderStatusEnum(OrderStatusEnum.WAIT_DIST).
                     paymentStatusEnum(PaymentStatusEnum.TRADE_SUCCESS).build();
-            // todo 改成发送消息
             TransactionSendResult transactionSendResult = rocketMQTemplate.sendMessageInTransaction(
                     RocketmqConfig.DISTRIBUTION_COURIER_GROUP,
                     RocketmqConfig.DISTRIBUTION_COURIER_TOPIC,

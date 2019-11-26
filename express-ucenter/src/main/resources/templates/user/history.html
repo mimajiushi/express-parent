@@ -444,7 +444,7 @@
             let id = "'" + value + "'";
             let result = '<button class="btn btn-xs btn-info" onclick="showDetail('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n' +
                 '         <button class="btn btn-xs btn-danger" onclick="refreshStatus('+id+')" title="刷新"><span class="glyphicon glyphicon-refresh"></span></button>\n';
-
+            console.log(row.canScore);
             // 订单完成
             if(row.orderStatus === 3 && row.canScore === "1") {
                 result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
