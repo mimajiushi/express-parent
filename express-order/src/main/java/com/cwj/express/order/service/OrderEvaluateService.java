@@ -1,10 +1,12 @@
 package com.cwj.express.order.service;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderEvaluate;
 import com.cwj.express.order.dao.OrderEvaluateMapper;
+import com.cwj.express.vo.order.OrderEvaluateVO;
 
 import java.math.BigDecimal;
 
@@ -38,4 +40,13 @@ public interface OrderEvaluateService {
      * @return 评价信息
      */
     OrderEvaluate getById(String orderId);
+
+    /**
+     * 分页获取用户评价信息
+     * @param page 分页对象
+     * @param userId 用户id
+     * @param roleEnum 角色枚举
+     * @return com.cwj.express.vo.order.OrderEvaluateVO
+     */
+    OrderEvaluateVO getPageByUserId(Page<OrderEvaluate> page, String userId, SysRoleEnum roleEnum);
 }

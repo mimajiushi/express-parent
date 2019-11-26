@@ -215,4 +215,20 @@ public class PageController extends BaseController {
 
     }
 
+    @GetMapping("/evaluatePage")
+    @PreAuthorize(AuthorizeConfig.PAY_USER_AND_COURIER)
+    public String evaluatePage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        UserEvaluate scoreById = userEvaluateService.getScoreById(sysUser.getId());
+        BigDecimal score = scoreById.getScore().divide(new BigDecimal(scoreById.getCount()), 2);
+        if (scoreById.getCount() == 0){
+            score = scoreById.getScore();
+        }
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+        map.put("score", score);
+        return "common/evaluate";
+    }
+
 }

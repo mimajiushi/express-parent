@@ -71,7 +71,6 @@ public class CourierSignServiceImpl implements CourierSignService {
                 if (updateCount < 1){
                     return ResponseResult.FAIL(CommonCode.COURIER_SIGN_DATA_CHANGED);
                 }
-            }else {
                 courierSignCountMapper.insert(newSignCount);
             }
         }

@@ -74,6 +74,7 @@ public enum CommonCode implements ResultCode{
     COURIER_SINGOT_EXIST(false, 70007, "加班签到记录已存在！"),
     COURIER_SIGN_NOTMAL_NOT_EXIST(false, 70008, "尚未进行普通签到！"),
     LEAVE_STATUS_CAN_NOT_SIGN(false, 70009, "请假状态无法签到"),
+    EVALUATE_UPDATE_RETRY(false, 70010, "分数状态更新失败！待消息重试！"),
 
 
     ;

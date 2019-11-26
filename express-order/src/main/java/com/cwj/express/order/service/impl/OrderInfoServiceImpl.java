@@ -421,12 +421,18 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     private String canEvaluate(String orderId, String userId, SysRoleEnum roleEnum){
         if (roleEnum == SysRoleEnum.COURIER){
             // 配送员
-            int count = orderEvaluateMapper.selectCount(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("courier_id", userId));
-            return count == 0?"1":"0";
+            OrderEvaluate orderEvaluate = orderEvaluateMapper.selectOne(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("courier_id", userId));
+            if (ObjectUtils.isEmpty(orderEvaluate)){
+                return "1";
+            }
+            return ("").equals(orderEvaluate.getCourierEvaluate())?"1":"0";
         }else if (roleEnum != SysRoleEnum.ADMIN){
             // 普通用户
-            int count = orderEvaluateMapper.selectCount(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("user_id", userId));
-            return count == 0?"1":"0";
+            OrderEvaluate orderEvaluate = orderEvaluateMapper.selectOne(new QueryWrapper<OrderEvaluate>().eq("id", orderId).eq("user_id", userId));
+            if (ObjectUtils.isEmpty(orderEvaluate)){
+                return "1";
+            }
+            return ("").equals(orderEvaluate.getUserEvaluate())?"1":"0";
         }
         return "0";
     }

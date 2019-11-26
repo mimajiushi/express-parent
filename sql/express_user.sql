@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2019-11-24 16:34:42
+Date: 2019-11-26 16:11:04
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -40,6 +40,7 @@ INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-2
 INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-22 20:36:42', '2019-11-17 19:36:30');
 INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉屎', '2019-11-24 16:02:54', '2019-11-18 06:20:47');
 INSERT INTO `courier_leave_log` VALUES ('63454354', '0', '拉肚子', '2019-11-24 16:28:41', '2019-11-18 06:44:59');
+INSERT INTO `courier_leave_log` VALUES ('23542345', '0', '拉肚子', '2019-11-24 19:38:06', '2019-11-18 07:02:56');
 
 -- ----------------------------
 -- Table structure for courier_sign_count
@@ -59,7 +60,9 @@ CREATE TABLE `courier_sign_count` (
 -- ----------------------------
 -- Records of courier_sign_count
 -- ----------------------------
-INSERT INTO `courier_sign_count` VALUES ('1198518276225765378', '63454354', '1', '1', '2019-11-24 16:26:39', '2019-11-24 16:26:39');
+INSERT INTO `courier_sign_count` VALUES ('1198518276225765378', '63454354', '2', '0', '2019-11-24 16:26:39', '2019-11-26 15:09:54');
+INSERT INTO `courier_sign_count` VALUES ('1198566372465025026', '23542345', '1', '1', '2019-11-24 19:37:46', '2019-11-24 19:37:46');
+INSERT INTO `courier_sign_count` VALUES ('1199223739502301186', '63454354', '1', '1', '2019-11-26 15:09:54', '2019-11-26 15:09:54');
 
 -- ----------------------------
 -- Table structure for courier_sign_data
@@ -78,6 +81,9 @@ CREATE TABLE `courier_sign_data` (
 -- Records of courier_sign_data
 -- ----------------------------
 INSERT INTO `courier_sign_data` VALUES ('1198518276255125505', '63454354', '2019-11-24 16:26:39', '0');
+INSERT INTO `courier_sign_data` VALUES ('1198566372490190849', '23542345', '2019-11-24 19:37:46', '0');
+INSERT INTO `courier_sign_data` VALUES ('1198566394363486210', '23542345', '2019-11-24 19:37:51', '1');
+INSERT INTO `courier_sign_data` VALUES ('1199223739540049922', '63454354', '2019-11-26 15:09:54', '0');
 
 -- ----------------------------
 -- Table structure for oauth_access_token
@@ -266,18 +272,22 @@ CREATE TABLE `user_evaluate` (
 -- ----------------------------
 -- Records of user_evaluate
 -- ----------------------------
-INSERT INTO `user_evaluate` VALUES ('1', '7.000', '1', '2019-05-04 12:57:12');
+INSERT INTO `user_evaluate` VALUES ('1', '10.000', '0', '2019-11-18 19:23:49');
 INSERT INTO `user_evaluate` VALUES ('123', '10.000', '0', '2019-10-30 15:11:53');
+INSERT INTO `user_evaluate` VALUES ('12312523', '10.000', '0', '2019-11-18 14:22:43');
 INSERT INTO `user_evaluate` VALUES ('1234', '10.000', '0', '2019-10-30 15:11:53');
 INSERT INTO `user_evaluate` VALUES ('12345', '10.000', '0', '2019-10-30 15:11:53');
-INSERT INTO `user_evaluate` VALUES ('270658f71ac110ec6cce0e08b1039b4d', '9.500', '1', '2019-10-30 15:11:15');
+INSERT INTO `user_evaluate` VALUES ('23542345', '10.000', '0', '2019-11-18 14:23:12');
+INSERT INTO `user_evaluate` VALUES ('270658f71ac110ec6cce0e08b1039b4d', '15.500', '3', '2019-11-18 20:09:27');
 INSERT INTO `user_evaluate` VALUES ('31772375647aaae1a28b3d785cdb99e2', '10.000', '0', '2019-10-30 14:05:30');
 INSERT INTO `user_evaluate` VALUES ('3247dc8a88fc9404f6a21c16ec250dcf', '10.000', '0', '2019-10-30 14:05:30');
+INSERT INTO `user_evaluate` VALUES ('57546432', '10.000', '0', '2019-11-18 14:23:36');
 INSERT INTO `user_evaluate` VALUES ('6150146f23bfa506b300f4f2c635dcba', '10.000', '0', '2019-05-04 11:30:01');
+INSERT INTO `user_evaluate` VALUES ('63454354', '25.000', '3', '2019-11-18 20:02:12');
 INSERT INTO `user_evaluate` VALUES ('6e87fd4d208aa60e57c4cee5404b8f6b', '10.000', '0', '2019-10-30 14:05:30');
 INSERT INTO `user_evaluate` VALUES ('77d014e9455b27c0696eb9f969f87912', '10.000', '0', '2019-05-04 11:30:01');
 INSERT INTO `user_evaluate` VALUES ('92602c3ce0b33707d84d1165ac698db2', '10.000', '0', '2019-05-04 11:30:01');
-INSERT INTO `user_evaluate` VALUES ('f10960e7392847a2c691ad066e2a87c4', '7.250', '2', '2019-10-30 15:11:53');
+INSERT INTO `user_evaluate` VALUES ('f10960e7392847a2c691ad066e2a87c4', '10.000', '0', '2019-11-18 15:43:47');
 
 -- ----------------------------
 -- Table structure for user_feedback

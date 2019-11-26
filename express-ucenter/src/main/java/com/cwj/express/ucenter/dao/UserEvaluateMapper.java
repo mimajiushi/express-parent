@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * @since 2019-11-02
  */
 public interface UserEvaluateMapper extends BaseMapper<UserEvaluate> {
-    @Update("update user_evaluate set score = (score + #{score}) / (count+1) where user_id = #{userId}")
+    @Update("update user_evaluate set score = (score + #{score}) where user_id = #{userId}")
     public void updateScore(@Param("userId") String userId, @Param("score") BigDecimal score);
 
     @Update("update user_evaluate set count = count + 1 where user_id = #{userId}")

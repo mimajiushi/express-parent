@@ -1,5 +1,6 @@
 package com.cwj.express.vo.order;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ApiModel(value="仪表盘订单信息对象", description="包含待支付，待配送，正在配送的订单数量")
 public class OrderDetailVO implements Serializable {
     /**
      * 订单id

@@ -11,6 +11,7 @@ import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
+import com.cwj.express.domain.order.OrderEvaluate;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.domain.ucenter.SysUser;
@@ -20,10 +21,7 @@ import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.ExpressOauth2Util;
-import com.cwj.express.vo.order.OrderDashboardVO;
-import com.cwj.express.vo.order.OrderDetailVO;
-import com.cwj.express.vo.order.OrderHistoryVO;
-import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.order.*;
 import com.cwj.express.vo.table.BootstrapTableVO;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -176,15 +174,18 @@ public class OrderController extends BaseController implements OrderControllerAp
     public ResponseResult evaluate(@PathVariable String orderId, @RequestParam String score, @RequestParam String evaluate) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
         SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        String scoreForUserId = "";
         // 查看订单是否完成
         OrderInfo orderInfo = orderInfoService.getOrderById(orderId);
         // 验证订单状态和订单所属者
         if (SysRoleEnum.COURIER == sysUser.getRole()){
+            scoreForUserId = orderInfo.getUserId();
             if (OrderStatusEnum.COMPLETE != orderInfo.getOrderStatus() ||
                     !sysUser.getId().equals(orderInfo.getCourierId())){
                 return ResponseResult.FAIL(CommonCode.ORDER_CAN_NOT_EVALUATE);
             }
         }else {
+            scoreForUserId = orderInfo.getCourierId();
             if (OrderStatusEnum.COMPLETE != orderInfo.getOrderStatus() ||
                     !sysUser.getId().equals(orderInfo.getUserId())){
                 return ResponseResult.FAIL(CommonCode.ORDER_CAN_NOT_EVALUATE);
@@ -193,7 +194,7 @@ public class OrderController extends BaseController implements OrderControllerAp
         LocalTransactionState localTransactionState = rocketMQTemplate.sendMessageInTransaction(
                 RocketmqConfig.EVALUATE_SCORE_GROUP,
                 RocketmqConfig.EVALUATE_SCORE_TOPIC,
-                MessageBuilder.withPayload(sysUser.getId() + "@@" + score)
+                MessageBuilder.withPayload(scoreForUserId + "@@" + score)
                         .setHeader("userId", sysUser.getId())
                         .setHeader("orderId", orderId)
                         .setHeader("role", sysUser.getRole().getType())
@@ -204,6 +205,17 @@ public class OrderController extends BaseController implements OrderControllerAp
             return ResponseResult.SUCCESS();
         }
         return ResponseResult.FAIL();
+    }
+
+    @Override
+    @PreAuthorize(AuthorizeConfig.PAY_USER_AND_COURIER)
+    @GetMapping("/evaluate/list")
+    public ResponseResult evaluateList(@RequestParam(defaultValue = "1", required = false) Integer current) {
+        SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        Page<OrderEvaluate> page = new Page<>(current, 10);
+        OrderEvaluateVO evaluateVO = orderEvaluateService.getPageByUserId(page, sysUser.getId(), sysUser.getRole());
+        return ResponseResult.SUCCESS(evaluateVO);
     }
 
     @Override

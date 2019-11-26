@@ -63,6 +63,9 @@ public interface OrderControllerApi {
     @ApiOperation("评价订单")
     public ResponseResult evaluate(@PathVariable String orderId, @RequestParam String score, @RequestParam String evaluate);
 
+    @ApiOperation("获取用户订单评价信息列表(普通用户、配送员)")
+    public ResponseResult evaluateList(@RequestParam(required = false, defaultValue = "1") Integer current);
+
     @ApiOperation(value = "配送员分数校准", notes = "courierId只有管理员操作接口才需要，配送员不需要")
     public Double countCourierScore(@PathVariable(required = false) String courierId);
 

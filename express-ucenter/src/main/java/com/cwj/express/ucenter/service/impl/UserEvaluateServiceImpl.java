@@ -1,6 +1,9 @@
 package com.cwj.express.ucenter.service.impl;
 
 import com.cwj.express.common.config.redis.RedisConfig;
+import com.cwj.express.common.exception.CustomException;
+import com.cwj.express.common.exception.ExceptionCast;
+import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.domain.ucenter.UserEvaluate;
 import com.cwj.express.ucenter.dao.UserEvaluateMapper;
 import com.cwj.express.ucenter.service.RedisService;
@@ -40,6 +43,16 @@ public class UserEvaluateServiceImpl implements UserEvaluateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateScoreAndCount(String userId, BigDecimal score) {
+        UserEvaluate userEvaluate = userEvaluateMapper.selectById(userId);
+        if (userEvaluate.getCount() == 0){
+            userEvaluate.setCount(1);
+            userEvaluate.setScore(score);
+            int count = userEvaluateMapper.updateById(userEvaluate);
+            if (count < 1){
+                ExceptionCast.cast(CommonCode.EVALUATE_UPDATE_RETRY);
+            }
+            return;
+        }
         userEvaluateMapper.updateCount(userId);
         userEvaluateMapper.updateScore(userId, score);
     }

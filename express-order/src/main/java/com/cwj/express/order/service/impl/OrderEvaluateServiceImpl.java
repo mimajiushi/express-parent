@@ -1,14 +1,20 @@
 package com.cwj.express.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderEvaluate;
+import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.order.dao.OrderEvaluateMapper;
 import com.cwj.express.order.service.OrderEvaluateService;
+import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.utils.LocalDateTimeUtils;
+import com.cwj.express.vo.order.OrderEvaluateItemVO;
+import com.cwj.express.vo.order.OrderEvaluateVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +22,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -26,6 +36,7 @@ import java.time.LocalDateTime;
 public class OrderEvaluateServiceImpl implements OrderEvaluateService {
 
     private final OrderEvaluateMapper orderEvaluateMapper;
+    private final OrderInfoService orderInfoService;
 
     @Override
 //    @Cacheable(cacheNames = RedisConfig.COUNT_EVALUATE_DATA, key = "#id")
@@ -51,16 +62,19 @@ public class OrderEvaluateServiceImpl implements OrderEvaluateService {
         QueryWrapper<OrderEvaluate> orderEvaluateQueryWrapper = new QueryWrapper<>();
         orderEvaluateQueryWrapper.eq("id", orderId);
         OrderEvaluate orderEvaluate = orderEvaluateMapper.selectById(orderId);
+        OrderInfo orderInfo = orderInfoService.getOrderById(orderId);
         if (ObjectUtils.isEmpty(orderEvaluate)){
             orderEvaluate = OrderEvaluate.builder()
                     .id(orderId).build();
             if (SysRoleEnum.COURIER == roleEnum){
                 orderEvaluate.setCourierId(userId);
+                orderEvaluate.setUserId(orderInfo.getUserId());
                 orderEvaluate.setCourierEvaluate(evaluate);
                 orderEvaluate.setCourierScore(score);
                 orderEvaluate.setCourierDate(now);
             }else {
                 orderEvaluate.setUserId(userId);
+                orderEvaluate.setCourierId(orderInfo.getCourierId());
                 orderEvaluate.setUserDate(now);
                 orderEvaluate.setUserScore(score);
                 orderEvaluate.setUserEvaluate(evaluate);
@@ -69,22 +83,24 @@ public class OrderEvaluateServiceImpl implements OrderEvaluateService {
             return ResponseResult.SUCCESS();
         }
         if (SysRoleEnum.COURIER == roleEnum){
-            if (userId.equals(orderEvaluate.getCourierId())){
+            if (!StringUtils.isEmpty(orderEvaluate.getCourierEvaluate())){
                 return ResponseResult.FAIL(CommonCode.ORDER_EVALUATE_EXIST);
             }
-            orderEvaluate.setCourierId(userId);
+//            orderEvaluate.setCourierId(userId);
+//            orderEvaluate.setUserId(orderInfo.getUserId());
             orderEvaluate.setCourierEvaluate(evaluate);
             orderEvaluate.setCourierScore(score);
             orderEvaluate.setCourierDate(now);
             orderEvaluateQueryWrapper.eq("courier_date", defaultTime);
         }else {
-            if (userId.equals(orderEvaluate.getCourierId())) {
+            if (!StringUtils.isEmpty(orderEvaluate.getUserEvaluate())) {
                 return ResponseResult.FAIL(CommonCode.ORDER_EVALUATE_EXIST);
             }
-            orderEvaluate.setUserId(userId);
+//            orderEvaluate.setUserId(userId);
+//            orderInfo.setCourierId(orderInfo.getCourierId());
             orderEvaluate.setUserDate(now);
             orderEvaluate.setUserScore(score);
-            orderEvaluate.setUserDate(now);
+            orderEvaluate.setUserEvaluate(evaluate);
             orderEvaluateQueryWrapper.eq("user_date", defaultTime);
         }
         int count = orderEvaluateMapper.update(orderEvaluate, orderEvaluateQueryWrapper);
@@ -97,5 +113,37 @@ public class OrderEvaluateServiceImpl implements OrderEvaluateService {
     @Override
     public OrderEvaluate getById(String orderId) {
         return orderEvaluateMapper.selectById(orderId);
+    }
+
+    @Override
+    public OrderEvaluateVO getPageByUserId(Page<OrderEvaluate> page, String userId, SysRoleEnum roleEnum) {
+        QueryWrapper<OrderEvaluate> orderEvaluateQueryWrapper = new QueryWrapper<>();
+        if (roleEnum == SysRoleEnum.COURIER){
+            orderEvaluateQueryWrapper.eq("courier_id", userId).orderByDesc("update_date");
+        }else {
+            orderEvaluateQueryWrapper.eq("user_id", userId).orderByDesc("update_date");
+        }
+        IPage<OrderEvaluate> resPage = orderEvaluateMapper.selectPage(page, orderEvaluateQueryWrapper);
+        List<OrderEvaluateItemVO> evaluateItemVOS = converter(resPage.getRecords(), roleEnum);
+        return OrderEvaluateVO.builder()
+                .current(page.getCurrent())
+                .page(resPage.getPages())
+                .record(evaluateItemVOS).build();
+    }
+
+    private List<OrderEvaluateItemVO> converter(List<OrderEvaluate> evaluateList, SysRoleEnum roleEnum){
+        if (ObjectUtils.isEmpty(evaluateList)){
+            return new ArrayList<>();
+        }
+        boolean isCourier = roleEnum == SysRoleEnum.COURIER;
+        return evaluateList.stream().map(item -> {
+            OrderEvaluateItemVO orderEvaluateItemVO = new OrderEvaluateItemVO();
+            orderEvaluateItemVO.setOrderId(item.getId());
+            String evaluate = isCourier?item.getUserEvaluate():item.getCourierEvaluate();
+            BigDecimal score = isCourier?item.getUserScore():item.getCourierScore();
+            orderEvaluateItemVO.setEvaluate(evaluate);
+            orderEvaluateItemVO.setScore(score);
+            return orderEvaluateItemVO;
+        }).collect(Collectors.toList());
     }
 }
