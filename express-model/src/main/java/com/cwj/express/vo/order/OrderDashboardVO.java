@@ -17,7 +17,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="仪表盘订单信息对象", description="包含待支付，待配送，正在配送的订单数量")
+@ApiModel(value="仪表盘订单信息对象")
 public class OrderDashboardVO implements Serializable {
     @ApiModelProperty(value = "待支付的订单数量(付费用户)")
     private int waitPaymentCount;
@@ -30,4 +30,13 @@ public class OrderDashboardVO implements Serializable {
 
     @ApiModelProperty(value = "正在配送的订单（付费用户，配送员）")
     private int transportCount;
+
+    @ApiModelProperty(value = "已完成送件上门的订单数量（管理员）")
+    private int sendOrderCount;
+
+    @ApiModelProperty(value = "已完成上门取件的订单数量（管理员）")
+    private int pickOrderCount;
+
+    @ApiModelProperty(value = "异常订单数量")
+    private int exceptionOrderCount;
 }

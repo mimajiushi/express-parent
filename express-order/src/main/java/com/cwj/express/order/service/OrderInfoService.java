@@ -35,6 +35,11 @@ public interface OrderInfoService {
     OrderDashboardVO getCourerDashboardData(String courierId);
 
     /**
+     * 获取当日 派件完成(送件上门)、收件完成(上门取件)、异常 的订单数量
+     */
+    OrderDashboardVO getAdminDashboardData();
+
+    /**
      * 创建订单并发送取消订单延时消息
      * @param orderInfoVO 订单信息
      * @return 成功则返回订单id， 失败则返回操作失败

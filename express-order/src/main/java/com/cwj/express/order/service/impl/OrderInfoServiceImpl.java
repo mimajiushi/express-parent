@@ -47,6 +47,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +118,29 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 .transportCount(transportCount)
                 .waitPickUpCount(waitPickupCount).build();
 
+    }
+
+    @Override
+    public OrderDashboardVO getAdminDashboardData() {
+        LocalDate nowDay = LocalDate.now();
+        LocalDate torDay = nowDay.plusDays(1);
+        Integer sendOrderCount = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("status", OrderStatusEnum.COMPLETE.getStatus())
+                .eq("type", OrderTypeEnum.TRANSPORT.getType())
+                .between("update_date", nowDay, torDay));
+        Integer pickOrderCount = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("status", OrderStatusEnum.COMPLETE.getStatus())
+                .eq("type", OrderTypeEnum.PICK_UP.getType())
+                .between("update_date", nowDay, torDay));
+
+        Integer exceptionOrderCount = orderInfoMapper.selectCount(new QueryWrapper<OrderInfo>()
+                .eq("status", OrderStatusEnum.ERROR.getStatus())
+                .between("update_date", nowDay, torDay));
+
+        return OrderDashboardVO.builder()
+                .pickOrderCount(pickOrderCount)
+                .sendOrderCount(sendOrderCount)
+                .exceptionOrderCount(exceptionOrderCount).build();
     }
 
     @Transactional(propagation = Propagation.REQUIRED ,rollbackFor = Exception.class)

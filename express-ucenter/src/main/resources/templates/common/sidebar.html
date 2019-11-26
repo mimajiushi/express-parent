@@ -8,6 +8,9 @@
             <li id="courierDashboard-sidebar" sec:authorize="hasAnyRole('ROLE_COURIER')">
                 <a href="/ucenter/courierDashboard/">仪表盘<i class="glyphicon glyphicon-dashboard pull-right"></i></a>
             </li>
+            <li id="adminDashboard-sidebar" sec:authorize="hasAnyRole('ROLE_ADMIN')">
+                <a href="/ucenter/adminDashboard/">仪表盘<i class="glyphicon glyphicon-dashboard pull-right"></i></a>
+            </li>
 
             <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER')" id="order-sidebar">
                 <a href="/ucenter/orderPage">立即下单<i class="glyphicon glyphicon-cloud-download pull-right"></i></a>

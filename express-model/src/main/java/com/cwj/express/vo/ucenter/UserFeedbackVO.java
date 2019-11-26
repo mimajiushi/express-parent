@@ -22,4 +22,8 @@ public class UserFeedbackVO implements Serializable {
     @ApiModelProperty(value = "等待处理的反馈数量")
     private int waitCount;
 
+    @ApiModelProperty(value = "已经完成的反馈数量")
+    private int finishedCount;
+
+
 }

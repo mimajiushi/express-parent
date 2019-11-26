@@ -7,7 +7,6 @@ import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.OrderStatusEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
-import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
@@ -23,10 +22,6 @@ import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.ExpressOauth2Util;
 import com.cwj.express.vo.order.*;
 import com.cwj.express.vo.table.BootstrapTableVO;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.client.producer.TransactionSendResult;
@@ -260,6 +255,13 @@ public class OrderController extends BaseController implements OrderControllerAp
             }
         }
         return ResponseResult.SUCCESS("重新分配成功！分配订单数：" + count);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/adminDashboardOrderData")
+    public OrderDashboardVO adminDashboardOrderData() {
+        return orderInfoService.getAdminDashboardData();
     }
 
 }

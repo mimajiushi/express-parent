@@ -1,20 +1,15 @@
 package com.cwj.express.api.order;
 
-import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
-import com.cwj.express.vo.order.OrderDetailVO;
 import com.cwj.express.vo.order.OrderHistoryVO;
 import com.cwj.express.vo.order.OrderInfoVO;
 import com.cwj.express.vo.table.BootstrapTableVO;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
@@ -71,4 +66,7 @@ public interface OrderControllerApi {
 
     @ApiOperation("重新分配订单配送员接口")
     public ResponseResult reDistributionCourier(String[] orderIds);
+
+    @ApiOperation("获取当日 派件完成(送件上门)、收件完成(上门取件)、异常 的订单数量")
+    public OrderDashboardVO adminDashboardOrderData();
 }

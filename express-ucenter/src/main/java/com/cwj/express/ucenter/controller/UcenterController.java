@@ -24,10 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * @author Administrator
- * @version 1.0
- **/
+
 @RestController
 @RequestMapping("/ucenter")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -133,6 +130,7 @@ public class UcenterController extends BaseController implements UcenterControll
         }
         return courierSignService.courierSignOT(id.getId());
     }
+
 
     @Override
     @PostMapping("/userLogout")

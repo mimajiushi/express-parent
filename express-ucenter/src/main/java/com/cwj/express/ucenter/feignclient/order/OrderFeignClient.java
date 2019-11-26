@@ -1,6 +1,7 @@
 package com.cwj.express.ucenter.feignclient.order;
 
 import com.cwj.express.common.constant.ExpressServiceListConstant;
+import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
@@ -38,4 +39,7 @@ public interface OrderFeignClient {
 
     @GetMapping("/order/countCourierScore/{courierId}")
     public Double countCourierScore(@PathVariable(required = false,value = "courierId") String courierId);
+
+    @GetMapping("/order/adminDashboardOrderData")
+    public OrderDashboardVO adminDashboardOrderData();
 }

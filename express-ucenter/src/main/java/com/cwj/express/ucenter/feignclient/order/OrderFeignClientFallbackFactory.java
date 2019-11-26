@@ -1,4 +1,5 @@
 package com.cwj.express.ucenter.feignclient.order;
+import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.vo.order.OrderDashboardVO;
@@ -46,6 +47,12 @@ public class OrderFeignClientFallbackFactory implements FallbackFactory<OrderFei
             @Override
             public Double countCourierScore(String courierId) {
                 log.error("获取配送员校准分数异常！异常信息:{}", throwable.getMessage());
+                return null;
+            }
+
+            @Override
+            public OrderDashboardVO adminDashboardOrderData() {
+                log.error("获取管理员订单仪表盘信息异常！异常信息:{}", throwable.getMessage());
                 return null;
             }
         };

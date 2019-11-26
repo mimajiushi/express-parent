@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
+import java.time.LocalDate;
 
 /**
  * @author chenwenjie
@@ -34,5 +37,21 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
         return UserFeedbackVO.builder()
                 .waitCount(waitCount)
                 .processCount(processCount).build();
+    }
+
+    @Override
+    public Integer getCountByStatusAndDate(FeedbackStatusEnum feedbackStatusEnum, LocalDate start, LocalDate end) {
+        QueryWrapper<UserFeedback> userFeedbackQueryWrapper = new QueryWrapper<UserFeedback>()
+                .eq("status", feedbackStatusEnum.getStatus())
+                .orderByDesc("create_date");
+        if (!ObjectUtils.isEmpty(start)){
+            start = start.plusDays(-1);
+            userFeedbackQueryWrapper.gt("update_date", start);
+        }
+        if (!ObjectUtils.isEmpty(end)){
+            end = end.plusDays(1);
+            userFeedbackQueryWrapper.lt("update_date", end);
+        }
+        return userFeedbackMapper.selectCount(userFeedbackQueryWrapper);
     }
 }

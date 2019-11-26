@@ -1,6 +1,8 @@
 package com.cwj.express.ucenter.controller;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
 import com.cwj.express.common.constant.URLConstant;
+import com.cwj.express.common.enums.FeedbackStatusEnum;
+import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.area.DataCompany;
 import com.cwj.express.domain.order.OrderInfo;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.annotations.ApiIgnore;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -67,7 +71,7 @@ public class PageController extends BaseController {
                     response.sendRedirect("/ucenter/dashboard");
                     return;
                 case ADMIN:
-                    response.sendRedirect("/ucenter/admin");
+                    response.sendRedirect("/ucenter/adminDashboard");
                     return;
                 case COURIER:
                     response.sendRedirect("/ucenter/courierDashboard");
@@ -146,6 +150,27 @@ public class PageController extends BaseController {
         map.put("feedbackDesc", feedbackDesc);
 
         return "courier/dashboard";
+    }
+
+    @GetMapping("/adminDashboard")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String adminDashboard(ModelMap map){
+        // 日 发(完成)/收(完成)/异常 件数量
+        OrderDashboardVO orderDashboardVO = orderFeignClient.adminDashboardOrderData();
+        map.put("orderDesc", "上门取件完成：" + orderDashboardVO.getPickOrderCount() +
+                "   送件上门完成：" + orderDashboardVO.getSendOrderCount() +
+                "   异常订单：" + orderDashboardVO.getExceptionOrderCount());
+        // 待处理反馈，日新增反馈数量
+        LocalDate nowDay = LocalDate.now();
+        Integer todWaitCount = userFeedbackService.getCountByStatusAndDate(FeedbackStatusEnum.WAIT, nowDay, nowDay);
+        Integer allWaitCount = userFeedbackService.getCountByStatusAndDate(FeedbackStatusEnum.WAIT, null, null);
+        // 日 已签到和未签到的 配送员占比饼图(暂时不写)
+        map.put("feedbackDesc", "待处理反馈：" + allWaitCount + "   今日新增反馈：" + todWaitCount);
+        SysUser sysUser = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysRolesLevel sysRolesLevel = sysRolesLevelService.getByUserId(sysUser.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysRolesLevel.getRoleDesc());
+        return "admin/dashboard";
     }
 
     @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)
