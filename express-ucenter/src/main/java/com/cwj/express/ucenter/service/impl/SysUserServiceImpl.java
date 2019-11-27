@@ -202,7 +202,7 @@ public class SysUserServiceImpl implements SysUserService {
             if (count == 0){
                 avgScore = score;
             }else {
-                avgScore = score.divide(new BigDecimal(count), 2);
+                avgScore = score.divide(new BigDecimal(count), 2,4);
             }
             return UserInfoVo.builder()
                     .id(sysUser.getId())

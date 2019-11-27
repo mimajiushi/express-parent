@@ -259,7 +259,7 @@ public class PageController extends BaseController {
         SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
         SysUser sysUser = sysUserService.getById(id.getId());
         UserEvaluate scoreById = userEvaluateService.getScoreById(sysUser.getId());
-        BigDecimal score = scoreById.getScore().divide(new BigDecimal(scoreById.getCount()), 2);
+        BigDecimal score = scoreById.getScore().divide(new BigDecimal(scoreById.getCount()), 2 , 4);
         if (scoreById.getCount() == 0){
             score = scoreById.getScore();
         }

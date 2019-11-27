@@ -39,5 +39,6 @@ public class InitCourierScoreTask {
             String key = RedisConfig.COURIER_WEIGHT_DATA + "::" + courier.getSchoolId();
             redisService.zadd(key, courier.getId(), socre);
         }
+        log.info("配送员权重初始化完成！");
     }
 }
