@@ -36,4 +36,12 @@ public interface CourierSignService {
      * @return 连签记录
      */
     CourierSignCount getSignCount(String courierId, int type);
+
+    /**
+     * 根据状态和日期查找签到记录数量
+     */
+    Integer getSignCount(String courierId, int type, LocalDate startDate, LocalDate endDate);
+
+
+
 }

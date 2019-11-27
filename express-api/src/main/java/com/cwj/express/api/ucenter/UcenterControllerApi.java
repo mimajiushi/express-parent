@@ -46,4 +46,10 @@ public interface UcenterControllerApi {
     public BootstrapTableVO<UserInfoVo> userListByParam(@RequestParam(required = false, defaultValue = "1") Integer current,
                                                         @RequestParam(defaultValue = "10", required = false) Integer size,
                                                         UserInfoVo userInfoVo);
+
+    @ApiOperation(value = "管理员获取用户详情")
+    public ResponseResult userInfoDetail(@PathVariable String userId, UserInfoVo userInfoVo);
+
+    @ApiOperation(value = "获取配送员工作情况")
+    public ResponseResult getCourierSignDetail(@PathVariable String courierId, String startData, String endData);
 }

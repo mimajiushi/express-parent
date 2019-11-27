@@ -123,4 +123,12 @@ public class CourierSignServiceImpl implements CourierSignService {
                 .eq("sign_count_type", type)
         .orderByDesc("update_date"));
     }
+
+    @Override
+    public Integer getSignCount(String courierId, int type, LocalDate startDate, LocalDate endDate) {
+        return courierSignDataMapper.selectCount(new QueryWrapper<CourierSignData>()
+                    .eq("courier_id", courierId)
+                    .eq("sign_data_type", type)
+                    .between("sign_date", startDate, endDate));
+    }
 }

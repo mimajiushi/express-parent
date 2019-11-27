@@ -80,6 +80,67 @@
         </div>
     </div>
 
+    <!-- 用户详情模态框 -->
+    <div class="modal fade" id="infoModel" tabindex="-1" role="dialog" aria-labelledby="infoModelLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="infoModelLabel">用户详情</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="modUserId" class="col-sm-2 control-label">用户id</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserId"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserSex" class="col-sm-2 control-label">性别</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserSex"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserRealName" class="col-sm-2 control-label">真实姓名</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserRealName"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserIdCard" class="col-sm-2 control-label">身份证号</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserIdCard"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserWorkIdCard" class="col-sm-2 control-label">学/工号</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserWorkIdCard"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserSchool" class="col-sm-2 control-label">学校</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserSchool"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserIsLeave" class="col-sm-2 control-label">是否请假中</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" id="modUserIsLeave"></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script th:src="@{/public/assets/js/http.js}" src="../../public/assets/js/http.js"></script>
     <script th:src="@{/public/assets/js/express.js}" src="../../public/assets/js/express.js"></script>
     <script th:src="@{/public/assets/js/jquery.min.js}" src="../../public/assets/js/jquery.min.js"></script>
@@ -175,7 +236,7 @@
                     }, {
                         field: 'id',
                         title: '操作',
-                        width: 120,
+                        width: 150,
                         align: 'center',
                         valign: 'middle',
                         formatter: actionFormatter
@@ -204,12 +265,11 @@
         //操作栏的格式化
         function actionFormatter(value, row, index) {
             let id = "'" + value + "'", result = '';
-
+            result = '<button class="btn btn-xs btn-info" onclick="showDetail('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n';
             // 不允许操作管理员
             if( row.role === 1) {
                 return result;
             }
-
             // 启用/禁用
             if(row.hasEnable) {
                 result += '<button class="btn btn-xs btn-danger" onclick="changeStatus(1,'+id+')" title="禁用">禁用</button>\n';
@@ -273,6 +333,27 @@
                     return '<span style="color:green">'+value+'</span>';
                 }
             }
+        }
+        
+        function showDetail(id) {
+            sendJson(HTTP.GET, $('#userInfoDetailURL').val() + id, {"Authorization": token}, null, false, function (res) {
+                if (res.code !== 10000) {
+                    layer.msg(res.data,{icon:5});
+                } else {
+                    // 初始化模态框信息
+                    let data = res.data;
+                    $("#modUserId").text(data.id);
+                    $("#modUserSex").text(data.sex);
+                    $("#modUserRealName").text(data.realName);
+                    $("#modUserIdCard").text(data.idCard);
+                    $("#modUserWorkIdCard").text(data.workerIdCard);
+                    $("#modUserSchool").text(data.schoolName);
+                    $("#modUserIsLeave").text(data.leaveStatusStr);
+                    $("#infoModel").modal("show");
+                }
+            }, function () {
+                layer.msg("未知错误",{icon:2});
+            });
         }
 
         function changeStatus(type, id) {

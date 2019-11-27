@@ -51,6 +51,16 @@ public class UserInfoVo {
     private String tel;
 
     /**
+     * 身份证号
+     */
+    private String idCard;
+
+    /**
+     * 学/工号
+     */
+    private String workerIdCard;
+
+    /**
      * 评分
      */
     private BigDecimal score;
@@ -71,6 +81,12 @@ public class UserInfoVo {
     private String sex;
 
     /**
+     * 学校
+     */
+    private String schoolName;
+
+
+    /**
      * 冻结时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -81,6 +97,14 @@ public class UserInfoVo {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createDate;
+
+    /*
+     * ==============================   查询起始和结束时间  ===================================
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private String startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private String endDate;
 
 
 
@@ -94,6 +118,11 @@ public class UserInfoVo {
     private boolean leave;
 
     /**
+     * 请假状态
+     */
+    private String leaveStatusStr;
+
+    /**
      * 签到状态文字
      */
     private String signStatusStr;
@@ -102,4 +131,19 @@ public class UserInfoVo {
      * 签到状态
      */
     private int signStatus;
+
+    /**
+     * 普通签到天数
+     */
+    private int normalSignCount;
+
+    /**
+     * 加班签到天数
+     */
+    private int overTimeSignCount;
+
+    /**
+     * 旷工天数
+     */
+    private int notWorkCount;
 }
