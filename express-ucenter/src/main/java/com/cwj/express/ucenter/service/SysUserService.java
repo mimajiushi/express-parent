@@ -1,6 +1,10 @@
 package com.cwj.express.ucenter.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.vo.table.BootstrapTableVO;
 import com.cwj.express.vo.ucenter.UserInfoVo;
 
 import java.util.List;
@@ -58,4 +62,12 @@ public interface SysUserService {
      * @param courier 配送员用户对象
      */
     public boolean isLeave(SysUser courier);
+
+    /**
+     * 条件查询用户列表
+     * @param page 分页信息
+     * @param userInfoVo 内含条件的对象
+     * @return 数据+bootstrap需要的表结构
+     */
+    public BootstrapTableVO<UserInfoVo> listByParam(Page<SysUser> page, UserInfoVo userInfoVo);
 }

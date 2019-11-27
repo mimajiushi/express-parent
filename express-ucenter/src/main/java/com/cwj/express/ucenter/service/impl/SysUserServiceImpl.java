@@ -1,15 +1,14 @@
 package com.cwj.express.ucenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.enums.CourierLeaveStatusEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.exception.ExceptionCast;
 import com.cwj.express.common.model.response.CommonCode;
-import com.cwj.express.domain.ucenter.CourierLeaveLog;
-import com.cwj.express.domain.ucenter.CourierSignCount;
-import com.cwj.express.domain.ucenter.CourierSignData;
-import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.domain.ucenter.*;
 import com.cwj.express.ucenter.dao.CourierLeaveLogMapper;
 import com.cwj.express.ucenter.dao.CourierSignDataMapper;
 import com.cwj.express.ucenter.dao.SysUserMapper;
@@ -17,7 +16,9 @@ import com.cwj.express.ucenter.feignclient.order.OrderFeignClient;
 import com.cwj.express.ucenter.service.CourierSignService;
 import com.cwj.express.ucenter.service.RedisService;
 import com.cwj.express.ucenter.service.SysUserService;
+import com.cwj.express.ucenter.service.UserEvaluateService;
 import com.cwj.express.utils.LocalDateTimeUtils;
+import com.cwj.express.vo.table.BootstrapTableVO;
 import com.cwj.express.vo.ucenter.UserInfoVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author cwj
@@ -44,6 +49,7 @@ public class SysUserServiceImpl implements SysUserService {
     private final CourierLeaveLogMapper courierLeaveLogMapper;
     private final OrderFeignClient orderFeignClient;
     private final CourierSignService courierSignService;
+    private final UserEvaluateService userEvaluateService;
 
     @Override
     public SysUser getExtByUserName(String username) {
@@ -161,6 +167,54 @@ public class SysUserServiceImpl implements SysUserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public BootstrapTableVO<UserInfoVo> listByParam(Page<SysUser> page, UserInfoVo userInfoVo) {
+        QueryWrapper<SysUser> sysUserQueryWrapper = new QueryWrapper<SysUser>().orderByDesc("create_date");
+        if (-1 != userInfoVo.getHasEnable()){
+            sysUserQueryWrapper.eq("has_enable", userInfoVo.getHasEnable());
+        }
+        if (null == userInfoVo.getHasReal() || -1 != userInfoVo.getHasReal()){
+            sysUserQueryWrapper.ne("real_name","");
+        }
+        if (-1 != userInfoVo.getRole()){
+            sysUserQueryWrapper.eq("role_id", userInfoVo.getRole());
+        }
+        // todo 后期可能会加入按区域查询
+        IPage<SysUser> sysUserIPage = sysUserMapper.selectPage(page, sysUserQueryWrapper);
+        List<SysUser> records = sysUserIPage.getRecords();
+        List<UserInfoVo> userInfoVoList = converter(records);
+        return BootstrapTableVO.<UserInfoVo>builder()
+                .rows(userInfoVoList)
+                .total(sysUserIPage.getTotal()).build();
+    }
+
+    private List<UserInfoVo> converter(List<SysUser> sysUserList){
+        if (ObjectUtils.isEmpty(sysUserList)){
+            return new ArrayList<>();
+        }
+        return sysUserList.stream().map(sysUser -> {
+            UserEvaluate scoreById = userEvaluateService.getScoreById(sysUser.getId());
+            BigDecimal score = scoreById.getScore();
+            Integer count = scoreById.getCount();
+            BigDecimal avgScore = new BigDecimal(-1);
+            if (count == 0){
+                avgScore = score;
+            }else {
+                avgScore = score.divide(new BigDecimal(count), 2);
+            }
+            return UserInfoVo.builder()
+                    .id(sysUser.getId())
+                    .role(sysUser.getRole().getType())
+                    .username(sysUser.getUsername())
+                    .tel(sysUser.getTel())
+                    .score(avgScore)
+                    .hasReal(StringUtils.isEmpty(sysUser.getRealName())?null:1)
+                    .hasEnable(sysUser.getHasEnable())
+                    .lockDate(sysUser.getLockDate())
+                    .createDate(sysUser.getCreateDate()).build();
+        }).collect(Collectors.toList());
     }
 
 }

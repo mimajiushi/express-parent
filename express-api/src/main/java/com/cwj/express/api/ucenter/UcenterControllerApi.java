@@ -3,9 +3,12 @@ package com.cwj.express.api.ucenter;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.ucenter.SysRolesLevel;
 import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.vo.table.BootstrapTableVO;
+import com.cwj.express.vo.ucenter.UserInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -38,4 +41,9 @@ public interface UcenterControllerApi {
 
     @ApiOperation(value = "用户登出接口")
     public ResponseResult userLogout();
+
+    @ApiOperation(value = "管理员条件获取用户列表")
+    public BootstrapTableVO<UserInfoVo> userListByParam(@RequestParam(required = false, defaultValue = "1") Integer current,
+                                                        @RequestParam(defaultValue = "10", required = false) Integer size,
+                                                        UserInfoVo userInfoVo);
 }

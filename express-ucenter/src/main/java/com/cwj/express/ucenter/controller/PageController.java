@@ -157,6 +157,9 @@ public class PageController extends BaseController {
     public String adminDashboard(ModelMap map){
         // 日 发(完成)/收(完成)/异常 件数量
         OrderDashboardVO orderDashboardVO = orderFeignClient.adminDashboardOrderData();
+        if (null == orderDashboardVO){
+            orderDashboardVO = new OrderDashboardVO();
+        }
         map.put("orderDesc", "上门取件完成：" + orderDashboardVO.getPickOrderCount() +
                 "   送件上门完成：" + orderDashboardVO.getSendOrderCount() +
                 "   异常订单：" + orderDashboardVO.getExceptionOrderCount());
@@ -171,6 +174,16 @@ public class PageController extends BaseController {
         map.put("frontName", sysUser.getUsername());
         map.put("roleName", sysRolesLevel.getRoleDesc());
         return "admin/dashboard";
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/userListPage")
+    public String userListPage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+        return "admin/user";
     }
 
     @PreAuthorize(AuthorizeConfig.ALL_PAY_USER)

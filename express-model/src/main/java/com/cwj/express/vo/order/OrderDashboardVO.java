@@ -20,23 +20,23 @@ import java.io.Serializable;
 @ApiModel(value="仪表盘订单信息对象")
 public class OrderDashboardVO implements Serializable {
     @ApiModelProperty(value = "待支付的订单数量(付费用户)")
-    private int waitPaymentCount;
+    private Integer waitPaymentCount;
 
     @ApiModelProperty(value = "等待配送员配送的订单(付费用户，配送员)")
-    private int waitCount;
+    private Integer waitCount;
 
     @ApiModelProperty(value = "等待配送员揽收的订单(配送员)")
-    private int waitPickUpCount;
+    private Integer waitPickUpCount;
 
     @ApiModelProperty(value = "正在配送的订单（付费用户，配送员）")
-    private int transportCount;
+    private Integer transportCount;
 
     @ApiModelProperty(value = "已完成送件上门的订单数量（管理员）")
-    private int sendOrderCount;
+    private Integer sendOrderCount;
 
     @ApiModelProperty(value = "已完成上门取件的订单数量（管理员）")
-    private int pickOrderCount;
+    private Integer pickOrderCount;
 
     @ApiModelProperty(value = "异常订单数量")
-    private int exceptionOrderCount;
+    private Integer exceptionOrderCount;
 }

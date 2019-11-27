@@ -1,5 +1,6 @@
 package com.cwj.express.ucenter.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.api.ucenter.UcenterControllerApi;
 import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.exception.ExceptionCast;
@@ -12,6 +13,8 @@ import com.cwj.express.ucenter.dao.UserEvaluateMapper;
 import com.cwj.express.ucenter.service.*;
 import com.cwj.express.utils.CookieUtil;
 import com.cwj.express.utils.ExpressOauth2Util;
+import com.cwj.express.vo.table.BootstrapTableVO;
+import com.cwj.express.vo.ucenter.UserInfoVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -141,6 +144,17 @@ public class UcenterController extends BaseController implements UcenterControll
             return ResponseResult.FAIL();
         }
         return ResponseResult.SUCCESS();
+    }
+
+    @Override
+    @GetMapping("/userInfoList")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public BootstrapTableVO<UserInfoVo> userListByParam(@RequestParam(required = false, defaultValue = "1") Integer current,
+                                            @RequestParam(required = false, defaultValue = "10") Integer size,
+                                            UserInfoVo userInfoVo) {
+        // 根据状态或角色查询
+        Page<SysUser> page = new Page<>(current, size);
+        return sysUserService.listByParam(page, userInfoVo);
     }
 
     /**
