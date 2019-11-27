@@ -91,46 +91,64 @@
                 <div class="modal-body">
                     <form class="form-horizontal">
                         <div class="form-group">
-                            <label for="modUserId" class="col-sm-2 control-label">用户id</label>
-                            <div class="col-sm-10">
+                            <label for="modUserId" class="col-sm-3 control-label">用户id</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserId"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserSex" class="col-sm-2 control-label">性别</label>
-                            <div class="col-sm-10">
+                            <label for="modUserRole" class="col-sm-3 control-label">角色</label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static" id="modUserRole"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modUserSex" class="col-sm-3 control-label">性别</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserSex"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserRealName" class="col-sm-2 control-label">真实姓名</label>
-                            <div class="col-sm-10">
+                            <label for="modUserRealName" class="col-sm-3 control-label">真实姓名</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserRealName"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserIdCard" class="col-sm-2 control-label">身份证号</label>
-                            <div class="col-sm-10">
+                            <label for="modUserIdCard" class="col-sm-3 control-label">身份证号</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserIdCard"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserWorkIdCard" class="col-sm-2 control-label">学/工号</label>
-                            <div class="col-sm-10">
+                            <label for="modUserWorkIdCard" class="col-sm-3 control-label">学/工号</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserWorkIdCard"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserSchool" class="col-sm-2 control-label">学校</label>
-                            <div class="col-sm-10">
+                            <label for="modUserSchool" class="col-sm-3 control-label">学校</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserSchool"></p>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="modUserIsLeave" class="col-sm-2 control-label">是否请假中</label>
-                            <div class="col-sm-10">
+                            <label for="modUserIsLeave" class="col-sm-3 control-label">是否请假中</label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static" id="modUserIsLeave"></p>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputStartDate" class="col-sm-1 col-lg-offset-1">从</label>
+                            <input type="date" id="inputStartDate" class="col-sm-4">
+                            <label for="inputEndDate" class="col-sm-1">到</label>
+                            <input type="date" id="inputEndDate" class="col-sm-4">
+                        </div>
+                        <div class="form-group">
+                                <button type="button" role="button" class="col-sm-10 col-lg-offset-1 btn btn-info" onclick="showSignChart()">查询签到情况</button>
+                        </div>
+                        <div class="form-group">
+                            <div id="signChart" class="col-sm-10 col-lg-offset-1" style="width: 500px;height:500px;display: none;"></div>
                         </div>
                     </form>
                 </div>
@@ -151,6 +169,14 @@
     <script th:src="@{/public/assets/js/bootstrap-table-export.min.js}" src="../../public/assets/js/bootstrap-table-export.min.js"></script>
     <script th:src="@{/public/assets/js/bootstrap-table-zh-CN.min.js}" src="../../public/assets/js/bootstrap-table-zh-CN.min.js"></script>
     <script th:src="@{/public/assets/js/tableExport.min.js}" src="../../public/assets/js/tableExport.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+    <script th:src="@{/public/assets/js/echart/macarons.js}" src="../../public/assets/js/echart/macarons.js"></script>
     <!-- 公用头部JS start -->
     <div th:replace="~{common/configJS :: configJS}">...</div>
     <!-- 公用头部JS end -->
@@ -226,11 +252,13 @@
                         field: 'hasEnable',
                         title: '启用状态',
                         formatter: enableFormatter
-                    }, {
-                        field: 'lockDate',
-                        title: '冻结时间',
-                        formatter: lockFormatter
-                    }, {
+                    },
+                    // , {
+                    //     field: 'lockDate',
+                    //     title: '冻结时间',
+                    //     formatter: lockFormatter
+                    // }
+                    {
                         field: 'createDate',
                         title: '注册时间'
                     }, {
@@ -336,6 +364,7 @@
         }
         
         function showDetail(id) {
+            $('#signChart').css('display','none');
             sendJson(HTTP.GET, $('#userInfoDetailURL').val() + id, {"Authorization": token}, null, false, function (res) {
                 if (res.code !== 10000) {
                     layer.msg(res.data,{icon:5});
@@ -349,11 +378,80 @@
                     $("#modUserWorkIdCard").text(data.workerIdCard);
                     $("#modUserSchool").text(data.schoolName);
                     $("#modUserIsLeave").text(data.leaveStatusStr);
+                    $('#modUserRole').text(data.roleName);
                     $("#infoModel").modal("show");
                 }
             }, function () {
                 layer.msg("未知错误",{icon:2});
             });
+        }
+        
+        function showSignChart() {
+            let role = $('#modUserRole').html();
+            if (role != "配送员"){
+                layer.msg('目前只有配送员有签到数据', {icon:5});
+                return;
+            }
+            let courierId = $('#modUserId').html();
+            let startDate = $('#inputStartDate').val();
+            let endDate = $('#inputEndDate').val();
+            let index = layer.load(1,{shade: [0.1,'#fff']});
+            let signChart = echarts.init(document.getElementById('signChart'),'macarons');
+            let data = '';
+
+            sendJson(HTTP.GET, $('#courierSignDetailURL').val() + courierId, {"Authorization": token},
+                {'startDateStr':startDate, 'endDateStr':endDate}, false,
+                function (res) {
+                    data = res.data;
+                    done();
+                    layer.close(index);
+                    $('#signChart').css('display','block');
+                },
+                function () {
+                    layer.close(index);
+                    layer.msg('获取数据失败！未知错误',{icon:5});
+                })
+            
+            
+            function done() {
+                let option = {
+                    title : {
+                        text: '配送员签到饼图',
+                        subtext: $('#modUserRealName').html(),
+                        x:'center'
+                    },
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: ['签到日', '加班日', '无签日']
+                    },
+                    series : [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius : '55%',
+                            center: ['50%', '60%'],
+                            data:[
+                                {value:data.normalSignCount, name:'签到日'},
+                                {value:data.workSignCount, name:'加班日'},
+                                {value:data.notWorkCount, name:'无签日'},
+                            ],
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                signChart.setOption(option);
+            }
         }
 
         function changeStatus(type, id) {

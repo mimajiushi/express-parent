@@ -187,6 +187,8 @@ public class UcenterController extends BaseController implements UcenterControll
         // 获取学校名字
         DataSchool school = areaFeignClient.getSchoolInfoById(String.valueOf(sysUser.getSchoolId()));
         String schoolName = school.getName();
+
+        userInfoVo1.setRoleName(sysUser.getRole().getCnName());
         userInfoVo1.setSchoolName(schoolName);
         if (SysRoleEnum.COURIER == sysUser.getRole()){
             if (ObjectUtils.isEmpty(score)){
@@ -203,18 +205,18 @@ public class UcenterController extends BaseController implements UcenterControll
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/getCourierSignDetail/{courierId}")
-    public ResponseResult getCourierSignDetail(@PathVariable String courierId, String startData, String endData){
+    public ResponseResult getCourierSignDetail(@PathVariable String courierId, String startDateStr, String endDateStr){
         Map<String, Long> resMap = new HashMap<>();
         // 根据日期 用户id 查询 配送员各签到情况、请假状态
         SysUser sysUser = sysUserService.getById(courierId);
         LocalDate startDate = sysUser.getCreateDate().toLocalDate().plusDays(-1);
         LocalDate endDate = LocalDate.now().plusDays(1);
         // 日期转换
-        if (!StringUtils.isEmpty(startData)){
-            startDate = LocalDateTimeUtils.ymdParseToLocalData(startData).plusDays(-1);
+        if (!StringUtils.isEmpty(startDateStr)){
+            startDate = LocalDateTimeUtils.ymdParseToLocalData(startDateStr).plusDays(-1);
         }
-        if (!StringUtils.isEmpty(endData)){
-            endDate = LocalDateTimeUtils.ymdParseToLocalData(endData).plusDays(1);
+        if (!StringUtils.isEmpty(endDateStr)){
+            endDate = LocalDateTimeUtils.ymdParseToLocalData(endDateStr).plusDays(1);
         }
 
         // 日期内工作总天数
@@ -223,7 +225,7 @@ public class UcenterController extends BaseController implements UcenterControll
         Long normalSignCount = Long.valueOf(courierSignService.getSignCount(sysUser.getId(), 0, startDate, endDate));
         // 获取加班天数
         Long workOTSignCount = Long.valueOf(courierSignService.getSignCount(sysUser.getId(), 1, startDate, endDate));
-        // 旷工天数
+        // 没有签到的天数
         Long notWorkCount = workDaysCount - normalSignCount;
 
         resMap.put("normalSignCount", normalSignCount);
