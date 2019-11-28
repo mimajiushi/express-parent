@@ -10,6 +10,7 @@ import com.cwj.express.vo.order.EchartCalendarPieItemVO;
 import com.cwj.express.vo.order.OrderChartParamVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class EchartOrderController extends BaseController implements EchartOrder
 
     @Override
     @GetMapping("/orderCountEchartData")
-    // todo 该接口暂时开放
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseResult getOrderChartByParam(OrderChartParamVO orderChartParamVO) {
         if (!StringUtils.isEmpty(orderChartParamVO.getCourierId())){
             SysUser courier = ucenterFeignClient.getById(orderChartParamVO.getCourierId());

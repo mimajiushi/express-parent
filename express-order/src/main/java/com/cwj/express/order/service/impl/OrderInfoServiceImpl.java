@@ -258,10 +258,12 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         switch (roleEnum){
             // 管理员
             case ADMIN:
-                if (-1 != orderHistoryVO.getPaymentStatus()){
-                    // todo 根据支付状态查询
-                }
-                break;
+//                if (-1 != orderHistoryVO.getPaymentStatus()){
+                // todo 根据支付状态查询(暂时不做)
+                IPage<OrderInfo> orderInfoIPage = orderInfoMapper.selectPage(page, orderInfoQueryWrapper);
+                rows = converter(orderInfoIPage.getRecords(), userId, roleEnum);
+                return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(orderInfoIPage.getTotal()).build();
+//                }
             // 配送员
             case COURIER:
                 orderInfoQueryWrapper.eq("courier_id", userId);
@@ -275,7 +277,6 @@ public class OrderInfoServiceImpl implements OrderInfoService {
                 rows = converter(iPage.getRecords(), userId, roleEnum);
                 return BootstrapTableVO.<OrderHistoryVO>builder().rows(rows).total(iPage.getTotal()).build();
         }
-        return null;
     }
 
     @Override

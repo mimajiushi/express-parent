@@ -72,7 +72,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         String[] ignoreUrls = {
 //                 "/**",
                 // "/alipay/return"
-                "/echart",
+//                "/echart",
                 "/test",
                 "/initScore",
                 "/luaTest",
