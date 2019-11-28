@@ -393,7 +393,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
             EchartCalendarPieItemVO itemVO2 = EchartCalendarPieItemVO.builder().name(OrderTypeEnum.TRANSPORT.getDesc()).value(trahSportCount).build();
             // 获取异常订单数据
             int exceptionCount = getCountByParam(orderChartParamVO, startDate, OrderStatusEnum.ERROR, null);
-            EchartCalendarPieItemVO itemVO3 = EchartCalendarPieItemVO.builder().name(OrderStatusEnum.ERROR.getName()).value(trahSportCount).build();
+            EchartCalendarPieItemVO itemVO3 = EchartCalendarPieItemVO.builder().name(OrderStatusEnum.ERROR.getName()).value(exceptionCount).build();
             array[0] = itemVO1;
             array[1] = itemVO2;
             array[2] = itemVO3;
@@ -407,7 +407,8 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     }
 
     // 根据查询参数获取某一天的订单量
-    int getCountByParam(OrderChartParamVO orderChartParamVO, LocalDate date, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum){
+    @Override
+    public int getCountByParam(OrderChartParamVO orderChartParamVO, LocalDate date, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum){
         QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
         if (!ObjectUtils.isEmpty(typeEnum)){
             orderInfoQueryWrapper.eq("type", typeEnum.getType());
@@ -420,6 +421,26 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         }
         LocalDate endDate = date.plusDays(1);
         orderInfoQueryWrapper.between("update_date", date, endDate);
+        return orderInfoMapper.selectCount(orderInfoQueryWrapper);
+    }
+
+    // 根据查询参数获取时间范围内的订单量
+    @Override
+    public int getCountByParam(OrderChartParamVO orderChartParamVO, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum){
+        LocalDate startDate = LocalDateTimeUtils.ymdParseToLocalData(orderChartParamVO.getStartDate()).plusDays(-1);
+        LocalDate endDate = LocalDateTimeUtils.ymdParseToLocalData(orderChartParamVO.getEndDate()).plusDays(1);
+
+        QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        if (!ObjectUtils.isEmpty(typeEnum)){
+            orderInfoQueryWrapper.eq("type", typeEnum.getType());
+        }
+        if (!ObjectUtils.isEmpty(statusEnum)){
+            orderInfoQueryWrapper.eq("status", statusEnum.getStatus());
+        }
+        if (!StringUtils.isEmpty(orderChartParamVO.getCourierId())){
+            orderInfoQueryWrapper.eq("courier_id", orderChartParamVO.getCourierId());
+        }
+        orderInfoQueryWrapper.between("update_date", startDate, endDate);
         return orderInfoMapper.selectCount(orderInfoQueryWrapper);
     }
 

@@ -1,12 +1,15 @@
 package com.cwj.express.order.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cwj.express.common.enums.OrderStatusEnum;
+import com.cwj.express.common.enums.OrderTypeEnum;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.vo.order.*;
 import com.cwj.express.vo.table.BootstrapTableVO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +130,16 @@ public interface OrderInfoService {
      * @return 订单信息
      */
     OrderInfo getOrderById(String orderId);
+
+    /**
+     * // 根据查询参数获取某一天的订单量
+     */
+    public int getCountByParam(OrderChartParamVO orderChartParamVO, LocalDate date, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum);
+
+    /**
+     * 根据查询参数获取时间范围内的订单量
+     */
+    public int getCountByParam(OrderChartParamVO orderChartParamVO, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum);
 
     /**
      * 根据查询参数获取

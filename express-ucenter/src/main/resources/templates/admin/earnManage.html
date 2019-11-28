@@ -70,6 +70,8 @@
         let option = [];
         let scatterData = '';
         let app = {};
+        let chartTitle = '';
+        let chartSubText = '';
 
         $(function () {
             $("#earningManagement-sidebar").addClass('active');
@@ -152,13 +154,17 @@
         
         function initOption() {
             option = {
+                title:{
+                    text: chartTitle,
+                    x: 'center'
+                },
                 tooltip : {},
                 legend: {
                     data: ['上门取件', '送件上门', '订单异常'],
                     bottom: 20
                 },
                 calendar: {
-                    top: 'middle',
+                    top: '10%',
                     left: 'center',
                     orient: 'vertical',
                     cellSize: cellSize,
@@ -216,6 +222,20 @@
                 'startDate': $('#inputStartDate').val(),
                 'endDate': $('#inputEndDate').val()
             };
+            // 获取总订单数量
+            sendJson(HTTP.GET, $('#getOrderCountByParamUrl').val(), {'Authorization':token}, data, false, function (res) {
+                    if (res.code === 10000){
+                        chartTitle = '上门收件：' + res.data.pickUpCount + '，送件上门：' + res.data.transportCount + '，异常订单：' + res.data.exceptionCount;
+                    }else {
+                        layer.close(index);
+                        layer.msg(res.data,{icon:5});
+                    }
+                },
+                function () {
+                    layer.close(index);
+                    layer.msg('未知错误！',{icon:5});
+                });
+            // 获取订单范围内每日的订单数量
             sendJson(HTTP.GET, $('#orderCountEchartDataUrl').val(), {'Authorization':token}, data, false, function (res) {
                 if (res.code === 10000){
                     // 计算图表高度
