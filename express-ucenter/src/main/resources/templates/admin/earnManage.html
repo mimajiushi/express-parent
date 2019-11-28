@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>收益查看 - Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" th:href="@{/public/assets/css/bootstrap.min.css}" href="../../public/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/public/assets/css/express.css}" href="../../public/assets/css/express.css"/>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 头部 -->
+        <nav th:replace="common/nav::html"></nav>
+        <!-- 主体 -->
+        <div class="row">
+            <!-- 左侧菜单 -->
+            <div th:replace="common/sidebar::html"></div>
+            <div class="col-md-10">
+                <!-- 筛选条件 -->
+                <div class="panel-heading">
+                    <form id="formData" class="form-inline">
+                        <div class="form-group">
+                            <label for="inputStartDate" class="ml10">开始日期</label>
+                            <input type="date" id="inputStartDate" class="form-control ml10">
+                            <label for="inputEndDate" class="ml10">结束日期</label>
+                            <input type="date" id="inputEndDate" class="form-control ml10">
+                        </div>
+                        <div class="form-group">
+                            <label for="courierId">配送员id</label>
+                            <input type="text" class="form-control" id="courierId" placeholder="为空则查询所有配送员">
+                        </div>
+                        <button type="button" class="btn btn-info ml10" onclick="queryData()">查询</button>
+                    </form>
+                </div>
+                <div class="panel-body">
+                    <div id="orderCountChart" style="width:1000px;height:600px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/public/assets/js/http.js}" src="../../public/assets/js/http.js"></script>
+    <script th:src="@{/public/assets/js/express.js}" src="../../public/assets/js/express.js"></script>
+    <script th:src="@{/public/assets/js/jquery.min.js}" src="../../public/assets/js/jquery.min.js"></script>
+    <script th:src="@{/public/assets/js/jquery.validate.min.js}" src="../../public/assets/js/jquery.validate.min.js"></script>
+    <script th:src="@{/public/assets/layer/layer.js}" src="../../public/assets/layer/layer.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap.min.js}" src="../../public/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+    <script th:src="@{/public/assets/js/echart/macarons.js}" src="../../public/assets/js/echart/macarons.js"></script>
+    <!-- 公用头部JS start -->
+    <div th:replace="~{common/configJS :: configJS}">...</div>
+    <!-- 公用头部JS end -->
+    <script>
+        let uid = getCookieValue('uid');
+        let token = "Bearer " + uid;
+        // 初始化图标信息
+        let orderCountChart = '';
+        let chartData = '';
+        let cellSize = [100, 100];
+        let pieRadius = 30;
+        let monthList = [];
+        let option = [];
+        let scatterData = '';
+        let app = {};
+
+        $(function () {
+            $("#earningManagement-sidebar").addClass('active');
+        });
+
+        // 获取时间内的月数
+        function getMonths(date1 , date2){
+            date1 = date1.split("-");
+            date2 = date2.split("-");
+            let year1 = parseInt(date1[0]) ,
+                month1 = parseInt(date1[1]) ,
+                year2 = parseInt(date2[0]) ,
+                month2 = parseInt(date2[1]) ,
+                months = (year2 - year1) * 12 + (month2-month1) + 1;
+            return months;
+        };
+
+        // 初始化时间信息
+        function getVirtulData() {
+            let startDate = echarts.number.parseDate($('#inputStartDate').val());
+            let endDate = echarts.number.parseDate($('#inputEndDate').val());
+            endDate.setDate(endDate.getDate()+1);
+            // 传给后台用
+            let monthFirstDate = new Date();
+            monthFirstDate.setFullYear(startDate.getFullYear());
+            monthFirstDate.setMonth(startDate.getMonth());
+            monthFirstDate.setDate(1);
+
+
+            if (startDate.getFullYear() === endDate.getFullYear() &&
+                startDate.getMonth() === endDate.getMonth()){
+                console.log("单个月")
+                monthList = [echarts.format.formatTime('yyyy-MM', +monthFirstDate)];
+            }else {
+                console.log("多个月");
+                let newDate = new Date();
+                newDate.setFullYear(endDate.getFullYear());
+                newDate.setMonth(endDate.getMonth());
+                newDate.setDate(endDate.getDate()-1);
+                monthList = [echarts.format.formatTime('yyyy-MM-dd', +monthFirstDate), echarts.format.formatTime('yyyy-MM-dd', +newDate)]
+            }
+
+            // console.log(monthList);
+
+            var date = +startDate;
+            var end = +endDate;
+
+            var dayTime = 3600 * 24 * 1000;
+            var data = [];
+            for (var time = date; time < end; time += dayTime) {
+                data.push([
+                    echarts.format.formatTime('yyyy-MM-dd', time),
+                    Math.floor(Math.random() * 100000000)
+                ]);
+            }
+            return data;
+        }
+
+        // 填充数据
+        function getPieSeries(scatterData, chart) {
+            // console.log(chartData);
+            return echarts.util.map(scatterData, function (item, index) {
+                var center = chart.convertToPixel('calendar', item);
+                // console.log(item[0]);
+                return {
+                    id: index + 'pie',
+                    type: 'pie',
+                    center: center,
+                    label: {
+                        normal: {
+                            formatter: '{c}',
+                            position: 'inside'
+                        }
+                    },
+                    radius: pieRadius,
+                    data: chartData[item[0]]
+                };
+            });
+        }
+        
+        function initOption() {
+            option = {
+                tooltip : {},
+                legend: {
+                    data: ['上门取件', '送件上门', '订单异常'],
+                    bottom: 20
+                },
+                calendar: {
+                    top: 'middle',
+                    left: 'center',
+                    orient: 'vertical',
+                    cellSize: cellSize,
+                    yearLabel: {
+                        show: false,
+                        textStyle: {
+                            fontSize: 30
+                        }
+                    },
+                    dayLabel: {
+                        margin: 20,
+                        firstDay: 1,
+                        nameMap: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+                    },
+                    monthLabel: {
+                        show: false
+                    },
+                    range: monthList
+                },
+                series: [{
+                    id: 'label',
+                    type: 'scatter',
+                    coordinateSystem: 'calendar',
+                    symbolSize: 1,
+                    label: {
+                        normal: {
+                            show: true,
+                            formatter: function (params) {
+                                // console.log(params);
+                                return echarts.format.formatTime('MM-dd', params.value[0]);
+                            },
+                            offset: [-cellSize[0] / 2 + 50, -cellSize[1] / 2 + 10],
+                            textStyle: {
+                                color: '#000',
+                                fontSize: 14
+                            }
+                        }
+                    },
+                    data: scatterData
+                }]
+            };
+        }
+
+        // 查询数据
+        function queryData() {
+
+            if ($('#inputStartDate').val() === '' || $('#inputEndDate').val() === ''){
+                layer.msg("请选择日期范围！",{icon:5});
+                return;
+            }
+
+            let index = layer.load(1,{shade: [0.1,'#fff']});
+            let data = {
+                'courierId': $('#courierId').val(),
+                'startDate': $('#inputStartDate').val(),
+                'endDate': $('#inputEndDate').val()
+            };
+            sendJson(HTTP.GET, $('#orderCountEchartDataUrl').val(), {'Authorization':token}, data, false, function (res) {
+                if (res.code === 10000){
+                    // 计算图表高度
+                    let monCount = getMonths($('#inputStartDate').val(), $('#inputEndDate').val());
+                    console.log(monCount);
+                    let h = monCount * 600;
+                    $('#orderCountChart').css('height',h+'px');
+                    // 初始化图表
+                    orderCountChart = echarts.init(document.getElementById('orderCountChart'),'macarons')
+                    layer.close(index);
+                    chartData = res.data;
+                    scatterData = getVirtulData();
+                    console.log(scatterData);
+                    initOption();
+
+                    if (!app.inNode) {
+                        var pieInitialized;
+                        setTimeout(function () {
+                            pieInitialized = true;
+                            orderCountChart.setOption({
+                                series: getPieSeries(scatterData, orderCountChart)
+                            });
+                        }, 10);
+                    };
+                    if (option && typeof option === "object") {
+                        orderCountChart.setOption(option, true);
+                    }
+                    // console.log(res.data['2019-11-19']);
+
+                }else {
+                    layer.close(index);
+                    layer.msg(res.data,{icon:5});
+                }
+            },
+            function () {
+                layer.close(index);
+                layer.msg('未知错误！',{icon:5});
+            })
+        }
+    </script>
+</body>
+</html>

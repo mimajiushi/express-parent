@@ -9,6 +9,8 @@ import lombok.ToString;
 
 @ToString
 public enum CommonCode implements ResultCode{
+    DATE_SELECT_ERROR(false, -9999, "日期选择错误"),
+
     INVALID_PARAM(false,10003,"非法参数！"),
     INVALID_TEL(false,10004,"非法手机号！"),
     SEND_SMS_FAIL(false,10005,"发送验证码失败！"),

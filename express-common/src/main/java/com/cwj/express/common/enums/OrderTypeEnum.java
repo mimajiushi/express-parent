@@ -18,7 +18,7 @@ public enum OrderTypeEnum implements IEnum<Integer> {
     /**
      * 代拿快递
      */
-    TRANSPORT("代拿快递", 0);
+    TRANSPORT("送件上门", 0);
 
     private String desc;
     private int type;

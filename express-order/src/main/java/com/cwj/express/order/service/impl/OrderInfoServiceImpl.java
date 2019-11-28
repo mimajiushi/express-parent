@@ -9,6 +9,8 @@ import com.cwj.express.common.config.redis.RedisConfig;
 import com.cwj.express.common.config.rocket.RocketmqConfig;
 import com.cwj.express.common.enums.*;
 import com.cwj.express.common.enums.rocketmq.MessageDelayLevel;
+import com.cwj.express.common.exception.ExceptionCast;
+import com.cwj.express.common.model.response.CommonCode;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.area.DataCompany;
 import com.cwj.express.domain.area.DataSchool;
@@ -27,10 +29,7 @@ import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.order.service.OrderPaymentService;
 import com.cwj.express.order.service.RedisService;
 import com.cwj.express.utils.LocalDateTimeUtils;
-import com.cwj.express.vo.order.OrderDashboardVO;
-import com.cwj.express.vo.order.OrderDetailVO;
-import com.cwj.express.vo.order.OrderHistoryVO;
-import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.order.*;
 import com.cwj.express.vo.table.BootstrapTableVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,6 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -50,7 +48,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -371,6 +371,55 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Override
     public OrderInfo getOrderById(String orderId) {
         return orderInfoMapper.selectById(orderId);
+    }
+
+    @Override
+    public Map<String, EchartCalendarPieItemVO[]> getMapCountByParam(OrderChartParamVO orderChartParamVO) {
+        LocalDate startDate = LocalDateTimeUtils.ymdParseToLocalData(orderChartParamVO.getStartDate());
+        LocalDate endDate = LocalDateTimeUtils.ymdParseToLocalData(orderChartParamVO.getEndDate()).plusDays(1);
+        if (startDate.isAfter(endDate)){
+            ExceptionCast.cast(CommonCode.DATE_SELECT_ERROR);
+        }
+        Map<String, EchartCalendarPieItemVO[]> resMap = new HashMap<>();
+        do {
+            // 获取上门取件完成的订单量
+//            List<EchartCalendarPieItemVO> list = new ArrayList<>();
+            EchartCalendarPieItemVO[] array = new EchartCalendarPieItemVO[3];
+            int pickUpCount = getCountByParam(orderChartParamVO, startDate, OrderStatusEnum.COMPLETE, OrderTypeEnum.PICK_UP);
+            EchartCalendarPieItemVO itemVO1 = EchartCalendarPieItemVO.builder().name(OrderTypeEnum.PICK_UP.getDesc()).value(pickUpCount).build();
+            // 获取送件上门完成的订单量
+            int trahSportCount = getCountByParam(orderChartParamVO, startDate, OrderStatusEnum.COMPLETE, OrderTypeEnum.TRANSPORT);
+            EchartCalendarPieItemVO itemVO2 = EchartCalendarPieItemVO.builder().name(OrderTypeEnum.TRANSPORT.getDesc()).value(trahSportCount).build();
+            // 获取异常订单数据
+            int exceptionCount = getCountByParam(orderChartParamVO, startDate, OrderStatusEnum.ERROR, null);
+            EchartCalendarPieItemVO itemVO3 = EchartCalendarPieItemVO.builder().name(OrderStatusEnum.ERROR.getName()).value(trahSportCount).build();
+            array[0] = itemVO1;
+            array[1] = itemVO2;
+            array[2] = itemVO3;
+            resMap.put(startDate.toString(), array);
+            startDate = startDate.plusDays(1);
+        }while (startDate.isBefore(endDate));
+        // 22 22(实则23)
+        // 22 24(实则25)
+
+        return resMap;
+    }
+
+    // 根据查询参数获取某一天的订单量
+    int getCountByParam(OrderChartParamVO orderChartParamVO, LocalDate date, OrderStatusEnum statusEnum, OrderTypeEnum typeEnum){
+        QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        if (!ObjectUtils.isEmpty(typeEnum)){
+            orderInfoQueryWrapper.eq("type", typeEnum.getType());
+        }
+        if (!ObjectUtils.isEmpty(statusEnum)){
+            orderInfoQueryWrapper.eq("status", statusEnum.getStatus());
+        }
+        if (!StringUtils.isEmpty(orderChartParamVO.getCourierId())){
+            orderInfoQueryWrapper.eq("courier_id", orderChartParamVO.getCourierId());
+        }
+        LocalDate endDate = date.plusDays(1);
+        orderInfoQueryWrapper.between("update_date", date, endDate);
+        return orderInfoMapper.selectCount(orderInfoQueryWrapper);
     }
 
     /**

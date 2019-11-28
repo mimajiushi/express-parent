@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cwj.express.common.enums.SysRoleEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.domain.order.OrderInfo;
-import com.cwj.express.vo.order.OrderDashboardVO;
-import com.cwj.express.vo.order.OrderDetailVO;
-import com.cwj.express.vo.order.OrderHistoryVO;
-import com.cwj.express.vo.order.OrderInfoVO;
+import com.cwj.express.vo.order.*;
 import com.cwj.express.vo.table.BootstrapTableVO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author cwj
@@ -129,4 +127,10 @@ public interface OrderInfoService {
      * @return 订单信息
      */
     OrderInfo getOrderById(String orderId);
+
+    /**
+     * 根据查询参数获取
+     * @param orderChartParamVO 查询参数
+     */
+     Map<String, EchartCalendarPieItemVO[]> getMapCountByParam(OrderChartParamVO orderChartParamVO);
 }

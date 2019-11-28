@@ -32,6 +32,10 @@
                 <a href="/ucenter/userListPage">用户管理<i class="glyphicon glyphicon-user pull-right"></i></a>
             </li>
 
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="earningManagement-sidebar">
+                <a href="/ucenter/earningManagePage">收益管理<i class="glyphicon glyphicon-user pull-right"></i></a>
+            </li>
+
             <!--订单改成由系统分配，这个应该不需要了-->
             <!--<li sec:authorize="hasAnyRole('ROLE_COURIER')" id="getorder-sidebar">-->
                 <!--<a href="/courier/order">接单大厅<i class="glyphicon glyphicon-cloud-download pull-right"></i></a>-->

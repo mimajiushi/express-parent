@@ -269,4 +269,14 @@ public class PageController extends BaseController {
         return "common/evaluate";
     }
 
+    @GetMapping("/earningManagePage")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String earningManagePage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+        return "admin/earnManage";
+    }
+
 }
