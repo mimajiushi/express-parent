@@ -11,19 +11,23 @@ import com.cwj.express.order.service.OrderInfoService;
 import com.cwj.express.vo.order.EchartCalendarPieItemVO;
 import com.cwj.express.vo.order.OrderChartParamVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class EchartOrderController extends BaseController implements EchartOrderControllerApi {
 
     private final UcenterFeignClient ucenterFeignClient;
@@ -45,6 +49,7 @@ public class EchartOrderController extends BaseController implements EchartOrder
 
     @Override
     @GetMapping("/getOrderCountByParam")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseResult getOrderCountByParam(OrderChartParamVO orderChartParamVO) {
         if (!ObjectUtils.isEmpty(orderChartParamVO.getCourierId())){
             SysUser courier = ucenterFeignClient.getById(orderChartParamVO.getCourierId());
@@ -61,5 +66,22 @@ public class EchartOrderController extends BaseController implements EchartOrder
         resMap.put("exceptionCount", exceptionCount);
 
         return ResponseResult.SUCCESS(resMap);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/getCourierRankList")
+    public ResponseResult getCourierRankList(String startTime, String endTime) {
+        if (StringUtils.isEmpty(startTime)){
+            return ResponseResult.FAIL("请选择开始时间！");
+        }
+        if (StringUtils.isEmpty(endTime)){
+            return ResponseResult.FAIL("请选择结束时间！");
+        }
+        LinkedHashMap<String,Object> res = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> rankList = orderInfoService.getRandList(startTime, endTime);
+        log.info(String.valueOf(rankList));
+        res.put("couriers",rankList);
+        return ResponseResult.SUCCESS(res);
     }
 }

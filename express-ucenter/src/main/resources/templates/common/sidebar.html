@@ -32,8 +32,13 @@
                 <a href="/ucenter/userListPage">用户管理<i class="glyphicon glyphicon-user pull-right"></i></a>
             </li>
 
+
+            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="courierRank-sidebar">
+                <a href="/ucenter/courierRankPage">配送员排行<i class="glyphicon glyphicon-align-left pull-right"></i></a>
+            </li>
+
             <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="earningManagement-sidebar">
-                <a href="/ucenter/earningManagePage">收益管理<i class="glyphicon glyphicon-user pull-right"></i></a>
+                <a href="/ucenter/earningManagePage">收益查询<i class="glyphicon glyphicon-yen pull-right"></i></a>
             </li>
 
             <!--订单改成由系统分配，这个应该不需要了-->
@@ -47,10 +52,6 @@
 
             <li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_COURIER')" id="adminFeedback-sidebar">
                 <a href="/admin/feedback">反馈管理<i class="glyphicon glyphicon-comment pull-right"></i></a>
-            </li>
-
-            <li sec:authorize="hasAnyRole('ROLE_ADMIN')" id="profit-sidebar" class="disabled">
-                <a href="#">收益管理<i class="glyphicon glyphicon-yen pull-right"></i></a>
             </li>
 
             <li sec:authorize="hasAnyRole('ROLE_USER','ROLE_VIP_USER','ROLE_SVIP_USER','ROLE_COURIER')" id="evaluate-sidebar">

@@ -245,6 +245,7 @@
                     $('#orderCountChart').css('height',h+'px');
                     // 初始化图表
                     orderCountChart = echarts.init(document.getElementById('orderCountChart'),'macarons')
+                    orderCountChart.resize();
                     layer.close(index);
                     chartData = res.data;
                     scatterData = getVirtulData();

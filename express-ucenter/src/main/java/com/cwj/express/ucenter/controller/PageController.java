@@ -279,4 +279,13 @@ public class PageController extends BaseController {
         return "admin/earnManage";
     }
 
+    @GetMapping("/courierRankPage")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String courierRankPage(ModelMap map){
+        SysUser id = ExpressOauth2Util.getUserJwtFromAttribute(request);
+        SysUser sysUser = sysUserService.getById(id.getId());
+        map.put("frontName", sysUser.getUsername());
+        map.put("roleName", sysUser.getRole().getCnName());
+        return "admin/rankList";
+    }
 }

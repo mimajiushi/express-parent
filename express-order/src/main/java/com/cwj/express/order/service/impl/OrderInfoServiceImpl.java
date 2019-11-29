@@ -47,10 +47,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -442,6 +439,27 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         }
         orderInfoQueryWrapper.between("update_date", startDate, endDate);
         return orderInfoMapper.selectCount(orderInfoQueryWrapper);
+    }
+
+    @Override
+    public LinkedHashMap<String, Integer> getRandList(String startTime, String endTime) {
+
+        //存放快递员姓名和完成单数
+        LinkedHashMap<String, Integer> couriers = new LinkedHashMap<String, Integer>();
+
+        //查询订单信息
+        List<CourierRankVO> orders = orderInfoMapper.selectCourierRank(startTime, endTime);
+
+
+        //填充返回集合  {姓名 工资 : 完成单数 }
+        for (CourierRankVO order : orders) {
+            int salary = 4000 + order.getSum()*50;
+            String courierName = ucenterFeignClient.getById(order.getCourierId()).getRealName()
+                    + " 工资: " + String.valueOf(salary) ;
+            couriers.put(courierName,order.getSum());
+        }
+
+        return couriers;
     }
 
     /**

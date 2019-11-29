@@ -11,6 +11,7 @@ import com.cwj.express.vo.table.BootstrapTableVO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -146,4 +147,12 @@ public interface OrderInfoService {
      * @param orderChartParamVO 查询参数
      */
      Map<String, EchartCalendarPieItemVO[]> getMapCountByParam(OrderChartParamVO orderChartParamVO);
+
+    /**
+     * 获取快递员排行
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return Map
+     */
+    public LinkedHashMap<String, Integer> getRandList(String startTime, String endTime);
 }

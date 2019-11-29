@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>快递员排行 - Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" th:href="@{/public/assets/css/bootstrap.min.css}" href="../../public/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/public/assets/css/bootstrap-table.css}" href="../../public/assets/css/bootstrap-table.css"/>
+    <link rel="stylesheet" th:href="@{/public/assets/css/express.css}" href="../../public/assets/css/express.css"/>
+    <link rel="stylesheet" th:href="@{/public/assets/css/star-rating.min.css}" href="../../public/assets/css/star-rating.min.css"/>
+</head>
+<body>
+
+
+<div class="col-md-10">
+    <nav th:replace="common/nav::html"></nav>
+    <!-- 主体 -->
+    <div class="row">
+        <!-- 左侧菜单 -->
+        <div th:replace="common/sidebar::html"></div>
+
+        <div class="panel-heading col-md-10">
+            <form class="form-inline">
+                <div class="panel-heading">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="inputStartDate" class="ml10">起</label>
+                            <input type="date" id="inputStartDate" class="form-control ml10">
+                            <label for="inputEndDate" class="ml10">讫</label>
+                            <input type="date" id="inputEndDate" class="form-control ml10">
+                        </div>
+                        <button type="button" class="btn btn-info ml10" onclick="showChart()">条件查询</button>
+                    </form>
+                </div>
+                <!--<div class="form-group">
+                    <label for="inputStartDate" class="col-sm-1 col-lg-offset-1">从</label>
+                    <input type="date" id="inputStartDate" class="col-sm-5">
+                    <label for="inputEndDate" class="col-sm-1">到</label>
+                    <input type="date" id="inputEndDate" class="col-sm-5">
+                </div>
+                <div class="form-group">
+                    <button type="button" role="button" class="col-sm-6 col-lg-offset-1 btn btn-info" onclick="showChart()">排名</button>
+                </div>-->
+                <div class="form-group">
+                    <div id="listChart" class="col-sm-10 col-lg-offset-1" style="width:1000px;height:500px;display: none;"></div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+    <script th:src="@{/public/assets/js/http.js}" src="../../public/assets/js/http.js"></script>
+    <script th:src="@{/public/assets/js/express.js}" src="../../public/assets/js/express.js"></script>
+    <script th:src="@{/public/assets/js/jquery.min.js}" src="../../public/assets/js/jquery.min.js"></script>
+    <script th:src="@{/public/assets/js/jquery.validate.min.js}" src="../../public/assets/js/jquery.validate.min.js"></script>
+    <script th:src="@{/public/assets/layer/layer.js}" src="../../public/assets/layer/layer.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap.min.js}" src="../../public/assets/js/bootstrap.min.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap-table.min.js}" src="../../public/assets/js/bootstrap-table.min.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap-table-export.min.js}" src="../../public/assets/js/bootstrap-table-export.min.js"></script>
+    <script th:src="@{/public/assets/js/bootstrap-table-zh-CN.min.js}" src="../../public/assets/js/bootstrap-table-zh-CN.min.js"></script>
+    <script th:src="@{/public/assets/js/tableExport.min.js}" src="../../public/assets/js/tableExport.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+    <script th:src="@{/public/assets/js/echart/macarons.js}" src="../../public/assets/js/echart/macarons.js"></script>
+    <!-- 公用头部JS start -->
+    <div th:replace="~{common/configJS :: configJS}">...</div>
+    <!-- 公用头部JS end -->
+
+    <script>
+        let uid = getCookieValue('uid');
+        let token = "Bearer " + uid;
+
+        $(function () {
+            $("#courierRank-sidebar").addClass('active');
+        });
+
+        //图表
+        function showChart() {
+            let startDate = $('#inputStartDate').val();
+            let endDate = $('#inputEndDate').val();
+            let index = layer.load(1, {shade: [0.1, '#fff']});
+            let listChart = echarts.init(document.getElementById('listChart'), 'macarons');
+            let data = '';
+
+            sendJson(HTTP.GET, $('#getCourierRankUrl').val(), {"Authorization": token},
+                {'startTime': startDate, 'endTime': endDate}, false,
+                function (res) {
+                    if (res.code === 10000) {
+                        data = res.data;
+                        done();
+                        layer.close(index);
+                        $('#listChart').css('display', 'block');
+                    }else {
+                        layer.msg(res.data,{icon:5});
+                    }
+                },
+                function () {
+                    layer.close(index);
+                    layer.msg('获取数据失败！未知错误', {icon: 5});
+                })
+
+            function done() {
+
+                var rankListJson = data.couriers;
+
+
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                canvas.width = canvas.height = 100;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.globalAlpha = 0.08;
+                ctx.font = '20px Microsoft Yahei';
+                ctx.translate(50, 50);
+                ctx.rotate(-Math.PI / 4);
+                let option = {
+                    backgroundColor: {
+                        type: 'pattern',
+                        image: canvas,
+                        repeat: 'repeat'
+                    },
+                    tooltip: {},
+                    title: [{
+                        text: '快递员排行 ',
+                        subtext:'工资标准 = 4000基础 + 50*单数提成',
+                        x: 'center',
+                    }],
+                    grid: [{
+                        // left: '3%',
+                        // right: '4%',
+                        // bottom: '3%',
+                        containLabel: true
+                    }],
+                    xAxis: [{
+                        type: 'value',
+                        boundaryGap: [0, 0.5]
+                    }],
+                    yAxis: [{
+                        type: 'category',
+                        data: Object.keys(rankListJson)
+                            ,
+                        axisLabel: {
+                            interval: 0,
+                            rotate: 30
+                        },
+                    }],
+                    series: [{
+                        type: 'bar',
+                        label: {
+                            normal: {
+                                position: 'right',
+                                show: true
+                            }
+                        },
+                        data: Object.keys(rankListJson).map(function (key) {
+                            return rankListJson[key];
+                        })
+                    }]
+                }
+                // 使用刚指定的配置项和数据显示图表。
+                listChart.setOption(option);
+            }
+        }
+    </script>
+</body>
+
+</html>
