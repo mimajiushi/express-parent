@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2019-11-26 16:11:04
+Date: 2019-11-29 13:03:33
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -62,7 +62,7 @@ CREATE TABLE `courier_sign_count` (
 -- ----------------------------
 INSERT INTO `courier_sign_count` VALUES ('1198518276225765378', '63454354', '2', '0', '2019-11-24 16:26:39', '2019-11-26 15:09:54');
 INSERT INTO `courier_sign_count` VALUES ('1198566372465025026', '23542345', '1', '1', '2019-11-24 19:37:46', '2019-11-24 19:37:46');
-INSERT INTO `courier_sign_count` VALUES ('1199223739502301186', '63454354', '1', '1', '2019-11-26 15:09:54', '2019-11-26 15:09:54');
+INSERT INTO `courier_sign_count` VALUES ('1199223739502301186', '63454354', '2', '1', '2019-11-26 15:09:54', '2019-11-27 23:04:32');
 
 -- ----------------------------
 -- Table structure for courier_sign_data
@@ -84,6 +84,8 @@ INSERT INTO `courier_sign_data` VALUES ('1198518276255125505', '63454354', '2019
 INSERT INTO `courier_sign_data` VALUES ('1198566372490190849', '23542345', '2019-11-24 19:37:46', '0');
 INSERT INTO `courier_sign_data` VALUES ('1198566394363486210', '23542345', '2019-11-24 19:37:51', '1');
 INSERT INTO `courier_sign_data` VALUES ('1199223739540049922', '63454354', '2019-11-26 15:09:54', '0');
+INSERT INTO `courier_sign_data` VALUES ('1199705573856227329', '63454354', '2019-11-27 23:04:32', '0');
+INSERT INTO `courier_sign_data` VALUES ('1199705586971815938', '63454354', '2019-11-27 23:04:36', '1');
 
 -- ----------------------------
 -- Table structure for oauth_access_token
@@ -233,7 +235,7 @@ CREATE TABLE `sys_user` (
   `third_login_type` int(11) NOT NULL DEFAULT '0' COMMENT '三方登陆类型（0：未绑定三方登陆）',
   `third_login_id` varchar(128) NOT NULL DEFAULT '' COMMENT '三方登陆ID',
   `has_enable` int(1) DEFAULT '1' COMMENT '是否启用（0：禁用；1：启用）',
-  `lock_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '解冻时间',
+  `lock_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -245,17 +247,18 @@ CREATE TABLE `sys_user` (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('1', 'user1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '0', '1', '1', '123', '3', '17623014429', '2032', '0', '', '1', '2019-10-27 00:55:00', '2019-04-17 23:10:21', '2019-11-14 12:38:28');
-INSERT INTO `sys_user` VALUES ('123', 'vip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '张三', '', '1740128357', '4', '', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-16 02:22:23');
-INSERT INTO `sys_user` VALUES ('12312523', 'courier2', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '张三', '12345', '11', '2', '15521245564', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-16 13:02:00');
-INSERT INTO `sys_user` VALUES ('1234', 'admin', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '', '', '1740128359', '1', '12312312312', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-13 23:13:39');
-INSERT INTO `sys_user` VALUES ('12345', 'svip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '小明', '12342342', '1740128359', '5', '12312312313', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-16 11:21:02');
-INSERT INTO `sys_user` VALUES ('23542345', 'courier3', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '王五', '12345', '11', '2', '15521245566', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-16 13:02:02');
-INSERT INTO `sys_user` VALUES ('270658f71ac110ec6cce0e08b1039b4d', 'chenwenjie', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '4c96fff933a1996d7453e262e0e56f3d', '1', '陈文杰', '', '1740128356', '3', '15920323196', '3237', '0', '', '1', '2019-10-27 00:55:03', '2019-10-19 11:27:26', '2019-11-17 02:37:17');
-INSERT INTO `sys_user` VALUES ('4139cb9237a7852e694f3569b9030b2c', 'admin1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '拉布拉多', '440102198001021230', '777777777', '1', '15521245562', '1367', '0', '', '1', '2019-10-27 00:55:07', '2019-05-03 02:03:48', '2019-11-14 12:38:32');
-INSERT INTO `sys_user` VALUES ('57546432', 'courier4', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '六', '12345', '11', '2', '15521245567', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-16 13:02:04');
-INSERT INTO `sys_user` VALUES ('63454354', 'courier1', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '小二', '12346', '11', '2', '15521245565', '3237', '0', 'a', '1', '2019-10-27 00:55:07', '2019-04-22 01:10:24', '2019-11-16 13:01:57');
-INSERT INTO `sys_user` VALUES ('77d014e9455b27c0696eb9f969f87912', 'user2', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '李四', '', '2222', '3', '15521245563', '1382', '0', '', '1', '2019-10-27 00:55:07', '2019-05-03 02:03:48', '2019-11-16 02:22:27');
+INSERT INTO `sys_user` VALUES ('1', 'user1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '0', 'efw', '440102198001021231', '123', '3', '17623014429', '2032', '0', '', '1', '0001-01-01 00:00:00', '2019-04-17 23:10:21', '2019-11-19 06:29:57');
+INSERT INTO `sys_user` VALUES ('123', 'vip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '张三', '440102198001021232', '1740128357', '4', '15521245234', '3237', '0', '', '1', '0001-01-01 00:00:00', '2019-10-19 11:27:26', '2019-11-19 06:36:04');
+INSERT INTO `sys_user` VALUES ('12312523', 'courier2', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '张三', '440102198001021233', '11', '2', '15521245564', '3237', '0', 'a', '1', '0001-01-01 00:00:00', '2019-04-22 01:10:24', '2019-11-19 06:30:06');
+INSERT INTO `sys_user` VALUES ('1234', 'admin', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', 'wes', '440102198001021234', '1740128359', '1', '12312312312', '3237', '0', '', '1', '0001-01-01 00:00:00', '2019-10-19 11:27:26', '2019-11-19 06:30:06');
+INSERT INTO `sys_user` VALUES ('12345', 'svip', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '小明', '440102198001021235', '1740128359', '5', '12312312313', '3237', '0', '', '1', '0001-01-01 00:00:00', '2019-10-19 11:27:26', '2019-11-19 06:30:07');
+INSERT INTO `sys_user` VALUES ('23542345', 'courier3', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '王五', '440102198001021236', '11', '2', '15521245566', '3237', '0', 'a', '1', '0001-01-01 00:00:00', '2019-04-22 01:10:24', '2019-11-19 06:30:08');
+INSERT INTO `sys_user` VALUES ('270658f71ac110ec6cce0e08b1039b4d', 'chenwenjie', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '4c96fff933a1996d7453e262e0e56f3d', '1', '陈文杰', '440102198001021237', '1740128356', '3', '15920323196', '3237', '0', '', '1', '0001-01-01 00:00:00', '2019-10-19 11:27:26', '2019-11-19 06:30:09');
+INSERT INTO `sys_user` VALUES ('4139cb9237a7852e694f3569b9030b2c', 'admin1', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '拉布拉多', '440102198001021238', '777777777', '1', '15521245562', '1367', '0', '', '1', '0001-01-01 00:00:00', '2019-05-03 02:03:48', '2019-11-19 06:30:09');
+INSERT INTO `sys_user` VALUES ('57546432', 'courier4', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '六', '440102198001021239', '11', '2', '15521245567', '3237', '0', 'a', '1', '0001-01-01 00:00:00', '2019-04-22 01:10:24', '2019-11-19 06:30:10');
+INSERT INTO `sys_user` VALUES ('63454354', 'courier1', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '小二', '440102198001021210', '11', '2', '15521245565', '3237', '0', 'a', '1', '0001-01-01 00:00:00', '2019-04-22 01:10:24', '2019-11-19 06:30:10');
+INSERT INTO `sys_user` VALUES ('77d014e9455b27c0696eb9f969f87912', 'user2', '$2a$10$lqib8LGGEziYYaJMmnQ4XubOugCjECjtLHb4yJLgZ.0wDwSjh09Yi', '', '1', '李四', '440102198001021211', '2222', '3', '15521245563', '1382', '0', '', '1', '0001-01-01 00:00:00', '2019-05-03 02:03:48', '2019-11-19 06:30:11');
+INSERT INTO `sys_user` VALUES ('AWAWD', 'courier5', '$2a$10$DIy4gVkWJIAdXaBXD6zRz.CSD4deAXVYIf3FJa3sEfzWR/IU78ok2', '', '1', '阿瑟', '440102198001021239', '11', '2', '15521242637', '1367', '0', 'a', '1', '0001-01-01 00:00:00', '2019-04-22 01:10:24', '2019-11-19 06:47:11');
 
 -- ----------------------------
 -- Table structure for user_evaluate
@@ -274,7 +277,7 @@ CREATE TABLE `user_evaluate` (
 -- ----------------------------
 INSERT INTO `user_evaluate` VALUES ('1', '10.000', '0', '2019-11-18 19:23:49');
 INSERT INTO `user_evaluate` VALUES ('123', '10.000', '0', '2019-10-30 15:11:53');
-INSERT INTO `user_evaluate` VALUES ('12312523', '10.000', '0', '2019-11-18 14:22:43');
+INSERT INTO `user_evaluate` VALUES ('12312523', '7.000', '1', '2019-11-29 12:58:57');
 INSERT INTO `user_evaluate` VALUES ('1234', '10.000', '0', '2019-10-30 15:11:53');
 INSERT INTO `user_evaluate` VALUES ('12345', '10.000', '0', '2019-10-30 15:11:53');
 INSERT INTO `user_evaluate` VALUES ('23542345', '10.000', '0', '2019-11-18 14:23:12');
