@@ -3,11 +3,15 @@ package com.cwj.express.order.controller;
 import com.cwj.express.api.order.OrderControllerApi;
 import com.cwj.express.common.config.auth.AuthorizeConfig;
 import com.cwj.express.common.config.redis.RedisConfig;
+import com.cwj.express.common.enums.PaymentStatusEnum;
+import com.cwj.express.common.enums.PaymentTypeEnum;
 import com.cwj.express.common.model.response.ResponseResult;
 import com.cwj.express.common.web.BaseController;
 import com.cwj.express.domain.order.OrderInfo;
 import com.cwj.express.domain.order.OrderPayment;
 import com.cwj.express.domain.ucenter.SysUser;
+import com.cwj.express.order.dao.OrderInfoMapper;
+import com.cwj.express.order.dao.OrderPaymentMapper;
 import com.cwj.express.order.feignclient.ucenter.UcenterFeignClient;
 import com.cwj.express.order.service.OrderEvaluateService;
 import com.cwj.express.order.service.OrderInfoService;
@@ -23,12 +27,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,6 +39,7 @@ import java.util.List;
  * 替代单元测试方便突发测试
  */
 
+@RequestMapping("/orderTest")
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TestController extends BaseController {
@@ -44,6 +48,8 @@ public class TestController extends BaseController {
     private final UcenterFeignClient ucenterFeignClient;
     private final OrderInfoService orderInfoService;
     private final RedisService redisService;
+    private final OrderInfoMapper orderInfoMapper;
+    private final OrderPaymentMapper orderPaymentMapper;
 
 
     /**
@@ -86,5 +92,23 @@ public class TestController extends BaseController {
     @GetMapping("/getUserById/{userId}")
     public SysUser getUserById(@PathVariable String userId){
         return ucenterFeignClient.getById(userId);
+    }
+
+    @GetMapping("/initPayMent")
+    public String initPayMent(){
+        List<OrderInfo> orderInfos = orderInfoMapper.selectList(null);
+        for (OrderInfo orderInfo : orderInfos) {
+            OrderPayment build = OrderPayment.builder()
+                    .orderId(orderInfo.getId())
+                    .paymentStatus(PaymentStatusEnum.TRADE_SUCCESS)
+                    .paymentType(PaymentTypeEnum.AliPay)
+                    .payment(new BigDecimal(43))
+                    .seller("2088102179254465")
+                    .remark("")
+                    .createDate(LocalDateTime.now()).build();
+            orderPaymentMapper.insert(build);
+        }
+
+        return "success";
     }
 }

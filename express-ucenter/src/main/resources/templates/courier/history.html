@@ -391,12 +391,12 @@
             if(row.orderStatus === 3 && row.canScore === "1") {
                 result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
             }
-            // 订单异常
-            if(row.orderStatus === 4) {
-                if(row.canScore === "1") {
-                    result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
-                }
-            }
+            // // 订单异常
+            // if(row.orderStatus === 4) {
+            //     if(row.canScore === "1") {
+            //         result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
+            //     }
+            // }
             return result;
         }
         // 订单状态的格式化

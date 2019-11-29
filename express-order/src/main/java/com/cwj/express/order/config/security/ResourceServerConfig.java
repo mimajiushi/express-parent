@@ -73,7 +73,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 //                 "/**",
                 // "/alipay/return"
 //                "/echart",
-                "/test",
+                "/orderTest/**",
                 "/initScore",
                 "/luaTest",
                 "/getUserById/**",
