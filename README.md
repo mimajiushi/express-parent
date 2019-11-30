@@ -12,7 +12,7 @@
 --
 springboot作为项目使用的基础建设框架
 mybatis-plus作为crud核心(为什么不用tk？因为mybatis-plus的使用更为简单，尤其是乐观锁、逻辑删除等)   
-spring security+oauth2使用rsa加密实现认证中心(我这里没有使用io.jsonwebtoken，实际上应该使用，nacos的源码也有使用，我没使用只是为了更好的熟悉security的部分源码)      
+spring security+oauth2使用rsa加密实现认证中心(我这里没有使用io.jsonwebtoken，实际上应该使用，nacos的源码也有使用jjwt，我没使用只是为了更好的熟悉security的部分源码)      
 redis除了用作基本缓存以外，还是程序实现自动分配配送员的核心（详细看plan目录下的编写计划），简单概括下就是zset+lua实现区域按权重分配配送员   
 rocketmq则是用作订单超时自动取消、用户支付后发送分配配送员的事务消息，用户评价后发送分数校准的事务消息
 nacos作为注册中心服务发现   
