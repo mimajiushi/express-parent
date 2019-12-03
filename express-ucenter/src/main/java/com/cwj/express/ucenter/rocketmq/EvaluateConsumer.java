@@ -28,6 +28,7 @@ public class EvaluateConsumer implements RocketMQListener<String> {
         String[] values = userIdAndScore.split("@@");
         String userId = values[0];
         BigDecimal score = new BigDecimal(values[1]);
-        userEvaluateService.updateScoreAndCount(userId, score);
+        String logId = values[2];
+        userEvaluateService.updateScoreAndCount(userId, score, logId);
     }
 }

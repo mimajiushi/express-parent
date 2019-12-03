@@ -26,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.client.producer.LocalTransactionState;
 import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.n3r.idworker.IdWorker;
+import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +47,7 @@ public class OrderController extends BaseController implements OrderControllerAp
     private final UcenterFeignClient ucenterFeignClient;
     private final RocketMQTemplate rocketMQTemplate;
     private final RedisService redisService;
+    private final Sid sid;
 
 //    @Override
 //    @GetMapping("/countEvaluate/{id}/{roleId}")
@@ -201,7 +204,7 @@ public class OrderController extends BaseController implements OrderControllerAp
         LocalTransactionState localTransactionState = rocketMQTemplate.sendMessageInTransaction(
                 RocketmqConfig.EVALUATE_SCORE_GROUP,
                 RocketmqConfig.EVALUATE_SCORE_TOPIC,
-                MessageBuilder.withPayload(scoreForUserId + "@@" + score)
+                MessageBuilder.withPayload(scoreForUserId + "@@" + score + "@@" + sid.nextShort())
                         .setHeader("userId", sysUser.getId())
                         .setHeader("orderId", orderId)
                         .setHeader("role", sysUser.getRole().getType())

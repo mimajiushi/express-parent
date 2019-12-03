@@ -54,6 +54,9 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
                 new QueryWrapper<OrderInfo>().
                         eq("id", orderId).
                         eq("courier_id", ""));
+        orderInfo.setUpdateDate(null);
+        // 一般情况下，如果是因网络波动重复发送的消息，就会直接跳过下面的if了，因为重复发送一般是很久没有收到回答信息
+        int updateCount = 0;
         if (!ObjectUtils.isEmpty(orderInfo)){
             // 查询 redis 日志
             String logKey = RedisConfig.ORDER_COURIER_DATA + "::" + orderId;
@@ -64,7 +67,8 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
                 if ("first".equals(type)){
                     orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
                 }
-                orderInfoMapper.updateById(orderInfo);
+                updateCount = orderInfoMapper.update(orderInfo, new QueryWrapper<OrderInfo>()
+                        .eq("id", orderId).eq("courier_id", ""));
             }else {
                 // 查询下单者的学校id(远程调用)
                 SysUser user = ucenterFeignClient.getById(orderInfo.getUserId());
@@ -79,8 +83,12 @@ public class DistributionCourierServiceImpl implements DistributionCourierServic
                 if ("first".equals(type)){
                     orderInfo.setOrderStatus(OrderStatusEnum.WAIT_PICK_UP);
                 }
-                orderInfoMapper.updateById(orderInfo);
+                updateCount = orderInfoMapper.update(orderInfo, new QueryWrapper<OrderInfo>()
+                        .eq("id", orderId).eq("courier_id", ""));
             }
+        }
+        if (updateCount == 0){
+            log.warn("【分配配送员业务】可能由于网络波动，消息被重复消费，订单号:{}", orderId);
         }
     }
 }

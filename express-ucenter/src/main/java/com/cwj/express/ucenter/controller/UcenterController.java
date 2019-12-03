@@ -69,7 +69,7 @@ public class UcenterController extends BaseController implements UcenterControll
 //                timeout,
 //                MessageDelayLevel.TIME_1S.level
 //        );
-        userEvaluateService.updateScoreAndCount("1", new BigDecimal(5));
+        userEvaluateService.updateScoreAndCount("1", new BigDecimal(5), "orderId");
         return "hello";
     }
 

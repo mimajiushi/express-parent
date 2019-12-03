@@ -36,7 +36,7 @@ public class Sid {
      * @return 固定21位数字字符串
      */
 
-    public static String next() {
+    public String next() {
         long id = idWorker.nextId();
         String yyMMdd = new SimpleDateFormat("yyMMdd").format(new Date());
         return yyMMdd + String.format("%014d", id);

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = "com.cwj.express.common")
 @ComponentScan(basePackages = "com.cwj.express.api")
 @ComponentScan(basePackages = "com.cwj.express.utils")
+@ComponentScan(basePackages = "org.n3r.idworker")
 @Slf4j
 @EnableFeignClients
 @EnableCaching

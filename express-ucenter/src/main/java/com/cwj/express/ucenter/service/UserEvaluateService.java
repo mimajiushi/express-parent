@@ -21,6 +21,7 @@ public interface UserEvaluateService {
      * 更新用户分数和被评价数量
      * @param userId 用户id
      * @param score 分数
+     * @param logId 日志id
      */
-    public void updateScoreAndCount(String userId, BigDecimal score);
+    public void updateScoreAndCount(String userId, BigDecimal score, String logId);
 }
