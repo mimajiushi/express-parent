@@ -121,11 +121,17 @@ public class OrderController extends BaseController implements OrderControllerAp
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_COURIER')")
+    @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     @PostMapping("/pickUpOrder/{orderId}")
     public ResponseResult pickUpOrder(@PathVariable String orderId, String courierRemark) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
-        boolean success = orderInfoService.pickUpOrder(orderId, id.getId(), courierRemark);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        boolean success = false;
+        if (SysRoleEnum.COURIER == sysUser.getRole()){
+            success = orderInfoService.pickUpOrder(orderId, id.getId(), courierRemark);
+        }else {
+            success = orderInfoService.pickUpOrder(orderId, orderInfoService.getOrderById(orderId).getCourierId(), courierRemark);
+        }
         if (!success){
             return ResponseResult.FAIL(CommonCode.ORDER_HAS_BEEN_CHANGEED);
         }
@@ -134,10 +140,16 @@ public class OrderController extends BaseController implements OrderControllerAp
 
     @Override
     @PostMapping("/finishOrder/{orderId}")
-    @PreAuthorize("hasRole('ROLE_COURIER')")
+    @PreAuthorize("hasAnyRole('ROLE_COURIER','ROLE_ADMIN')")
     public ResponseResult finishOrder(@PathVariable String orderId, String courierRemark) {
         SysUser id = ExpressOauth2Util.getUserJwtFromHeader(request);
-        boolean success = orderInfoService.finishOrder(orderId, id.getId(), courierRemark);
+        SysUser sysUser = ucenterFeignClient.getById(id.getId());
+        boolean success = false;
+        if (SysRoleEnum.COURIER == sysUser.getRole()){
+            success = orderInfoService.finishOrder(orderId, id.getId(), courierRemark);
+        }else {
+            success = orderInfoService.finishOrder(orderId, orderInfoService.getOrderById(orderId).getCourierId(), courierRemark);
+        }
         if (!success){
             return ResponseResult.FAIL(CommonCode.ORDER_HAS_BEEN_CHANGEED);
         }

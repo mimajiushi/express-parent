@@ -239,6 +239,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Override
     public BootstrapTableVO<OrderHistoryVO> orderList(Page<OrderInfo> page, String userId, SysRoleEnum roleEnum, OrderHistoryVO orderHistoryVO) {
         QueryWrapper<OrderInfo> orderInfoQueryWrapper = new QueryWrapper<>();
+        orderInfoQueryWrapper.orderByDesc("create_date");
         List<OrderHistoryVO> rows = new ArrayList<>();
         if (-1 != orderHistoryVO.getOrderStatus()){
             orderInfoQueryWrapper.eq("status", OrderStatusEnum.getByStatus(orderHistoryVO.getOrderStatus()));

@@ -348,11 +348,17 @@
             let result = '<button class="btn btn-xs btn-info" onclick="showDetail('+id+')" title="查看"><span class="glyphicon glyphicon-search"></span></button>\n';
             // 等待揽收
             if (row.orderStatus === 6){
-                result += '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
+                result += '<button class="btn btn-xs btn-success" onclick="pickUpOrder('+id+')" title="揽收完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n' +
+                    '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
             }
             // 等待接单
             if(row.orderStatus === 2) {
-                result += '<button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
+                result += '<button class="btn btn-xs btn-success" onclick="completeOrder('+id+')" title="订单完成"><span class="glyphicon glyphicon-ok-circle"></span></button>\n' +
+                    '         <button class="btn btn-xs btn-danger" onclick="errorComplete('+id+')" title="设为异常"><span class="glyphicon glyphicon-remove-circle"></span></button>\n';
+            }
+            // 订单完成
+            if(row.orderStatus === 3 && row.canScore === "1") {
+                result += '<button class="btn btn-xs btn-default" onclick="showEvaluate('+id+')" title="评价"><span class="glyphicon glyphicon-edit"></span></button>\n';
             }
             return result;
         }
@@ -449,6 +455,40 @@
                 }
             }, function () {
                 layer.msg("未知错误",{icon:2});
+            });
+        }
+
+        function pickUpOrder(id) {
+            layer.prompt({title:"揽收完成", formType:2},function(val, index) {
+                sendJson(HTTP.POST, pickUpOrderUrl + id, {"Authorization": token}, {"courierRemark": val}, false, function (res) {
+                        if (res.code === 10000){
+                            layer.msg("揽收成功！", {icon: 6});
+                            layer.close(index);
+                            flushTable();
+                        }else {
+                            layer.msg(res.data, {icon: 5});
+                            layer.close(index);
+                        }
+                    },
+                    function () {
+                        layer.msg("未知错误", {icon: 5});
+                    })
+            });
+        }
+
+        function completeOrder(id) {
+            layer.prompt({title:"订单完成", formType:2},function(val, index) {
+                sendJson(HTTP.POST, finishOrderUrl + id, {"Authorization": token}, {"courierRemark": val}, false, function (res) {
+                    if (res.code === 10000) {
+                        layer.msg("操作成功", {icon: 6});
+                        layer.close(index);
+                        flushTable();
+                    } else {
+                        layer.msg(res.data, {icon: 5});
+                    }
+                }, function () {
+                    layer.msg("未知错误", {icon: 5});
+                });
             });
         }
 
