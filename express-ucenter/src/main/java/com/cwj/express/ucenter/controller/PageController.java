@@ -102,8 +102,12 @@ public class PageController extends BaseController {
         BigDecimal score = scoreById == null?new BigDecimal(0):scoreById.getScore();
 //        int evaluateCount = orderFeignClient.countEvaluate(sysUser.getId(), sysUser.getRole().getType());
         int evaluateCount = scoreById.getCount();
-
-        String userDesc = "您共收到：" + evaluateCount + "条评价，您的综合评分为：" + score.divide(new BigDecimal(evaluateCount), 2, 4) + "分";
+        String userDesc = "";
+        if (evaluateCount == 0){
+            userDesc = "您共收到：0条评价，您的综合评分为：10分";
+        }else {
+            userDesc = "您共收到：" + evaluateCount + "条评价，您的综合评分为：" + score.divide(new BigDecimal(evaluateCount), 2, 4) + "分";
+        }
         map.put("evaluateDesc", userDesc);
 
         OrderDashboardVO userDashboardData = orderFeignClient.getUserDashboardData();
