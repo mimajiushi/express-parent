@@ -22,3 +22,4 @@ if res_courier_id  then
 end
 return res_courier_id
 --- 客户端执行： redis-cli -a 123456 --eval distribution.lua qid1 , orderid  600
+--- eval "local a=redis.call('hget','lme0225','margin1') local b=1 repeat b=b+1 until(b>100000000000000) return a" 0 (死循环)
