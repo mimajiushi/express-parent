@@ -19,6 +19,7 @@
 7. sentinel作为服务熔断/限流降级    
 8. 实现了配送员签到/加班功能，能统计连签天数    
 9. 也实现了不同会员下单时打折的功能    
+10. 也有整合swagger（layui），访问地址是 ip:port + context-path + /docs.html，例如localhost:40200/order/docs.html或http://localhost:40300/docs.html，如果提示Access token expired请清除cookie
 
 额外说明：
 --
@@ -31,7 +32,7 @@
 7. 项目启动需要nacos是启动的，nacos的ip改成自己的， sentinel暂时可有可无    
 8. 项目中的反馈功能还未实现，因为只是简单的crud(包括某些查询)没什么新知识，所以暂时放着不管
 9. 本项目偏向于个人的未知领域探索实现(绝对不是因为偷懒，笑)，比如分布式事务如何保证最终一致性等，所以对个别功能定了计划但并没有实现，   
-    比如：百度地图的区域可视化，收获地址管理等（以前的作品都实现过的功能我就不再实现了）
+    比如：百度地图的区域可视化，收获地址管理等（以前的作品都实现过的功能我就不再实现了）    
 
 缺点：
 --
@@ -91,3 +92,5 @@
 ![Image text](<http://www.wenjie.store/express-parent%E9%85%8D%E9%80%81%E5%91%98%E6%9F%A5%E7%9C%8B%E8%AF%84%E4%BB%B7.png>)
 ![Image text](<http://www.wenjie.store/express-parent%E9%85%8D%E9%80%81%E5%91%98%E7%AD%BE%E5%88%B0.png>)
 ![Image text](<http://www.wenjie.store/express-parent%E9%85%8D%E9%80%81%E5%91%98%E9%A6%96%E9%A1%B5.png>)
+![Image text](<https://www.wenjie.store/express-parent%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20191207200024.png>)
+![Image text](<https://www.wenjie.store/express-parent%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20191207200132.png>)
