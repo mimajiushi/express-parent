@@ -1,5 +1,4 @@
 # express-parent
-正在做:
 --  
 项目核心功能简述：   
 -- 在此之前最好先看下notes、plan目录下的txt文件
