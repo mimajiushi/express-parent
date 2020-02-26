@@ -1,14 +1,18 @@
-# express-parent
---  
-项目核心功能简述：   
--- 在此之前最好先看下notes、plan目录下的txt文件
+## express-parent
+项目核心功能简述：
+在此之前最好先看下notes、plan目录下的txt文件
 本项目是一个自己臆想出需求(当然，大部分以课程设计文档需求为主)的大学快递代拿服务系统，   
 后端使用了springboot，mybatis-plus，redis(含lua)，rocketmq等进行功能开发实现。   
 除此之外也整合了nacos，sentinel实现了简单的微服务   
 至于前端，本人前端水平有限，只能使用老一套的jq，bootstrap实现   
 
-各组件使用情况：
---
+
+## 分配配送员完整思路
+
+参考[我的博客](https://wenjie.store/archives/practical-experience-1)
+
+
+## 各组件使用情况：
 1. springboot作为项目使用的基础建设框架    
 2. mybatis-plus作为crud核心(为什么不用tk？因为mybatis-plus的使用更为简单，尤其是乐观锁、逻辑删除等)    
 3. spring security+oauth2使用rsa加密实现认证中心(我这里没有使用io.jsonwebtoken，实际上应该使用，nacos的源码也有使用jjwt，我没使用只是为了更好的熟悉security的部分源码)      
@@ -20,8 +24,7 @@
 9. 也实现了不同会员下单时打折的功能    
 10. 也有整合swagger（layui），访问地址是 ip:port + context-path + /docs.html，例如localhost:40200/order/docs.html或http://localhost:40300/docs.html，如果提示Access token expired请清除cookie
 
-额外说明：
---
+## 额外说明：
 1. 启动express-order之前要启动express-ucenter，   
 2. 因为初始化配送员权重的代码写到order去了，order需要远程调用ucenter。   
 3. 代码还可能出现大改   
@@ -33,15 +36,13 @@
 9. 本项目偏向于个人的未知领域探索实现(绝对不是因为偷懒，笑)，比如分布式事务如何保证最终一致性等，所以对个别功能定了计划但并没有实现，   
     比如：百度地图的区域可视化，收获地址管理等（以前的作品都实现过的功能我就不再实现了）    
 
-缺点：
---
+## 缺点：
 1. 部份表可能显得比较肿，主要原因还是时间有限，不想重复过多无意义的dao代码    
 2. 我前端比较垃圾    
 3. 授权粒度只细化到角色级别，白话就是角色即权限，这么做一方面本项目没有前后分离也没有实现前后分离的动态路由，所以没必要细化到各角色权限也能实现该有的功能     
 4. 一些开源组件实现可能还存在比较细节的错误    
 
-一些容易出错的坑和项目主要关注的点：
---
+## 一些容易出错的坑和项目主要关注的点：
 1. 一个大坑就是rocketmq，我是现学现用的，曾因为理论不完善而导致代码多次出现大改，   
     1.1. 主要坑有两个，一个两阶段提交如何确保事务最终一致性（其实就是这学期nosql的理论实践）  
     1.2. 还有就是消息可能会重复发送，要保证业务更改操作前查询的的幂等性   
@@ -71,7 +72,7 @@
     
 最近要考试，除了课程设计可能漏掉的功能以外，停止更新
 
-# --------------------------示例图-------------------------------
+## --------------------------示例图-------------------------------
 
 ![Image text](<http://www.wenjie.store/express-parent%E4%B8%8B%E5%8D%95%E9%A1%B5.png>)
 ![Image text](<http://www.wenjie.store/express-parent%E5%AE%8C%E6%88%90%E8%AE%A2%E5%8D%95.png>)
