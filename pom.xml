@@ -28,7 +28,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <mysql-connector-java.version>5.1.45</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.16</mysql-connector-java.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-lang3.version>3.6</commons-lang3.version>
         <lombok.version>1.18.8</lombok.version>
