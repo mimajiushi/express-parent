@@ -46,7 +46,7 @@
         <alipay-sdk-java.version>3.0.52.ALL</alipay-sdk-java.version>
         <qcloudsms.version>1.0.2</qcloudsms.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
-        <commons-io.version>2.6</commons-io.version>
+        <commons-io.version>2.7</commons-io.version>
         <commons-collections4.version>4.1</commons-collections4.version>
         <java-sdk.version>4.11.0</java-sdk.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
