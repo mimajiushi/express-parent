@@ -33,7 +33,7 @@
         <commons-lang3.version>3.6</commons-lang3.version>
         <lombok.version>1.18.8</lombok.version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
-        <fastjson.version>1.2.30</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <mysql-connector-java.version>5.1.40</mysql-connector-java.version>
         <guava.version>27.1-jre</guava.version>
         <spring-cloud-dependencies.version>Greenwich.SR1</spring-cloud-dependencies.version>
